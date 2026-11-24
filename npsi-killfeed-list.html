@@ -17,7 +17,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 @keyframes blink{50%{opacity:.15}}
 /* ===== killfeed (NPSI redesign of the socketkill ticker) ===== */
 #kf{position:absolute;left:0;top:0;width:560px;height:800px;display:flex;flex-direction:column;gap:8px;z-index:3}
-#kfhead{height:96px;flex:none;border:1px solid var(--purple);background:rgba(5,3,8,.7);padding:10px 16px;
+#kfhead{height:112px;flex:none;border:1px solid var(--purple);background:rgba(5,3,8,.7);padding:10px 16px;
   display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
 #kfhead:before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;
   background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweepx 3.6s ease-in-out infinite}
@@ -25,8 +25,8 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #kfhead .t{display:flex;align-items:center;gap:10px;font:700 15px 'Orbitron';letter-spacing:4px;color:var(--white)}
 #kfhead .t i{width:9px;height:9px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--glow);animation:blink 1.4s steps(2) infinite}
 #kfhead .t .n{margin-left:auto;font:600 14px 'Rajdhani';letter-spacing:.14em;color:#a898c4;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
-#kfhead .st{display:flex;gap:36px;font:700 22px/1 var(--head);color:var(--white)}
-#kfhead .st span small{display:block;font:600 11px 'Orbitron';letter-spacing:2px;color:var(--violet);margin-bottom:3px}
+#kfhead .st{display:flex;justify-content:space-between;gap:10px;font:700 21px/1 var(--head);color:var(--white)}
+#kfhead .st span small{display:block;font:600 8.5px 'Orbitron';letter-spacing:1px;color:var(--violet);margin-bottom:5px;white-space:nowrap}
 #kfhead .st .l,#kfhead .st small.l{color:var(--orange)}
 #kfhead .st b{display:inline-block;font-variant-numeric:tabular-nums}
 #kfhead .st b.bump{animation:bump .5s ease-out}
@@ -49,24 +49,28 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 .k .sh em{position:absolute;left:0;bottom:0;padding:0 4px;font:700 9px 'Orbitron';letter-spacing:1px;font-style:normal;background:var(--purple);color:#fff}
 .k.loss .sh em{background:var(--orange);color:#000}
 .k .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
-.k .tx b{font:700 21px/1.1 var(--head);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .tx b{font:700 24px/1.1 var(--head);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .k .tx span{font:600 15px/1.1 'Rajdhani';color:var(--violet);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .k .tx span u{text-decoration:none;color:#a898c4;letter-spacing:.08em;text-transform:uppercase}
-.k .isk{flex:none;text-align:right;font:700 15px 'Orbitron';letter-spacing:1px;color:var(--white);text-shadow:0 0 10px var(--glow)}
+.k .isk{flex:none;text-align:right;font:700 18px 'Orbitron';letter-spacing:1px;color:var(--white);text-shadow:0 0 10px var(--glow)}
 .k.loss .isk{color:var(--orange);text-shadow:0 0 10px rgba(245,138,31,.6)}
 #kfempty{flex:1;display:flex;align-items:center;justify-content:center;border:1px dashed var(--dim);
   font:600 18px 'Orbitron';letter-spacing:6px;color:#7a6a9c;animation:blink 2.4s ease-in-out infinite}
 
-#dbg{position:absolute;left:0;right:0;bottom:0;padding:4px 8px;font:600 12px/1.3 monospace;color:#b98bff;background:rgba(5,3,8,.9);z-index:9;display:none;white-space:pre-wrap}
 </style>
 </head>
 <body>
 <div id="stage">
-  <div id="dbg"></div>
   <div id="kf">
     <div id="kfhead">
       <div class="t"><i></i>KILLFEED<span class="n" id="kfname">LOADING…</span></div>
-      <div class="st"><span><small>KILLS</small><b id="sk">0</b></span><span><small class="l">LOSSES</small><b class="l" id="sl">0</b></span><span><small>ISK</small><b id="si">0</b></span></div>
+      <div class="st">
+        <span><small>KILLS</small><b id="sk">–</b></span>
+        <span><small class="l">LOSSES</small><b class="l" id="sl">–</b></span>
+        <span><small>SHIPS DESTROYED</small><b id="ss">–</b></span>
+        <span><small>PODS DESTROYED</small><b id="sp">–</b></span>
+        <span><small class="l">ISK LOST</small><b class="l" id="si">–</b></span>
+      </div>
     </div>
     <div id="kfrow"><div id="kfempty">LOADING KILLMAILS…</div></div>
   </div>
@@ -86,11 +90,10 @@ const ESI='https://esi.evetech.net/latest',$=id=>document.getElementById(id),row
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmtIsk=v=>v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'K':String(Math.round(v||0));
 const ago=t=>{const m=Math.max(0,Math.round((Date.now()-new Date(t))/60000));return m<1?'JUST NOW':m<60?m+'M AGO':m<1440?Math.floor(m/60)+'H AGO':Math.floor(m/1440)+'D AGO'};
-const log=[];function dbg(m){log.push(new Date().toISOString().slice(11,19)+' '+m);if(log.length>8)log.shift();if(QS.has('debug')){const e=$('dbg');e.style.display='block';e.textContent=log.join('\n')}}
 function empty(t){if(!row.querySelector('.k'))row.innerHTML=`<div id="kfempty">${esc(t)}</div>`}
 
 /* ---------- data ---------- */
-const names={},shown=new Set();let stats={k:0,l:0,isk:0};
+const names={},shown=new Set();
 async function getJSON(u,o){const r=await fetch(u,o);if(!r.ok)throw new Error(r.status+' '+u.replace(/^https:\/\//,'').slice(0,50));return r.json()}
 async function resolve(ids){
   const need=[...new Set(ids.filter(i=>i&&!names[i]))];if(!need.length)return;
@@ -105,48 +108,60 @@ async function buildCard(z){                       // z = {killmail_id, zkb:{has
     pilot:v.character_id?nm(v.character_id):(v.corporation_id?'Structure / NPC':'Unknown'),system:nm(k.solar_system_id),time:k.killmail_time,value:z.zkb.totalValue||0}
 }
 
-/* ---------- header counters ---------- */
-const cur={sk:0,sl:0,si:0},raf={};
+/* ---------- header totals (all-time, from zKillboard stats) ---------- */
+const cur={sk:0,sl:0,ss:0,sp:0,si:0},raf={};
 function tween(id,to,fmt){const el=$(id),from=cur[id],t0=performance.now();cancelAnimationFrame(raf[id]);
   el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
   (function f(n){const p=Math.min(1,(n-t0)/1000),e=1-Math.pow(1-p,3);cur[id]=from+(to-from)*e;el.textContent=fmt(p<1?(id==='si'?cur[id]:Math.round(cur[id])):to);if(p<1)raf[id]=requestAnimationFrame(f)})(t0)}
-function head(){tween('sk',stats.k,String);tween('sl',stats.l,String);tween('si',stats.isk,fmtIsk)}
+const fmtN=n=>Math.round(n).toLocaleString('en-GB');
+function head(){
+  const t=totals;if(!t)return;
+  tween('sk',t.kills,fmtN);tween('sl',t.losses,fmtN);tween('ss',t.ships,fmtN);tween('sp',t.pods,fmtN);tween('si',t.iskLost,fmtIsk);
+}
+let totals=null;
+async function loadTotals(){
+  try{
+    const st=await getJSON(`https://zkillboard.com/api/stats/characterID/${CHAR}/`);
+    const g=(st.groups&&(st.groups[29]||st.groups['29']))||{};
+    const kills=+st.shipsDestroyed||0,pods=+g.shipsDestroyed||0;
+    totals={kills,losses:+st.shipsLost||0,pods,ships:Math.max(0,kills-pods),iskLost:+st.iskLost||0};
+    head();
+  }catch(e){}
+}
 
 /* ---------- list ---------- */
 function addCard(d,delay=0){
   const e=$('kfempty');e&&e.remove();
   const el=document.createElement('div');el.className='k '+(d.loss?'loss':'kill');el.dataset.t=d.time;el.style.animationDelay=delay+'s';
-  el.innerHTML=`<div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=64" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"><em>${d.loss?'LOSS':'KILL'}</em></div>
-   <div class="tx"><b>${esc(d.shipName)}</b><span>${esc(d.pilot)} · ${esc(d.system)} · <u>${ago(d.time)}</u></span></div><div class="isk">${fmtIsk(d.value)}</div>`;
+  el.innerHTML=`<div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=64" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"></div>
+   <div class="tx"><b>${esc(d.shipName)}</b></div><div class="isk">${fmtIsk(d.value)}</div>`;
   /* keep newest first: insert before the first card that is older */
   const after=[...row.querySelectorAll('.k:not(.out)')].find(x=>new Date(x.dataset.t)<new Date(d.time));
   after?row.insertBefore(el,after):row.appendChild(el);
-  d.loss?stats.l++:(stats.k++,stats.isk+=d.value);head();
   [...row.querySelectorAll('.k:not(.out)')].slice(MAX).forEach(x=>{x.classList.add('out');setTimeout(()=>x.remove(),500)});
 }
-setInterval(()=>document.querySelectorAll('.k u').forEach(u=>u.textContent=ago(u.closest('.k').dataset.t)),30000);
 
 /* ---------- refresh: poll zKillboard, add anything new ---------- */
 let busy=false,first=true;
 async function refresh(){
   if(busy)return;busy=true;
   try{
+    loadTotals();
     const list=await getJSON(`https://zkillboard.com/api/characterID/${CHAR}/`);
     if(!Array.isArray(list))throw new Error('unexpected zKillboard reply');
     const fresh=list.slice(0,MAX).filter(z=>!shown.has(z.killmail_id));
-    dbg(`zkill ok: ${list.length} total, ${fresh.length} new`);
     let i=0;
-    for(const z of fresh.reverse()){shown.add(z.killmail_id);try{addCard(await buildCard(z),first?i++*.1:0)}catch(e){shown.delete(z.killmail_id);dbg('km fail '+e.message)}}
+    for(const z of fresh.reverse()){shown.add(z.killmail_id);try{addCard(await buildCard(z),first?i++*.1:0)}catch(e){shown.delete(z.killmail_id)}}
     if(first&&!list.length)empty('NO KILLMAILS FOUND');
     first=false;
-  }catch(e){dbg('ERR '+e.message);empty('CANNOT REACH ZKILLBOARD')}
+  }catch(e){empty('CANNOT REACH ZKILLBOARD')}
   busy=false;
 }
 /* instant updates via websocket → just trigger a refresh (keeps one code path) */
 function socket(){
   let back=2000;
   const open=()=>{let ws;try{ws=new WebSocket('wss://zkillboard.com/websocket/')}catch(e){return}
-    ws.onopen=()=>{back=2000;dbg('ws open');ws.send(JSON.stringify({action:'sub',channel:'character:'+CHAR}))};
+    ws.onopen=()=>{back=2000;ws.send(JSON.stringify({action:'sub',channel:'character:'+CHAR}))};
     ws.onmessage=()=>setTimeout(refresh,4000);     // zKill needs a few seconds to index the kill
     ws.onclose=()=>setTimeout(open,back=Math.min(back*2,30000));ws.onerror=()=>ws.close()};
   open();
@@ -156,6 +171,7 @@ async function title(){try{await resolve([CHAR]);$('kfname').textContent=nm(CHAR
 /* ---------- demo ---------- */
 function demo(){
   $('kfname').textContent='DEMO PILOT';
+  totals={kills:1284,losses:213,pods:97,ships:1187,iskLost:96.4e9};head();
   const R=[[29990,'Loki','Tama',0,1.34e9],[35683,'Hecate','Amamake',0,212e6],[34562,'Svipul','Rancer',1,88e6],[29984,'Tengu','Old Man Star',0,742e6],[34317,'Confessor','Hek',0,134e6],
     [11202,'Ares','Jita',0,9e6],[11184,'Crusader','Perimeter',1,21e6],[17738,'Machariel','Sosala',0,980e6],[24690,'Hurricane','Aufay',0,64e6],[22456,'Sabre','Otela',0,47e6],[11567,'Avatar','Tama',0,95e9]];
   const mk=(r,i)=>({id:Math.random(),ship:r[0],shipName:r[1],pilot:'Demo Pilot',system:r[2],loss:!!r[3],value:r[4],time:Date.now()-i*18e5});
