@@ -118,8 +118,6 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
       <div id="lab"><i></i><span id="labt">NOW FLYING</span></div>
       <div id="sname">—</div>
       <div id="scls"></div>
-      <div id="cust"></div>
-      <div id="pil"><span>PILOT</span><b id="pilot"></b></div>
     </div>
   </div>
   <div id="msg">LOADING…</div>
@@ -280,8 +278,7 @@ function render(m){
   img.src=`https://images.evetech.net/types/${m.ship}/render?size=256`;img.classList.add('in');
   setModel(m.shipName);
   $('sname').textContent=m.shipName;$('scls').textContent=m.cls||'';
-  $('cust').textContent=m.custom?'“'+m.custom+'”':'';
-  $('pilot').textContent=m.pilot||'';$('labt').textContent=m.label||'NOW FLYING';
+  $('labt').textContent=m.label||'NOW FLYING';
   /* replay the entrance animation on every ship change */
   document.querySelectorAll('#info>*').forEach(e=>{e.style.animation='none';void e.offsetWidth;e.style.animation=''});
   const f=$('flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');
