@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NPSI.ROCKS – Current Ship &amp; Fit (Live)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* OBS Browser Source: width 760, height 440 (any size with the same ratio works), transparent background */
+:root{
+  --steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif;
+  --purple:#8a3ffc;--violet:#b98bff;--glow:#a35cff;--dim:#2a1747;--white:#f4efff;--orange:#f58a1f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:transparent;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:760px;height:440px;transform-origin:0 0;font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--white)}
+@keyframes blink{50%{opacity:.15}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{50%{transform:translateY(-6px)}}
+@keyframes sweepx{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
+@keyframes fin{from{opacity:0;transform:translateY(14px)}}
+@keyframes shipin{from{opacity:0;transform:scale(.8) translateX(-30px);filter:blur(8px)}}
+
+#card{position:absolute;inset:0;border:1px solid var(--purple);background:rgba(5,3,8,.72);overflow:hidden;
+  clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px)}
+#card:before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;
+  background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweepx 3.6s ease-in-out infinite}
+#card:after{content:"";position:absolute;left:0;right:0;height:120px;top:-120px;pointer-events:none;
+  background:linear-gradient(transparent,rgba(166,92,255,.12),transparent);animation:scan 6s linear infinite}
+@keyframes scan{to{top:440px}}
+
+#top{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+  border-bottom:1px solid var(--dim);background:linear-gradient(90deg,rgba(138,63,252,.18),transparent)}
+#top .t{display:flex;align-items:center;gap:10px;font:700 15px 'Orbitron';letter-spacing:4px}
+#top .t i{width:9px;height:9px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--glow);animation:blink 1.4s steps(2) infinite}
+#pilot{font:600 15px 'Orbitron';letter-spacing:3px;color:var(--violet);text-transform:uppercase}
+
+#left{position:absolute;left:0;top:46px;bottom:0;width:250px;display:flex;flex-direction:column;align-items:center;padding-top:20px}
+#shipwrap{position:relative;width:210px;height:210px;display:flex;align-items:center;justify-content:center}
+#shipwrap svg{position:absolute;inset:0;overflow:visible}
+.r1{transform-origin:105px 105px;animation:spin 30s linear infinite}
+.r2{transform-origin:105px 105px;animation:spin 18s linear infinite reverse}
+#ship{position:relative;width:170px;height:170px;animation:bob 4s ease-in-out infinite;filter:drop-shadow(0 0 16px rgba(163,92,255,.7))}
+#ship.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both,bob 4s .9s ease-in-out infinite}
+#sname{margin-top:12px;font:800 28px/1.1 var(--head);text-align:center;text-shadow:0 0 16px rgba(166,92,255,.6);padding:0 10px}
+#snote{margin-top:6px;font:600 13px 'Orbitron';letter-spacing:2px;color:var(--violet);text-align:center;padding:0 12px;text-transform:uppercase}
+
+#right{position:absolute;left:250px;right:0;top:46px;bottom:0;padding:16px 18px 16px 8px;display:flex;flex-direction:column}
+#slots{flex:1;display:flex;flex-direction:column;gap:9px;justify-content:center}
+.row{display:flex;align-items:center;gap:10px;animation:fin .6s both}
+.row .lb{width:64px;flex:none;font:700 12px 'Orbitron';letter-spacing:2px;color:var(--violet);border-left:3px solid var(--steel);padding-left:8px}
+.row.low .lb{border-color:#7a6a9c}
+.row.mid .lb{border-color:var(--steel)}
+.row.high .lb{border-color:var(--orange)}
+.row .ic{display:flex;flex-wrap:wrap;gap:6px}
+.m{position:relative;width:42px;height:42px;background:#0a0514;border:1px solid var(--dim);transition:all .3s;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.m img{width:100%;height:100%;display:block}
+.m .q{position:absolute;right:1px;bottom:0;font:700 11px 'Orbitron';color:#fff;text-shadow:0 0 4px #000,0 0 4px #000}
+.m.on{border-color:#fff;box-shadow:0 0 14px var(--glow);transform:translateY(-3px) scale(1.08);z-index:2;background:rgba(166,92,255,.3)}
+#cap{height:38px;margin-top:8px;display:flex;align-items:center;gap:10px;border:1px solid var(--dim);background:rgba(138,63,252,.1);padding:0 12px;
+  font:700 20px var(--head);white-space:nowrap;overflow:hidden}
+#cap small{font:600 13px 'Rajdhani';letter-spacing:.1em;color:#a898c4;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis}
+#cap b{overflow:hidden;text-overflow:ellipsis}
+#msg{position:absolute;inset:46px 0 0 0;display:flex;align-items:center;justify-content:center;
+  font:600 20px 'Orbitron';letter-spacing:6px;color:#7a6a9c;animation:blink 2.4s ease-in-out infinite}
+#msg.login{animation:none;flex-direction:column;gap:16px;text-align:center}
+#lb{font:700 16px 'Orbitron';letter-spacing:4px;color:#fff;background:var(--purple);border:1px solid var(--violet);padding:12px 22px;cursor:pointer;
+  box-shadow:0 0 18px rgba(163,92,255,.5)}
+#lb:hover{background:var(--steel)}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div id="card">
+  <div id="top"><div class="t"><i></i>CURRENT SHIP</div><div id="pilot">LOADING…</div></div>
+  <div id="left">
+    <div id="shipwrap">
+      <svg viewBox="0 0 210 210" fill="none" stroke="#8a3ffc">
+        <g class="r1"><circle cx="105" cy="105" r="102" stroke-width="1.5" stroke-dasharray="3 9" opacity=".7"/><circle cx="105" cy="105" r="98" stroke-width="4" stroke-dasharray="60 220" stroke="#b98bff"/></g>
+        <g class="r2"><circle cx="105" cy="105" r="88" stroke-width="2" stroke-dasharray="30 14 4 14" opacity=".8"/><circle cx="105" cy="105" r="84" stroke-width="5" stroke-dasharray="40 260" stroke="#a35cff"/></g>
+      </svg>
+      <img id="ship" alt="">
+    </div>
+    <div id="sname">—</div>
+    <div id="snote"></div>
+  </div>
+  <div id="right"><div id="slots"></div><div id="cap"><small>MODULE</small><b id="capn">—</b></div></div>
+  <div id="msg" style="display:none"></div>
+ </div>
+</div>
+
+<script>
+/* ===== EDIT ME ===== */
+const CONFIG = {
+  // Paste your EVE application Client ID here (from developers.eveonline.com). See setup steps.
+  // You can also add ?client_id=XXXX to the URL once; it is then remembered.
+  clientId: ''
+};
+/* =================== */
+
+const QS=new URLSearchParams(location.search);
+const CHAR=parseInt(QS.get('character')||'1376548045',10);
+const DEMO=QS.has('demo');
+const esi='https://esi.evetech.net/latest';
+const $=id=>document.getElementById(id);
+const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ago=t=>{const m=Math.max(0,Math.round((Date.now()-new Date(t))/60000));return m<1?'just now':m<60?m+'m ago':m<1440?Math.floor(m/60)+'h ago':Math.floor(m/1440)+'d ago'};
+
+/* scale 760x440 stage to any source size */
+const stage=$('stage');
+function fit(){const s=Math.min(innerWidth/760,innerHeight/440);stage.style.transform=`translate(${(innerWidth-760*s)/2}px,${(innerHeight-440*s)/2}px) scale(${s})`}
+addEventListener('resize',fit);fit();
+
+/* ---- ESI helpers ---- */
+const types={};
+async function getType(id){
+  if(types[id])return types[id];
+  const r=await fetch(`${esi}/universe/types/${id}/`);
+  return types[id]=await r.json();           // {name, category_id, group_id}
+}
+async function nameOf(id){
+  const r=await fetch(esi+'/universe/names/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify([id])});
+  return (await r.json())[0].name;
+}
+const SLOT=f=>f>=27&&f<=34?'high':f>=19&&f<=26?'mid':f>=11&&f<=18?'low':f>=92&&f<=94?'rig':f>=125&&f<=132?'sub':f===87?'drone':null;
+const EMPTY=()=>({high:[],mid:[],low:[],rig:[],sub:[],drone:[]});
+
+/* killmail items -> slot model */
+async function slotsFromItems(items){
+  await Promise.all([...new Set(items.map(i=>i.item_type_id))].map(getType));
+  const by={};
+  items.forEach(i=>{const s=SLOT(i.flag);if(s)(by[i.flag]??=[]).push(i)});
+  const out=EMPTY();
+  Object.keys(by).sort((a,b)=>a-b).forEach(f=>{
+    const list=by[f],slot=SLOT(+f);
+    const mod=list.find(i=>types[i.item_type_id].category_id!==8)||list[0];
+    const ch=list.find(i=>types[i.item_type_id].category_id===8&&i!==mod);
+    out[slot].push({id:mod.item_type_id,name:types[mod.item_type_id].name,
+      charge:ch?types[ch.item_type_id].name:'',qty:slot==='drone'?(mod.quantity_dropped||0)+(mod.quantity_destroyed||0)+(mod.quantity||0):0});
+  });
+  return out;
+}
+
+function demoModel(){
+  const mod=(id,name,charge='',qty=0)=>({id,name,charge,qty});
+  return{key:'demo',pilot:'Demo Pilot',ship:29990,shipName:'Loki',note:'Demo fit · 2h ago',slots:{
+    high:[mod(2048,'Demo Launcher I','Demo Missile'),mod(2048,'Demo Launcher I','Demo Missile'),mod(2048,'Demo Launcher I','Demo Missile'),mod(2048,'Demo Launcher I','Demo Missile')],
+    mid:[mod(447,'Warp Scrambler II'),mod(526,'Stasis Webifier II'),mod(438,'1MN Afterburner II'),mod(3841,'Medium Shield Extender II')],
+    low:[mod(2048,'Damage Control II'),mod(519,'Gyrostabilizer II'),mod(519,'Gyrostabilizer II')],
+    rig:[mod(2281,'Demo Rig I'),mod(2281,'Demo Rig I'),mod(2281,'Demo Rig I')],sub:[],
+    drone:[mod(2048,'Demo Drone',' ',5)]}};
+}
+
+/* ---- render ---- */
+let curKey=null,cycleT=null;
+const LABEL={high:'HIGH',mid:'MID',low:'LOW',rig:'RIG',sub:'SUB',drone:'DRONE'};
+function render(m){
+  $('msg').style.display='none';
+  if(m.key===curKey)return;curKey=m.key;
+  $('pilot').textContent=(m.pilot||'').toUpperCase();
+  const img=$('ship');img.classList.remove('in');void img.offsetWidth;
+  img.src=`https://images.evetech.net/types/${m.ship}/render?size=256`;img.classList.add('in');
+  $('sname').textContent=m.shipName;$('snote').textContent=m.note||'';
+  const box=$('slots');box.innerHTML='';
+  let d=0;
+  ['high','mid','low','rig','sub','drone'].forEach(k=>{
+    const arr=m.slots[k];if(!arr||!arr.length)return;
+    const row=document.createElement('div');row.className='row '+k;row.style.animationDelay=(d++*.12)+'s';
+    row.innerHTML=`<div class="lb">${LABEL[k]}</div><div class="ic">`+arr.map((x,i)=>
+      `<div class="m" data-n="${esc(x.name)}" data-c="${esc((x.charge||'').trim())}" style="animation:fin .5s ${(d*.12+i*.04).toFixed(2)}s both"><img alt="" src="https://images.evetech.net/types/${x.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0">${x.qty?`<span class="q">${x.qty}</span>`:''}</div>`).join('')+'</div>';
+    box.appendChild(row);
+  });
+  const all=[...box.querySelectorAll('.m')];
+  clearInterval(cycleT);
+  if(!all.length){$('capn').textContent='No fit data';$('cap').querySelector('small').textContent='';return;}
+  let i=0;
+  const step=()=>{all.forEach((e,j)=>e.classList.toggle('on',j===i));
+    const e=all[i];$('capn').textContent=e.dataset.n+(e.dataset.c?'  ·  '+e.dataset.c:'');
+    $('cap').querySelector('small').textContent=e.closest('.row').querySelector('.lb').textContent;
+    i=(i+1)%all.length};
+  step();cycleT=setInterval(step,2000);
+}
+function message(t,html){const m=$('msg');if(html)m.innerHTML=html;else m.textContent=t;m.style.display='flex';$('pilot').textContent=''}
+
+/* ================= EVE SSO (PKCE, no secret needed) ================= */
+const SCOPES='esi-location.read_ship_type.v1 esi-assets.read_assets.v1';
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const lsDel=k=>{try{localStorage.removeItem(k)}catch(e){}};
+if(QS.get('client_id'))lsSet('npsi_cid',QS.get('client_id'));
+const CLIENT_ID=(CONFIG.clientId||lsGet('npsi_cid')||'').trim();
+const REDIRECT=location.origin+location.pathname;
+const b64url=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const rnd=n=>b64url(crypto.getRandomValues(new Uint8Array(n)));
+
+async function login(){
+  const v=rnd(48),state=rnd(16);
+  const ch=b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));
+  lsSet('npsi_pkce',JSON.stringify({v,s:state}));
+  location.href='https://login.eveonline.com/v2/oauth/authorize/?'+new URLSearchParams({
+    response_type:'code',redirect_uri:REDIRECT,client_id:CLIENT_ID,scope:SCOPES,
+    code_challenge:ch,code_challenge_method:'S256',state});
+}
+async function tokenReq(params){
+  const r=await fetch('https://login.eveonline.com/v2/oauth/token',{method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:CLIENT_ID,...params})});
+  if(!r.ok)throw new Error('token '+r.status);
+  return r.json();
+}
+function saveTokens(t){
+  const pl=JSON.parse(atob(t.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+  lsSet('npsi_auth',JSON.stringify({access:t.access_token,refresh:t.refresh_token,
+    exp:Date.now()+(t.expires_in-60)*1000,id:+pl.sub.split(':')[2],name:pl.name}));
+}
+async function handleCallback(){
+  const code=QS.get('code');if(!code)return;
+  const saved=JSON.parse(lsGet('npsi_pkce')||'null');
+  history.replaceState(null,'',location.pathname);
+  if(!saved||saved.s!==QS.get('state'))throw new Error('state');
+  saveTokens(await tokenReq({grant_type:'authorization_code',code,code_verifier:saved.v}));
+  lsDel('npsi_pkce');
+}
+async function bearer(){
+  let a=JSON.parse(lsGet('npsi_auth')||'null');if(!a)return null;
+  if(Date.now()>a.exp){
+    try{saveTokens(await tokenReq({grant_type:'refresh_token',refresh_token:a.refresh}));a=JSON.parse(lsGet('npsi_auth'))}
+    catch(e){lsDel('npsi_auth');return null}
+  }
+  return a;
+}
+const esiAuth=(path,a)=>fetch(esi+path,{headers:{Authorization:'Bearer '+a.access}});
+
+/* ================= live ship + fit ================= */
+const FLAGMAP=f=>{
+  let m;
+  if(f==='DroneBay')return 87;
+  if(m=f.match(/^HiSlot(\d)$/))return 27+ +m[1];
+  if(m=f.match(/^MedSlot(\d)$/))return 19+ +m[1];
+  if(m=f.match(/^LoSlot(\d)$/))return 11+ +m[1];
+  if(m=f.match(/^RigSlot(\d)$/))return 92+ +m[1];
+  if(m=f.match(/^SubSystemSlot(\d)$/))return 125+ +m[1];
+  return null;
+};
+async function slotsFromAssets(a,shipItemId){
+  const first=await esiAuth(`/characters/${a.id}/assets/?page=1`,a);
+  if(first.status===403||first.status===401)throw new Error('scope');
+  const pages=+first.headers.get('x-pages')||1;
+  let all=await first.json();
+  const rest=await Promise.all(Array.from({length:pages-1},(_,i)=>esiAuth(`/characters/${a.id}/assets/?page=${i+2}`,a).then(r=>r.json())));
+  rest.forEach(r=>all=all.concat(r));
+  const items=all.filter(i=>i.location_id===shipItemId).map(i=>({item_type_id:i.type_id,flag:FLAGMAP(i.location_flag),quantity:i.quantity}))
+    .filter(i=>i.flag!==null);
+  return slotsFromItems(items);
+}
+let lastShip=null,lastAssets=0,fitCache=EMPTY();
+async function liveLoad(){
+  const a=await bearer();
+  if(!a){showLogin();return}
+  const r=await esiAuth(`/characters/${a.id}/ship/`,a);
+  if(r.status===401||r.status===403){lsDel('npsi_auth');showLogin();return}
+  const sh=await r.json();
+  const key=sh.ship_item_id+':'+sh.ship_type_id;
+  if(key!==lastShip||Date.now()-lastAssets>300000){
+    try{fitCache=await slotsFromAssets(a,sh.ship_item_id)}
+    catch(e){if(e.message==='scope'){lsDel('npsi_auth');showLogin();return}fitCache=EMPTY()}
+    lastShip=key;lastAssets=Date.now();
+  }
+  const sig=Object.values(fitCache).flat().map(x=>x.id+(x.charge||'')+x.qty).join(',');
+  render({key:key+'|'+sig,pilot:a.name,ship:sh.ship_type_id,shipName:(await getType(sh.ship_type_id)).name,
+    note:sh.ship_name?'“'+sh.ship_name+'”':'Live from EVE',slots:fitCache});
+}
+function showLogin(){
+  const m=$('msg');m.classList.add('login');
+  message('',`<div>CONNECT TO EVE ONLINE</div><button id="lb">LOGIN WITH EVE</button>`);
+  $('lb').onclick=login;
+}
+
+(async()=>{
+  if(DEMO){render(demoModel());return}
+  if(!CLIENT_ID){message('SET YOUR CLIENT ID – SEE SETUP');return}
+  try{await handleCallback()}catch(e){message('LOGIN FAILED – RELOAD AND TRY AGAIN');return}
+  const run=async()=>{try{await liveLoad()}catch(e){if(!curKey)message('AWAITING DATA')}};
+  run();setInterval(run,15000);
+})();
+</script>
+</body>
+</html>
