@@ -9,7 +9,7 @@
 /* OBS Browser Source: width 560, height 800 (any size with the same ratio works), transparent background */
 :root{
   --bg:#050308;--steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif; --purple:#8a3ffc; --violet:#b98bff; --glow:#a35cff;
-  --dim:#2a1747; --white:#f4efff; --orange:#f58a1f;
+  --dim:#2a1747; --white:#f4efff; --orange:#ff2b3d;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;background:transparent;overflow:hidden}
@@ -38,7 +38,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 .k.loss{border-left-color:var(--orange)}
 .k:after{content:"";position:absolute;top:0;bottom:0;width:80px;left:-120px;transform:skewX(-20deg);
   background:linear-gradient(90deg,transparent,rgba(185,139,255,.35),transparent);animation:shine .9s .35s both}
-.k.loss:after{background:linear-gradient(90deg,transparent,rgba(245,138,31,.35),transparent)}
+.k.loss:after{background:linear-gradient(90deg,transparent,rgba(255,43,61,.35),transparent)}
 .k.out{animation:kout .5s both}
 @keyframes kin{from{opacity:0;transform:translateX(-60px) scale(.96)}}
 @keyframes kout{to{opacity:0;transform:translateX(40px)}}
@@ -49,11 +49,13 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 .k .sh em{position:absolute;left:0;bottom:0;padding:0 4px;font:700 9px 'Orbitron';letter-spacing:1px;font-style:normal;background:var(--purple);color:#fff}
 .k.loss .sh em{background:var(--orange);color:#000}
 .k .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
-.k .tx b{font:700 24px/1.1 var(--head);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .tx b{font:700 22px/1.1 var(--head);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .tx small{font:600 14px/1.1 'Rajdhani';letter-spacing:.1em;color:#a898c4;text-transform:uppercase}
+.k .tx u{text-decoration:none}
 .k .tx span{font:600 15px/1.1 'Rajdhani';color:var(--violet);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .k .tx span u{text-decoration:none;color:#a898c4;letter-spacing:.08em;text-transform:uppercase}
 .k .isk{flex:none;text-align:right;font:700 18px 'Orbitron';letter-spacing:1px;color:var(--white);text-shadow:0 0 10px var(--glow)}
-.k.loss .isk{color:var(--orange);text-shadow:0 0 10px rgba(245,138,31,.6)}
+.k.loss .isk{color:var(--orange);text-shadow:0 0 10px rgba(255,43,61,.6)}
 #kfempty{flex:1;display:flex;align-items:center;justify-content:center;border:1px dashed var(--dim);
   font:600 18px 'Orbitron';letter-spacing:6px;color:#7a6a9c;animation:blink 2.4s ease-in-out infinite}
 
@@ -84,7 +86,7 @@ addEventListener('resize',fit);fit();
 const QS=new URLSearchParams(location.search);
 const CHAR=parseInt(QS.get('character')||'1376548045',10);
 const MAX=Math.min(10,Math.max(1,parseInt(QS.get('max')||'10',10)));
-const POLL_MS=30000;
+const POLL_MS=30000,WINDOW_MS=24*3600*1000;      /* only kills from the last 24 hours */
 /* ================================================================================================ */
 const ESI='https://esi.evetech.net/latest',$=id=>document.getElementById(id),row=$('kfrow');
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -134,12 +136,18 @@ function addCard(d,delay=0){
   const e=$('kfempty');e&&e.remove();
   const el=document.createElement('div');el.className='k '+(d.loss?'loss':'kill');el.dataset.t=d.time;el.style.animationDelay=delay+'s';
   el.innerHTML=`<div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=64" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"></div>
-   <div class="tx"><b>${esc(d.shipName)}</b></div><div class="isk">${fmtIsk(d.value)}</div>`;
+   <div class="tx"><b>${esc(d.shipName)}</b><small><u>${ago(d.time)}</u></small></div><div class="isk">${fmtIsk(d.value)}</div>`;
   /* keep newest first: insert before the first card that is older */
   const after=[...row.querySelectorAll('.k:not(.out)')].find(x=>new Date(x.dataset.t)<new Date(d.time));
   after?row.insertBefore(el,after):row.appendChild(el);
   [...row.querySelectorAll('.k:not(.out)')].slice(MAX).forEach(x=>{x.classList.add('out');setTimeout(()=>x.remove(),500)});
 }
+
+setInterval(()=>{
+  document.querySelectorAll('.k').forEach(k=>{
+    if(Date.now()-new Date(k.dataset.t)>=WINDOW_MS){k.classList.add('out');setTimeout(()=>{k.remove();empty('NO KILLS IN THE LAST 24 HOURS')},500)}
+    else{const u=k.querySelector('u');if(u)u.textContent=ago(k.dataset.t)}});
+},30000);
 
 /* ---------- refresh: poll zKillboard, add anything new ---------- */
 let busy=false,first=true;
@@ -151,8 +159,8 @@ async function refresh(){
     if(!Array.isArray(list))throw new Error('unexpected zKillboard reply');
     const fresh=list.slice(0,MAX).filter(z=>!shown.has(z.killmail_id));
     let i=0;
-    for(const z of fresh.reverse()){shown.add(z.killmail_id);try{addCard(await buildCard(z),first?i++*.1:0)}catch(e){shown.delete(z.killmail_id)}}
-    if(first&&!list.length)empty('NO KILLMAILS FOUND');
+    for(const z of fresh.reverse()){shown.add(z.killmail_id);try{const d=await buildCard(z);if(Date.now()-new Date(d.time)<WINDOW_MS)addCard(d,first?i++*.1:0)}catch(e){shown.delete(z.killmail_id)}}
+    if(first)empty('NO KILLS IN THE LAST 24 HOURS');
     first=false;
   }catch(e){empty('CANNOT REACH ZKILLBOARD')}
   busy=false;
