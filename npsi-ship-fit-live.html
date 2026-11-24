@@ -23,15 +23,12 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 @keyframes txtin{from{opacity:0;transform:translateY(16px)}}
 @keyframes flash{0%{opacity:.9}100%{opacity:0}}
 
-#card{position:absolute;inset:0;border:1px solid var(--purple);background:rgba(5,3,8,.72);overflow:hidden;
+#card{position:absolute;inset:0;background:rgba(5,3,8,.72);overflow:hidden;
   clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px)}
-#card:before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweepx 3.6s ease-in-out infinite}
-#card .beam{position:absolute;left:0;right:0;height:70px;top:-70px;pointer-events:none;background:linear-gradient(transparent,rgba(166,92,255,.14),transparent);animation:scan 5s linear infinite}
-#card .grid{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(166,92,255,.05) 0 1px,transparent 1px 4px)}
 #flash{position:absolute;inset:0;background:radial-gradient(circle at 25% 50%,rgba(185,139,255,.8),transparent 60%);opacity:0;pointer-events:none}
 #flash.go{animation:flash .9s ease-out}
 
-#shipwrap{position:absolute;left:109px;top:13px;width:180px;height:180px;display:flex;align-items:center;justify-content:center}
+#shipwrap{position:absolute;left:110px;top:14px;width:180px;height:180px;display:flex;align-items:center;justify-content:center}
 #shipwrap svg{position:absolute;inset:0;overflow:visible}
 .r1{transform-origin:90px 90px;animation:spin 30s linear infinite}
 .r2{transform-origin:90px 90px;animation:spin 18s linear infinite reverse}
@@ -96,7 +93,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 </defs></svg>
 <div id="stage">
   <div id="card">
-    <div class="grid"></div><div class="beam"></div><div id="flash"></div>
+    <div id="flash"></div>
     <div id="shipwrap">
       <svg id="hud" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc">
         <g class="h-slow"><circle cx="100" cy="100" r="97" stroke-width="3" stroke-dasharray="1.2 7.6" stroke="#b98bff" opacity=".8"/></g>
