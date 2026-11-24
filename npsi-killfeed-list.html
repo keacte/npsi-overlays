@@ -32,7 +32,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #kfhead .st b.bump{animation:bump .5s ease-out}
 @keyframes bump{0%{transform:scale(1.35);text-shadow:0 0 16px var(--glow)}100%{transform:scale(1)}}
 #kfrow{flex:1;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
-.k{flex:none;height:62px;position:relative;display:flex;align-items:center;gap:12px;padding:0 14px 0 6px;
+.k{flex:none;height:62px;position:relative;display:flex;align-items:center;gap:12px;padding:0 14px 0 4px;
   background:rgba(5,3,8,.7);border:1px solid var(--dim);border-left:3px solid var(--steel);overflow:hidden;
   animation:kin .7s cubic-bezier(.2,.8,.2,1) both}
 .k.loss{border-left-color:var(--orange)}
@@ -50,8 +50,13 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 .k.loss .sh em{background:var(--orange);color:#000}
 .k .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
 .k .tx b{font:700 22px/1.1 var(--head);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.k .tx small{font:600 14px/1.1 'Rajdhani';letter-spacing:.1em;color:#a898c4;text-transform:uppercase}
-.k .tx u{text-decoration:none}
+.k .tm{flex:none;width:62px;text-align:center;font:700 19px/1 'Orbitron';letter-spacing:1px;color:var(--violet);font-variant-numeric:tabular-nums}
+.k .tm small{display:block;margin-top:4px;font:600 9px 'Orbitron';letter-spacing:3px;color:#8a7bb0}
+.k.gold{border-color:rgba(255,200,61,.55);border-left-color:#ffc83d;background:linear-gradient(90deg,rgba(255,200,61,.20),rgba(5,3,8,.75) 70%);box-shadow:0 0 18px rgba(255,200,61,.28)}
+.k.gold .tm{color:#ffc83d}.k.gold .tm small{color:#b8923a}
+.k.gold .tx b{color:#ffe08a;text-shadow:0 0 12px rgba(255,200,61,.55)}
+.k.gold .isk{color:#ffc83d;text-shadow:0 0 12px rgba(255,200,61,.8)}
+.k.gold:after{background:linear-gradient(90deg,transparent,rgba(255,200,61,.4),transparent)}
 .k .tx span{font:600 15px/1.1 'Rajdhani';color:var(--violet);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .k .tx span u{text-decoration:none;color:#a898c4;letter-spacing:.08em;text-transform:uppercase}
 .k .isk{flex:none;text-align:right;font:700 18px 'Orbitron';letter-spacing:1px;color:var(--white);text-shadow:0 0 10px var(--glow)}
@@ -68,10 +73,9 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
       <div class="t"><i></i>KILLFEED · 24H<span class="n" id="kfname">LOADING…</span></div>
       <div class="st">
         <span><small>KILLS</small><b id="sk">–</b></span>
+        <span><small>KILL VALUE</small><b id="sv">–</b></span>
         <span><small class="l">LOSSES</small><b class="l" id="sl">–</b></span>
-        <span><small>SHIPS DESTROYED</small><b id="ss">–</b></span>
-        <span><small>PODS DESTROYED</small><b id="sp">–</b></span>
-        <span><small class="l">ISK LOST</small><b class="l" id="si">–</b></span>
+        <span><small class="l">LOSS VALUE</small><b class="l" id="si">–</b></span>
       </div>
     </div>
     <div id="kfrow"><div id="kfempty">LOADING KILLMAILS…</div></div>
@@ -86,6 +90,7 @@ addEventListener('resize',fit);fit();
 const QS=new URLSearchParams(location.search);
 const CHAR=parseInt(QS.get('character')||'1376548045',10);
 const MAX=Math.min(10,Math.max(1,parseInt(QS.get('max')||'10',10)));
+const HIGH_VALUE=1e9;                               /* kills worth at least this much are highlighted gold */
 const POLL_MS=300000,WINDOW_MS=24*3600*1000;      /* only kills from the last 24 hours */
 /* ================================================================================================ */
 const ESI='https://esi.evetech.net/latest',$=id=>document.getElementById(id),row=$('kfrow');
@@ -115,29 +120,26 @@ const PODS=new Set([670,33328]);                   // Capsule, Capsule - Genolut
 async function pool(items,n,fn){const q=[...items];await Promise.all(Array.from({length:n},async()=>{while(q.length){const x=q.shift();try{await fn(x)}catch(e){}}}))}
 
 /* ---------- header totals (rolling last 24 hours) ---------- */
-const cur={sk:0,sl:0,ss:0,sp:0,si:0},raf={};
+const cur={sk:0,sv:0,sl:0,si:0},raf={};
 function tween(id,to,fmt){const el=$(id),from=cur[id],t0=performance.now();cancelAnimationFrame(raf[id]);
   el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
-  (function f(n){const p=Math.min(1,(n-t0)/1000),e=1-Math.pow(1-p,3);cur[id]=from+(to-from)*e;el.textContent=fmt(p<1?(id==='si'?cur[id]:Math.round(cur[id])):to);if(p<1)raf[id]=requestAnimationFrame(f)})(t0)}
+  (function f(n){const p=Math.min(1,(n-t0)/1000),e=1-Math.pow(1-p,3);cur[id]=from+(to-from)*e;el.textContent=fmt(p<1?((id==='si'||id==='sv')?cur[id]:Math.round(cur[id])):to);if(p<1)raf[id]=requestAnimationFrame(f)})(t0)}
+const utc=t=>new Date(t).toISOString().slice(11,16);
 const fmtN=n=>Math.round(n).toLocaleString('en-GB');
 function head(){
   const t=totals;if(!t)return;
-  tween('sk',t.kills,fmtN);tween('sl',t.losses,fmtN);tween('ss',t.ships,fmtN);tween('sp',t.pods,fmtN);tween('si',t.iskLost,fmtIsk);
+  tween('sk',t.kills,fmtN);tween('sv',t.killIsk,fmtIsk);tween('sl',t.losses,fmtN);tween('si',t.lossIsk,fmtIsk);
 }
 let totals=null;
-async function computeTotals(K,L){
-  let pods=0;
-  await pool(K,6,async z=>{const k=await getKm(z);if(PODS.has(k.victim.ship_type_id))pods++});
-  totals={kills:K.length,losses:L.length,pods,ships:Math.max(0,K.length-pods),iskLost:L.reduce((a,z)=>a+(z.zkb.totalValue||0),0)};
-  head();
-}
+const sumV=a=>a.reduce((x,z)=>x+(z.zkb.totalValue||0),0);
+function computeTotals(K,L){totals={kills:K.length,killIsk:sumV(K),losses:L.length,lossIsk:sumV(L)};head()}
 
 /* ---------- list ---------- */
 function addCard(d,delay=0){
   const e=$('kfempty');e&&e.remove();
-  const el=document.createElement('div');el.className='k '+(d.loss?'loss':'kill');el.dataset.t=d.time;el.style.animationDelay=delay+'s';
-  el.innerHTML=`<div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=64" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"></div>
-   <div class="tx"><b>${esc(d.shipName)}</b><small><u>${ago(d.time)}</u></small></div><div class="isk">${fmtIsk(d.value)}</div>`;
+  const el=document.createElement('div');el.className='k '+(d.loss?'loss':(d.value>=HIGH_VALUE?'kill gold':'kill'));el.dataset.t=d.time;el.style.animationDelay=delay+'s';
+  el.innerHTML=`<div class="tm">${utc(d.time)}<small>UTC</small></div><div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=64" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"></div>
+   <div class="tx"><b>${esc(d.shipName)}</b></div><div class="isk">${fmtIsk(d.value)}</div>`;
   /* keep newest first: insert before the first card that is older */
   const after=[...row.querySelectorAll('.k:not(.out)')].find(x=>new Date(x.dataset.t)<new Date(d.time));
   after?row.insertBefore(el,after):row.appendChild(el);
@@ -147,7 +149,7 @@ function addCard(d,delay=0){
 setInterval(()=>{
   document.querySelectorAll('.k').forEach(k=>{
     if(Date.now()-new Date(k.dataset.t)>=WINDOW_MS){k.classList.add('out');setTimeout(()=>{k.remove();empty('NO KILLS IN THE LAST 24 HOURS')},500)}
-    else{const u=k.querySelector('u');if(u)u.textContent=ago(k.dataset.t)}});
+    });
 },30000);
 
 /* ---------- refresh: poll zKillboard, add anything new ---------- */
@@ -173,7 +175,7 @@ async function title(){try{await resolve([CHAR]);$('kfname').textContent=nm(CHAR
 /* ---------- demo ---------- */
 function demo(){
   $('kfname').textContent='DEMO PILOT';
-  totals={kills:14,losses:3,pods:2,ships:12,iskLost:1.8e9};head();
+  totals={kills:14,killIsk:98.4e9,losses:3,lossIsk:1.8e9};head();
   const R=[[29990,'Loki','Tama',0,1.34e9],[35683,'Hecate','Amamake',0,212e6],[34562,'Svipul','Rancer',1,88e6],[29984,'Tengu','Old Man Star',0,742e6],[34317,'Confessor','Hek',0,134e6],
     [11202,'Ares','Jita',0,9e6],[11184,'Crusader','Perimeter',1,21e6],[17738,'Machariel','Sosala',0,980e6],[24690,'Hurricane','Aufay',0,64e6],[22456,'Sabre','Otela',0,47e6],[11567,'Avatar','Tama',0,95e9]];
   const mk=(r,i)=>({id:Math.random(),ship:r[0],shipName:r[1],pilot:'Demo Pilot',system:r[2],loss:!!r[3],value:r[4],time:new Date(Date.now()-i*18e5).toISOString()});
