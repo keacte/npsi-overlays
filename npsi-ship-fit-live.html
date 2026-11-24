@@ -36,6 +36,8 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 .r1{transform-origin:90px 90px;animation:spin 30s linear infinite}
 .r2{transform-origin:90px 90px;animation:spin 18s linear infinite reverse}
 #ship{position:relative;width:150px;height:150px;animation:bob 4s ease-in-out infinite;filter:drop-shadow(0 0 14px rgba(163,92,255,.75))}
+#ship3d{position:relative;display:none;width:176px;height:176px;filter:drop-shadow(0 0 14px rgba(163,92,255,.6))}
+#ship3d.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
 #ship.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both,bob 4s .9s ease-in-out infinite}
 
 #info{position:absolute;left:206px;right:16px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:4px}
@@ -66,7 +68,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
         <g class="r1"><circle cx="90" cy="90" r="88" stroke-width="1.5" stroke-dasharray="3 9" opacity=".7"/><circle cx="90" cy="90" r="85" stroke-width="4" stroke-dasharray="55 200" stroke="#b98bff"/></g>
         <g class="r2"><circle cx="90" cy="90" r="76" stroke-width="2" stroke-dasharray="26 12 4 12" opacity=".8"/><circle cx="90" cy="90" r="73" stroke-width="5" stroke-dasharray="36 230" stroke="#a35cff"/></g>
       </svg>
-      <img id="ship" alt="">
+      <img id="ship" alt=""><canvas id="ship3d" width="352" height="352"></canvas>
     </div>
     <div id="info">
       <div id="lab"><i></i><span id="labt">NOW FLYING</span></div>
@@ -79,6 +81,58 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
   <div id="msg">LOADING…</div>
 </div>
 
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+/* 3D ship viewer: spins the model around its vertical axis. Falls back to the 2D render if anything fails. */
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+const cv=document.getElementById('ship3d'),img=document.getElementById('ship');
+const R=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+R.setPixelRatio(1);R.setSize(352,352,false);R.setClearColor(0x000000,0);
+R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.1;
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,.1,1000);
+const pivot=new THREE.Group();scene.add(pivot);
+scene.add(new THREE.HemisphereLight(0xcdb4ff,0x1a0b33,1.4));
+const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(4,6,5);scene.add(key);
+const rim=new THREE.DirectionalLight(0xa35cff,2.5);rim.position.set(-5,2,-4);scene.add(rim);
+const SPIN=0.6;                         /* radians per second, about the vertical (Y) axis */
+let model=null,token=0,raf=0,last=0,loadedUrl=null;
+const loader=new GLTFLoader();
+
+function frame(t){
+  raf=requestAnimationFrame(frame);
+  const dt=Math.min(.1,(t-last)/1000||0);last=t;
+  pivot.rotation.y+=SPIN*dt;
+  R.render(scene,cam);
+}
+function show3d(on){
+  cv.style.display=on?'block':'none';img.style.display=on?'none':'';
+  if(on){cv.classList.remove('in');void cv.offsetWidth;cv.classList.add('in');if(!raf){last=performance.now();raf=requestAnimationFrame(frame)}}
+  else if(raf){cancelAnimationFrame(raf);raf=0}
+}
+function clear(){if(model){pivot.remove(model);model.traverse(o=>{o.geometry&&o.geometry.dispose()});model=null}}
+async function apply(){
+  const want=window.__wantModel,my=++token;
+  if(!want){show3d(false);return}
+  if(want===loadedUrl&&model){show3d(true);return}
+  try{
+    const g=await loader.loadAsync(new URL(want,location.href).href);
+    if(my!==token)return;
+    clear();model=g.scene;
+    /* drop the file's own lights; we light the scene ourselves */
+    const lights=[];model.traverse(o=>{if(o.isLight)lights.push(o)});lights.forEach(l=>l.parent.remove(l));
+    const box=new THREE.Box3().setFromObject(model),c=box.getCenter(new THREE.Vector3()),sph=box.getBoundingSphere(new THREE.Sphere());
+    model.position.sub(c);pivot.add(model);pivot.rotation.set(0,0,0);
+    const d=sph.radius/Math.sin(THREE.MathUtils.degToRad(15))*0.9;
+    cam.position.set(0,d*.32,d);cam.lookAt(0,0,0);
+    loadedUrl=want;show3d(true);
+  }catch(e){if(my===token)show3d(false)}   /* keep the 2D render */
+}
+window.addEventListener('shipmodel',apply);
+apply();
+</script>
 <script>
 /* ===== EDIT ME ===== */
 const CONFIG = {
@@ -166,12 +220,16 @@ async function bearer(){
 const esiAuth=(path,a)=>fetch(esi+path,{headers:{Authorization:'Bearer '+a.access}});
 
 /* ================= ship sources ================= */
+/* ships that have a 3D model: ship name -> file (placed next to this page) */
+const MODELS={'Raptor':'Raptor_14.glb'};
+function setModel(name){window.__wantModel=MODELS[name]||null;window.dispatchEvent(new Event('shipmodel'))}
 let curKey=null;
 function render(m){
   $('msg').style.display='none';
   if(m.key===curKey)return;curKey=m.key;
   const img=$('ship');img.classList.remove('in');void img.offsetWidth;
   img.src=`https://images.evetech.net/types/${m.ship}/render?size=256`;img.classList.add('in');
+  setModel(m.shipName);
   $('sname').textContent=m.shipName;$('scls').textContent=m.cls||'';
   $('cust').textContent=m.custom?'“'+m.custom+'”':'';
   $('pilot').textContent=m.pilot||'';$('labt').textContent=m.label||'NOW FLYING';
@@ -201,7 +259,7 @@ async function killboardLoad(){
   render({key:'kb'+k.killmail_id,ship,...await shipInfo(ship),pilot:names[0].name,label:'LAST SEEN · '+ago(k.killmail_time)});
 }
 
-function demoModel(){return{key:'demo',ship:29990,shipName:'Loki',cls:'Strategic Cruiser',custom:'Demo Ship',pilot:'Demo Pilot',label:'NOW FLYING'}}
+function demoModel(){return QS.get('demo')==='raptor'?{key:'demo',ship:11196,shipName:'Raptor',cls:'Interceptor',custom:'Demo Ship',pilot:'Demo Pilot',label:'NOW FLYING'}:{key:'demo',ship:29990,shipName:'Loki',cls:'Strategic Cruiser',custom:'Demo Ship',pilot:'Demo Pilot',label:'NOW FLYING'}}
 
 function showLogin(err){
   const m=$('msg');m.classList.add('login');
