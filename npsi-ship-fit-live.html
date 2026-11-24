@@ -67,7 +67,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #info>*{animation:txtin .6s both}
 #lab{display:flex;align-items:center;gap:10px;font:700 13px 'Orbitron';letter-spacing:4px;color:var(--violet)}
 #lab i{width:9px;height:9px;border-radius:50%;background:#ff2b3d;box-shadow:0 0 10px #ff2b3d;animation:blink 1.4s steps(2) infinite}
-#sname{font:800 46px/1 var(--head);text-shadow:0 0 20px rgba(166,92,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation-delay:.1s}
+#sname{font:800 46px/1.02 var(--head);text-shadow:0 0 20px rgba(166,92,255,.7);white-space:pre;animation-delay:.1s}
 #scls{font:700 15px 'Orbitron';letter-spacing:3px;color:var(--steel);text-shadow:0 0 12px rgba(166,92,255,.6);text-transform:uppercase;animation-delay:.18s}
 #cust{font:600 18px 'Rajdhani';color:var(--violet);letter-spacing:.04em;animation-delay:.24s}
 #pil{margin-top:6px;padding-top:6px;border-top:1px solid var(--dim);display:flex;justify-content:space-between;font:600 14px 'Orbitron';letter-spacing:3px;color:#a898c4;text-transform:uppercase;animation-delay:.3s}
@@ -277,7 +277,7 @@ function render(m){
   const img=$('ship');img.classList.remove('in');void img.offsetWidth;
   img.src=`https://images.evetech.net/types/${m.ship}/render?size=256`;img.classList.add('in');
   setModel(m.shipName);
-  $('sname').textContent=m.shipName;$('scls').textContent=m.cls||'';
+  setName(m.shipName);$('scls').textContent=m.cls||'';
   $('labt').textContent=m.label||'NOW FLYING';
   /* replay the entrance animation on every ship change */
   document.querySelectorAll('#info>*').forEach(e=>{e.style.animation='none';void e.offsetWidth;e.style.animation=''});
@@ -305,7 +305,29 @@ async function killboardLoad(){
   render({key:'kb'+k.killmail_id,ship,...await shipInfo(ship),pilot:names[0].name,label:'LAST SEEN · '+ago(k.killmail_time)});
 }
 
-function demoModel(){return QS.get('demo')==='raptor'?{key:'demo',ship:11196,shipName:'Raptor',cls:'Interceptor',custom:'Demo Ship',pilot:'Demo Pilot',label:'NOW FLYING'}:{key:'demo',ship:29990,shipName:'Loki',cls:'Strategic Cruiser',custom:'Demo Ship',pilot:'Demo Pilot',label:'NOW FLYING'}}
+/* Ship name: one line at full size if it fits; otherwise two lines at a smaller size, shrinking until it fits */
+let nameNow='';
+function setName(n){nameNow=n;fitName()}
+function fitName(){
+  const el=$('sname'),max=el.clientWidth||338,n=nameNow;
+  if(!n)return;
+  const fits=()=>el.scrollWidth<=max+0.5;
+  el.textContent=n;el.style.fontSize='46px';
+  if(fits())return;                                    /* fits on one line */
+  const words=n.split(' ');
+  if(words.length>1){                                  /* wrap onto two balanced lines */
+    let best=1,bd=1e9;
+    for(let i=1;i<words.length;i++){const d=Math.abs(words.slice(0,i).join(' ').length-words.slice(i).join(' ').length);if(d<bd){bd=d;best=i}}
+    el.textContent=words.slice(0,best).join(' ')+'\n'+words.slice(best).join(' ');
+    for(let sz=38;sz>=18;sz--){el.style.fontSize=sz+'px';if(fits())return}
+  }else{                                               /* single long word: just shrink */
+    for(let sz=45;sz>=16;sz--){el.style.fontSize=sz+'px';if(fits())return}
+  }
+}
+document.fonts&&document.fonts.ready.then(fitName);   /* re-fit once the web font has loaded */
+
+function demoModel(){const o=demoModel0();if(QS.get('name'))o.shipName=QS.get('name');return o}
+function demoModel0(){return QS.get('demo')==='raptor'?{key:'demo',ship:11196,shipName:'Raptor',cls:'Interceptor',custom:'Demo Ship',pilot:'Demo Pilot',label:'NOW FLYING'}:{key:'demo',ship:29990,shipName:'Loki',cls:'Strategic Cruiser',custom:'Demo Ship',pilot:'Demo Pilot',label:'NOW FLYING'}}
 
 function showLogin(err){
   const m=$('msg');m.classList.add('login');
