@@ -23,7 +23,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
   background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweepx 3.6s ease-in-out infinite}
 @keyframes sweepx{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
 #kfhead .t{display:flex;align-items:center;gap:10px;font:700 15px 'Orbitron';letter-spacing:4px;color:var(--white)}
-#kfhead .t i{width:9px;height:9px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--glow);animation:blink 1.4s steps(2) infinite}
+#kfhead .t i{width:10px;height:10px;border-radius:50%;background:#ff2b3d;box-shadow:0 0 10px #ff2b3d;animation:blink 1.4s steps(2) infinite}
 #kfhead .t .n{margin-left:auto;font:600 14px 'Rajdhani';letter-spacing:.14em;color:#a898c4;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
 #kfhead .st{display:flex;justify-content:space-between;gap:10px;font:700 21px/1 var(--head);color:var(--white)}
 #kfhead .st span small{display:block;font:600 8.5px 'Orbitron';letter-spacing:1px;color:var(--violet);margin-bottom:5px;white-space:nowrap}
@@ -65,7 +65,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 <div id="stage">
   <div id="kf">
     <div id="kfhead">
-      <div class="t"><i></i>KILLFEED<span class="n" id="kfname">LOADING…</span></div>
+      <div class="t"><i></i>KILLFEED · 24H<span class="n" id="kfname">LOADING…</span></div>
       <div class="st">
         <span><small>KILLS</small><b id="sk">–</b></span>
         <span><small class="l">LOSSES</small><b class="l" id="sl">–</b></span>
@@ -103,14 +103,18 @@ async function resolve(ids){
   catch(e){for(const id of need){try{(await getJSON(ESI+'/universe/names/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify([id])})).forEach(n=>names[n.id]=n.name)}catch(_){}}}
 }
 const nm=id=>names[id]||'Unknown';
+const kmCache={};
+const getKm=z=>kmCache[z.killmail_id]||(kmCache[z.killmail_id]=getJSON(`${ESI}/killmails/${z.killmail_id}/${z.zkb.hash}/`).catch(e=>{delete kmCache[z.killmail_id];throw e}));
 async function buildCard(z){                       // z = {killmail_id, zkb:{hash,totalValue}}
-  const k=await getJSON(`${ESI}/killmails/${z.killmail_id}/${z.zkb.hash}/`),v=k.victim;
+  const k=await getKm(z),v=k.victim;
   await resolve([v.character_id,v.ship_type_id,k.solar_system_id]);
   return{id:k.killmail_id,loss:v.character_id===CHAR,ship:v.ship_type_id,shipName:nm(v.ship_type_id),
     pilot:v.character_id?nm(v.character_id):(v.corporation_id?'Structure / NPC':'Unknown'),system:nm(k.solar_system_id),time:k.killmail_time,value:z.zkb.totalValue||0}
 }
+const PODS=new Set([670,33328]);                   // Capsule, Capsule - Genolution Core Augmentation
+async function pool(items,n,fn){const q=[...items];await Promise.all(Array.from({length:n},async()=>{while(q.length){const x=q.shift();try{await fn(x)}catch(e){}}}))}
 
-/* ---------- header totals (all-time, from zKillboard stats) ---------- */
+/* ---------- header totals (rolling last 24 hours) ---------- */
 const cur={sk:0,sl:0,ss:0,sp:0,si:0},raf={};
 function tween(id,to,fmt){const el=$(id),from=cur[id],t0=performance.now();cancelAnimationFrame(raf[id]);
   el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
@@ -121,14 +125,11 @@ function head(){
   tween('sk',t.kills,fmtN);tween('sl',t.losses,fmtN);tween('ss',t.ships,fmtN);tween('sp',t.pods,fmtN);tween('si',t.iskLost,fmtIsk);
 }
 let totals=null;
-async function loadTotals(){
-  try{
-    const st=await getJSON(`https://zkillboard.com/api/stats/characterID/${CHAR}/`);
-    const g=(st.groups&&(st.groups[29]||st.groups['29']))||{};
-    const kills=+st.shipsDestroyed||0,pods=+g.shipsDestroyed||0;
-    totals={kills,losses:+st.shipsLost||0,pods,ships:Math.max(0,kills-pods),iskLost:+st.iskLost||0};
-    head();
-  }catch(e){}
+async function computeTotals(K,L){
+  let pods=0;
+  await pool(K,6,async z=>{const k=await getKm(z);if(PODS.has(k.victim.ship_type_id))pods++});
+  totals={kills:K.length,losses:L.length,pods,ships:Math.max(0,K.length-pods),iskLost:L.reduce((a,z)=>a+(z.zkb.totalValue||0),0)};
+  head();
 }
 
 /* ---------- list ---------- */
@@ -154,12 +155,14 @@ let busy=false,first=true;
 async function refresh(){
   if(busy)return;busy=true;
   try{
-    loadTotals();
-    const list=await getJSON(`https://zkillboard.com/api/characterID/${CHAR}/`);
-    if(!Array.isArray(list))throw new Error('unexpected zKillboard reply');
-    const fresh=list.slice(0,MAX).filter(z=>!shown.has(z.killmail_id));
+    const base=`https://zkillboard.com/api/%/characterID/${CHAR}/pastSeconds/86400/`;
+    const [K,L]=await Promise.all([getJSON(base.replace('%','kills')),getJSON(base.replace('%','losses'))]);
+    if(!Array.isArray(K)||!Array.isArray(L))throw new Error('unexpected zKillboard reply');
+    const all=[...K,...L].sort((x,y)=>y.killmail_id-x.killmail_id).slice(0,MAX);
+    const fresh=all.filter(z=>!shown.has(z.killmail_id)),done=computeTotals(K,L);
     let i=0;
     for(const z of fresh.reverse()){shown.add(z.killmail_id);try{const d=await buildCard(z);if(Date.now()-new Date(d.time)<WINDOW_MS)addCard(d,first?i++*.1:0)}catch(e){shown.delete(z.killmail_id)}}
+    await done;
     if(first)empty('NO KILLS IN THE LAST 24 HOURS');
     first=false;
   }catch(e){empty('CANNOT REACH ZKILLBOARD')}
@@ -179,7 +182,7 @@ async function title(){try{await resolve([CHAR]);$('kfname').textContent=nm(CHAR
 /* ---------- demo ---------- */
 function demo(){
   $('kfname').textContent='DEMO PILOT';
-  totals={kills:1284,losses:213,pods:97,ships:1187,iskLost:96.4e9};head();
+  totals={kills:14,losses:3,pods:2,ships:12,iskLost:1.8e9};head();
   const R=[[29990,'Loki','Tama',0,1.34e9],[35683,'Hecate','Amamake',0,212e6],[34562,'Svipul','Rancer',1,88e6],[29984,'Tengu','Old Man Star',0,742e6],[34317,'Confessor','Hek',0,134e6],
     [11202,'Ares','Jita',0,9e6],[11184,'Crusader','Perimeter',1,21e6],[17738,'Machariel','Sosala',0,980e6],[24690,'Hurricane','Aufay',0,64e6],[22456,'Sabre','Otela',0,47e6],[11567,'Avatar','Tama',0,95e9]];
   const mk=(r,i)=>({id:Math.random(),ship:r[0],shipName:r[1],pilot:'Demo Pilot',system:r[2],loss:!!r[3],value:r[4],time:Date.now()-i*18e5});
