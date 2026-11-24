@@ -86,7 +86,7 @@ addEventListener('resize',fit);fit();
 const QS=new URLSearchParams(location.search);
 const CHAR=parseInt(QS.get('character')||'1376548045',10);
 const MAX=Math.min(10,Math.max(1,parseInt(QS.get('max')||'10',10)));
-const POLL_MS=120000,WINDOW_MS=24*3600*1000;      /* only kills from the last 24 hours */
+const POLL_MS=300000,WINDOW_MS=24*3600*1000;      /* only kills from the last 24 hours */
 /* ================================================================================================ */
 const ESI='https://esi.evetech.net/latest',$=id=>document.getElementById(id),row=$('kfrow');
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
