@@ -29,35 +29,26 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 
 #shipwrap{position:absolute;left:14px;top:10px;width:180px;height:180px;display:flex;align-items:center;justify-content:center}
 #shipwrap svg{position:absolute;inset:0;overflow:visible}
-.r1{transform-origin:90px 90px;animation:spin 30s linear infinite}
-.r2{transform-origin:90px 90px;animation:spin 18s linear infinite reverse}
 #ship{position:relative;z-index:1;width:138px;height:138px;filter:drop-shadow(0 0 14px rgba(163,92,255,.75))}
-#ship3d{position:relative;z-index:1;display:none;width:162px;height:162px;filter:drop-shadow(0 0 14px rgba(163,92,255,.6))}
-#ship3d.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
 #ship.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
 
 
 /* ===== HUD around the (static) ship ===== */
 #hud{position:absolute;left:0;top:0;width:180px;height:180px;overflow:visible;z-index:2;pointer-events:none}
 #hud *{transform-box:view-box}
-.h-cw{transform-origin:100px 100px;animation:spin 40s linear infinite}
-.h-ccw{transform-origin:100px 100px;animation:spin 24s linear infinite reverse}
-.h-fast{transform-origin:100px 100px;animation:spin 9s linear infinite}
-.h-slow{transform-origin:100px 100px;animation:spin 70s linear infinite reverse}
-.h-orbit1{transform-origin:100px 100px;animation:spin 7s linear infinite}
-.h-orbit2{transform-origin:100px 100px;animation:spin 11s linear infinite reverse}
-.h-brk{transform-origin:100px 100px;animation:breathe 3.2s ease-in-out infinite}
-.h-ping{transform-origin:100px 100px;animation:ping 3.6s ease-out infinite}
+.h-cw{transform-origin:100px 100px;}
+.h-ccw{transform-origin:100px 100px;}
+.h-fast{transform-origin:100px 100px;}
+.h-slow{transform-origin:100px 100px;}
+.h-orbit1{transform-origin:100px 100px;}
+.h-orbit2{transform-origin:100px 100px;}
+.h-brk{transform-origin:100px 100px;}
+.h-ping{transform-origin:100px 100px;}
 @keyframes breathe{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.07);opacity:.5}}
 @keyframes ping{from{transform:scale(.45);opacity:.8}to{transform:scale(1.15);opacity:0}}
-#radar{position:absolute;left:50%;top:50%;width:136px;height:136px;margin:-68px 0 0 -68px;border-radius:50%;z-index:2;pointer-events:none;
-  background:conic-gradient(from 0deg,rgba(166,92,255,0) 0deg,rgba(166,92,255,0) 280deg,rgba(185,139,255,.38) 358deg,rgba(255,255,255,.55) 360deg);
-  -webkit-mask:radial-gradient(circle,transparent 0 30%,#000 31%);mask:radial-gradient(circle,transparent 0 30%,#000 31%);
-  animation:spin 4.5s linear infinite}
 
 /* ===== purple tone: the ship is recoloured in shades of purple (add ?style=photo for original colours) ===== */
 .tone #ship{filter:url(#tone) drop-shadow(0 0 10px rgba(163,92,255,.7))}
-.tone #ship3d{filter:url(#tone) drop-shadow(0 0 10px rgba(163,92,255,.6))}
 
 #info{position:absolute;left:206px;right:16px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;gap:4px}
 #info>*{animation:txtin .6s both}
@@ -107,8 +98,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
         </g>
         <path d="M100 8v10M100 182v10M8 100h10M182 100h10" stroke="#b98bff" stroke-width="1.5" opacity=".6"/>
       </svg>
-      <div id="radar"></div>
-      <img id="ship" alt=""><canvas id="ship3d" width="352" height="352"></canvas>
+      <img id="ship" alt="">
     </div>
     <div id="info">
       <div id="lab"><i></i><span id="labt">NOW FLYING</span></div>
@@ -119,62 +109,6 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
   <div id="msg">LOADING…</div>
 </div>
 
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
-</script>
-<script type="module">
-/* 3D ship viewer: spins the model around its vertical axis. Falls back to the 2D render if anything fails. */
-import * as THREE from 'three';
-import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-const cv=document.getElementById('ship3d'),img=document.getElementById('ship');
-const dbg=m=>{if(new URLSearchParams(location.search).has('debug')){let e=document.getElementById('dbg');if(!e){e=document.createElement('div');e.id='dbg';e.style.cssText='position:absolute;left:8px;bottom:4px;z-index:9;font:600 11px Rajdhani,sans-serif;color:#f58a1f;max-width:190px';document.getElementById('card').appendChild(e)}e.textContent='3D: '+m}};
-
-let R;try{R=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true})}catch(e){window.__wantModel=null;dbg('WebGL unavailable');throw e}
-R.setPixelRatio(1);R.setSize(352,352,false);R.setClearColor(0x000000,0);
-R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.1;
-const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,.1,1000);
-const pivot=new THREE.Group();scene.add(pivot);
-scene.add(new THREE.HemisphereLight(0xcdb4ff,0x1a0b33,1.4));
-const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(4,6,5);scene.add(key);
-const rim=new THREE.DirectionalLight(0xa35cff,2.5);rim.position.set(-5,2,-4);scene.add(rim);
-const SPIN=0;                           /* ship is static; the HUD animates around it */
-const ANGLE=parseFloat(new URLSearchParams(location.search).get('angle')||'-0.6');   /* viewing angle in radians (?angle=) */
-let model=null,token=0,raf=0,last=0,loadedUrl=null;
-const loader=new GLTFLoader();
-
-function frame(t){
-  raf=requestAnimationFrame(frame);
-  const dt=Math.min(.1,(t-last)/1000||0);last=t;
-  pivot.rotation.y+=SPIN*dt;
-  R.render(scene,cam);
-}
-function show3d(on){
-  cv.style.display=on?'block':'none';img.style.display=on?'none':'';
-  if(on){cv.classList.remove('in');void cv.offsetWidth;cv.classList.add('in');if(!raf){last=performance.now();raf=requestAnimationFrame(frame)}}
-  else if(raf){cancelAnimationFrame(raf);raf=0}
-}
-function clear(){if(model){pivot.remove(model);model.traverse(o=>{o.geometry&&o.geometry.dispose()});model=null}}
-async function apply(){
-  const want=window.__wantModel,my=++token;
-  if(!want){dbg('no model for this ship');show3d(false);return}
-  if(want===loadedUrl&&model){show3d(true);return}
-  try{
-    dbg('loading '+want+'…');
-    const g=await loader.loadAsync(new URL(want,location.href).href);
-    if(my!==token)return;
-    clear();model=g.scene;
-    /* drop the file's own lights; we light the scene ourselves */
-    const lights=[];model.traverse(o=>{if(o.isLight)lights.push(o)});lights.forEach(l=>l.parent.remove(l));
-    const box=new THREE.Box3().setFromObject(model),c=box.getCenter(new THREE.Vector3()),sph=box.getBoundingSphere(new THREE.Sphere());
-    model.position.sub(c);pivot.add(model);pivot.rotation.set(0,ANGLE,0);
-    const d=sph.radius/Math.sin(THREE.MathUtils.degToRad(15))*1.08;
-    cam.position.set(0,d*.32,d);cam.lookAt(0,0,0);
-    loadedUrl=want;show3d(true);dbg('ok');
-  }catch(e){dbg('FAILED – '+(e&&e.message||e));if(my===token)show3d(false)}   /* keep the 2D render */
-}
-window.addEventListener('shipmodel',apply);
-apply();
-</script>
 <script>
 /* ===== EDIT ME ===== */
 const CONFIG = {
@@ -264,15 +198,12 @@ const esiAuth=(path,a)=>fetch(esi+path,{headers:{Authorization:'Bearer '+a.acces
 
 /* ================= ship sources ================= */
 /* ships that have a 3D model: ship name -> file (placed next to this page) */
-const MODELS={'Raptor':'Raptor_14.glb'};
-function setModel(name){window.__wantModel=MODELS[name]||null;window.dispatchEvent(new Event('shipmodel'))}
 let curKey=null;
 function render(m){
   $('msg').style.display='none';
   if(m.key===curKey)return;curKey=m.key;
   const img=$('ship');img.classList.remove('in');void img.offsetWidth;
   img.src=`https://images.evetech.net/types/${m.ship}/render?size=256`;img.classList.add('in');
-  setModel(m.shipName);
   setName(m.shipName);$('scls').textContent=m.cls||'';
   $('labt').textContent=m.label||'NOW FLYING';
   /* replay the entrance animation on every ship change */
