@@ -138,7 +138,7 @@ function computeTotals(K,L){totals={kills:K.length,killIsk:sumV(K),losses:L.leng
 function addCard(d,delay=0){
   const e=$('kfempty');e&&e.remove();
   const el=document.createElement('div');el.className='k '+(d.loss?'loss':(d.value>=HIGH_VALUE?'kill gold':'kill'));el.dataset.t=d.time;el.style.animationDelay=delay+'s';
-  el.innerHTML=`<div class="tm">${utc(d.time)}<small>UTC</small></div><div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=64" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"></div>
+  el.innerHTML=`<div class="tm">${utc(d.time)}</div><div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=64" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"></div>
    <div class="tx"><b>${esc(d.shipName)}</b></div><div class="isk">${fmtIsk(d.value)}</div>`;
   /* keep newest first: insert before the first card that is older */
   const after=[...row.querySelectorAll('.k:not(.out)')].find(x=>new Date(x.dataset.t)<new Date(d.time));
