@@ -151,25 +151,41 @@ async function loadRecent(){
 }
 async function resolveChar(){await resolve([CHAR]);const n=nm(CHAR);$('kfname').textContent=n.toUpperCase();return n.toUpperCase()}
 
-/* live stream from zKillboard */
+/* live updates: zKillboard websocket (character channel + global stream) and a 45s polling fallback */
+async function fromZkb(z){
+  const k=await fetch(`${esi}/killmails/${z.killmail_id}/${z.zkb.hash}/`).then(r=>r.json());
+  return model(k,z.zkb.totalValue);
+}
+async function ingest(km){
+  try{
+    if(!km||!km.killmail_id||seen.has(km.killmail_id))return;
+    if(!km.victim&&km.zkb&&km.zkb.hash){seen.add(km.killmail_id);const m=await fromZkb(km);count(m);addCard(m);return}
+    if(!km.victim||!involved(km))return;
+    seen.add(km.killmail_id);
+    const m=await model(km,km.zkb&&km.zkb.totalValue);
+    count(m);addCard(m);
+  }catch(e){}
+}
+async function poll(){
+  try{
+    const list=await (await fetch(`https://zkillboard.com/api/characterID/${CHAR}/`)).json();
+    const fresh=list.slice(0,MAX_CARDS).filter(z=>!seen.has(z.killmail_id)).reverse();   // oldest first
+    for(const z of fresh){seen.add(z.killmail_id);const m=await fromZkb(z);count(m);addCard(m)}
+  }catch(e){}
+}
 function live(){
   let ws,back=2000;
   const open=()=>{
     ws=new WebSocket('wss://zkillboard.com/websocket/');
-    ws.onopen=()=>{back=2000;ws.send(JSON.stringify({action:'sub',channel:'killstream'}))};
-    ws.onmessage=async ev=>{
-      try{
-        const km=JSON.parse(ev.data);
-        if(!km.victim||seen.has(km.killmail_id)||!involved(km))return;
-        seen.add(km.killmail_id);
-        const m=await model(km,km.zkb&&km.zkb.totalValue);
-        count(m);addCard(m);
-      }catch(e){}
-    };
+    ws.onopen=()=>{back=2000;
+      ws.send(JSON.stringify({action:'sub',channel:'character:'+CHAR}));
+      ws.send(JSON.stringify({action:'sub',channel:'killstream'}))};
+    ws.onmessage=ev=>{try{ingest(JSON.parse(ev.data))}catch(e){}};
     ws.onclose=()=>setTimeout(open,back=Math.min(back*2,30000));
     ws.onerror=()=>ws.close();
   };
   open();
+  setInterval(poll,45000);
 }
 
 /* ?demo=1 preview with fake pilots (no network needed except ship images) */

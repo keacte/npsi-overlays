@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NPSI.ROCKS – Killfeed</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* OBS Browser Source: width 1720, height 114 (any size with the same ratio works), transparent background */
+:root{
+  --bg:#050308;--steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif; --purple:#8a3ffc; --violet:#b98bff; --glow:#a35cff;
+  --dim:#2a1747; --white:#f4efff; --orange:#f58a1f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:transparent;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1720px;height:114px;transform-origin:0 0;font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--white)}
+@keyframes blink{50%{opacity:.15}}
+/* ===== killfeed (NPSI redesign of the socketkill ticker) ===== */
+#kf{position:absolute;left:0;top:0;width:1720px;height:114px;display:flex;gap:14px;z-index:3}
+#kfhead{width:226px;flex:none;border:1px solid var(--purple);background:rgba(5,3,8,.7);padding:10px 14px;
+  display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+#kfhead:before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;
+  background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweepx 3.6s ease-in-out infinite}
+@keyframes sweepx{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
+#kfhead .t{display:flex;align-items:center;gap:10px;font:700 15px 'Orbitron';letter-spacing:4px;color:var(--white)}
+#kfhead .t i{width:9px;height:9px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--glow);animation:blink 1.4s steps(2) infinite}
+#kfhead .n{font:600 14px 'Rajdhani';letter-spacing:.14em;color:#a898c4;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#kfhead .st{display:flex;justify-content:space-between;font:700 22px/1 var(--head);color:var(--white)}
+#kfhead .st span small{display:block;font:600 11px 'Orbitron';letter-spacing:2px;color:var(--violet);margin-bottom:3px}
+#kfhead .st .l{color:var(--orange)}
+#kfhead .st b{display:inline-block;font-variant-numeric:tabular-nums}
+#kfhead .st b.bump{animation:bump .5s ease-out}
+@keyframes bump{0%{transform:scale(1.35);text-shadow:0 0 16px var(--glow)}100%{transform:scale(1)}}
+#kfrow{flex:1;display:flex;gap:12px;min-width:0;overflow:hidden}
+.k{flex:1 1 0;min-width:0;position:relative;display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px;
+  background:rgba(5,3,8,.7);border:1px solid var(--dim);border-left:3px solid var(--steel);overflow:hidden;
+  animation:kin .8s cubic-bezier(.2,.8,.2,1) both}
+.k.loss{border-left-color:var(--orange)}
+.k:after{content:"";position:absolute;top:0;bottom:0;width:80px;left:-120px;transform:skewX(-20deg);
+  background:linear-gradient(90deg,transparent,rgba(185,139,255,.35),transparent);animation:shine .9s .35s both}
+.k.loss:after{background:linear-gradient(90deg,transparent,rgba(245,138,31,.35),transparent)}
+.k.out{animation:kout .5s both}
+@keyframes kin{from{opacity:0;transform:translateX(-60px) scale(.96)}}
+@keyframes kout{to{opacity:0;transform:translateX(40px)}}
+@keyframes shine{to{left:130%}}
+.k .sh{width:92px;height:92px;flex:none;position:relative;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);background:#0a0514}
+.k .sh img{width:100%;height:100%;display:block}
+.k .sh em{position:absolute;left:0;bottom:0;padding:1px 6px;font:700 11px 'Orbitron';letter-spacing:2px;font-style:normal;
+  background:var(--purple);color:#fff}
+.k.loss .sh em{background:var(--orange);color:#000}
+.k .tx{min-width:0;display:flex;flex-direction:column;gap:2px}
+.k .tx b{font:700 22px/1.1 var(--head);color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .tx span{font:600 17px/1.1 'Rajdhani';color:var(--violet);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .tx small{font:600 13px/1.2 'Rajdhani';letter-spacing:.1em;color:#a898c4;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k .isk{position:absolute;right:10px;top:6px;font:700 14px 'Orbitron';letter-spacing:1px;color:var(--white);text-shadow:0 0 10px var(--glow)}
+.k.loss .isk{color:var(--orange);text-shadow:0 0 10px rgba(245,138,31,.6)}
+#kfempty{flex:1;display:flex;align-items:center;justify-content:center;border:1px dashed var(--dim);
+  font:600 18px 'Orbitron';letter-spacing:6px;color:#7a6a9c;animation:blink 2.4s ease-in-out infinite}
+
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="kf">
+    <div id="kfhead">
+      <div class="t"><i></i>KILLFEED</div>
+      <div class="n" id="kfname">LOADING…</div>
+      <div class="st"><span><small>KILLS</small><b id="sk">0</b></span><span><small class="l">LOSSES</small><b class="l" id="sl">0</b></span><span><small>ISK</small><b id="si">0</b></span></div>
+    </div>
+    <div id="kfrow"><div id="kfempty">AWAITING KILLMAILS</div></div>
+  </div>
+</div>
+<script>
+const stage=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1720,innerHeight/114);stage.style.transform=`scale(${s})`;}
+addEventListener('resize',fit);fit();
+/* ===== KILLFEED ===== */
+const QS=new URLSearchParams(location.search);
+const CHAR=parseInt(QS.get('character')||'1376548045',10);
+const DEMO=QS.has('demo');
+const MAX_CARDS=5;
+const esi='https://esi.evetech.net/latest';
+const nameCache={};
+const $=id=>document.getElementById(id);
+const row=$('kfrow');
+const seen=new Set();
+let stats={k:0,l:0,isk:0};
+
+const fmtIsk=v=>v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'K':String(Math.round(v));
+const ago=t=>{const m=Math.max(0,Math.round((Date.now()-new Date(t))/60000));return m<1?'JUST NOW':m<60?m+'M AGO':m<1440?Math.floor(m/60)+'H AGO':Math.floor(m/1440)+'D AGO'};
+const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function resolve(ids){
+  const need=[...new Set(ids.filter(i=>i&&!nameCache[i]))];
+  if(!need.length)return;
+  const r=await fetch(esi+'/universe/names/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(need)});
+  (await r.json()).forEach(n=>nameCache[n.id]=n.name);
+}
+const nm=id=>nameCache[id]||'Unknown';
+
+/* smooth count-up for the header numbers */
+const shown={sk:0,sl:0,si:0},anim={};
+function tween(id,target,fmt){
+  const el=$(id),from=shown[id],t0=performance.now(),dur=1100;
+  cancelAnimationFrame(anim[id]);
+  el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
+  (function step(now){
+    const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);
+    shown[id]=from+(target-from)*e;
+    el.textContent=fmt(p<1?(id==='si'?shown[id]:Math.round(shown[id])):target);
+    if(p<1)anim[id]=requestAnimationFrame(step);
+  })(t0);
+}
+function setHead(){
+  tween('sk',stats.k,String);tween('sl',stats.l,String);tween('si',stats.isk,fmtIsk);
+}
+function addCard(d,animate=true,delay=0){
+  $('kfempty')&&$('kfempty').remove();
+  const el=document.createElement('div');
+  el.className='k '+(d.loss?'loss':'kill');
+  el.dataset.t=d.time;
+  el.style.animationDelay=delay+'s';
+  el.innerHTML=`<div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=128" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"><em>${d.loss?'LOSS':'KILL'}</em></div>
+   <div class="tx"><b>${esc(d.shipName)}</b><span>${esc(d.pilot)}</span><small>${esc(d.system)} · <u>${ago(d.time)}</u></small></div>
+   <div class="isk">${fmtIsk(d.value)}</div>`;
+  row.prepend(el);
+  while(row.children.length>MAX_CARDS){
+    const last=row.lastElementChild;last.classList.add('out');setTimeout(()=>last.remove(),500);
+    if(row.querySelectorAll('.k:not(.out)').length<=MAX_CARDS)break;
+  }
+}
+setInterval(()=>document.querySelectorAll('.k').forEach(e=>{const u=e.querySelector('u');if(u)u.textContent=ago(e.dataset.t)}),30000);
+
+/* turn an ESI-style killmail (+ zkb) into a card model */
+async function model(km,value){
+  const v=km.victim,loss=v.character_id===CHAR;
+  await resolve([v.character_id,v.ship_type_id,km.solar_system_id]);
+  return{id:km.killmail_id,loss,ship:v.ship_type_id,shipName:nm(v.ship_type_id),
+    pilot:nm(v.character_id)||'Unknown',system:nm(km.solar_system_id),time:km.killmail_time,value:value||0};
+}
+const involved=km=>km.victim.character_id===CHAR||(km.attackers||[]).some(a=>a.character_id===CHAR);
+function count(m){m.loss?stats.l++:(stats.k++,stats.isk+=m.value);setHead();}
+
+async function loadRecent(){
+  const list=await (await fetch(`https://zkillboard.com/api/characterID/${CHAR}/`)).json();
+  const top=list.slice(0,MAX_CARDS);
+  const kms=await Promise.all(top.map(z=>fetch(`${esi}/killmails/${z.killmail_id}/${z.zkb.hash}/`).then(r=>r.json()).then(k=>[k,z.zkb.totalValue])));
+  const models=[];
+  for(const [k,val] of kms){seen.add(k.killmail_id);models.push(await model(k,val));}
+  models.sort((a,b)=>new Date(a.time)-new Date(b.time));      // oldest first -> newest ends on the left
+  models.forEach((m,i)=>{count(m);addCard(m,true,i*.12)});
+  models.length||(row.innerHTML='<div id="kfempty">NO RECENT ACTIVITY</div>');
+  try{const c=await resolveChar();$('kfname').textContent=c}catch(e){}
+}
+async function resolveChar(){await resolve([CHAR]);const n=nm(CHAR);$('kfname').textContent=n.toUpperCase();return n.toUpperCase()}
+
+/* live updates: zKillboard websocket (character channel + global stream) and a 45s polling fallback */
+async function fromZkb(z){
+  const k=await fetch(`${esi}/killmails/${z.killmail_id}/${z.zkb.hash}/`).then(r=>r.json());
+  return model(k,z.zkb.totalValue);
+}
+async function ingest(km){
+  try{
+    if(!km||!km.killmail_id||seen.has(km.killmail_id))return;
+    if(!km.victim&&km.zkb&&km.zkb.hash){seen.add(km.killmail_id);const m=await fromZkb(km);count(m);addCard(m);return}
+    if(!km.victim||!involved(km))return;
+    seen.add(km.killmail_id);
+    const m=await model(km,km.zkb&&km.zkb.totalValue);
+    count(m);addCard(m);
+  }catch(e){}
+}
+async function poll(){
+  try{
+    const list=await (await fetch(`https://zkillboard.com/api/characterID/${CHAR}/`)).json();
+    const fresh=list.slice(0,MAX_CARDS).filter(z=>!seen.has(z.killmail_id)).reverse();   // oldest first
+    for(const z of fresh){seen.add(z.killmail_id);const m=await fromZkb(z);count(m);addCard(m)}
+  }catch(e){}
+}
+function live(){
+  let ws,back=2000;
+  const open=()=>{
+    ws=new WebSocket('wss://zkillboard.com/websocket/');
+    ws.onopen=()=>{back=2000;
+      ws.send(JSON.stringify({action:'sub',channel:'character:'+CHAR}));
+      ws.send(JSON.stringify({action:'sub',channel:'killstream'}))};
+    ws.onmessage=ev=>{try{ingest(JSON.parse(ev.data))}catch(e){}};
+    ws.onclose=()=>setTimeout(open,back=Math.min(back*2,30000));
+    ws.onerror=()=>ws.close();
+  };
+  open();
+  setInterval(poll,45000);
+}
+
+/* ?demo=1 preview with fake pilots (no network needed except ship images) */
+function demo(){
+  $('kfname').textContent='DEMO PILOT';
+  const rows=[[29990,'Loki','Demo Pilot A','Tama',false,1.34e9],[35683,'Hecate','Demo Pilot B','Amamake',false,212e6],
+   [34562,'Svipul','Demo Pilot C','Rancer',true,88e6],[29984,'Tengu','Demo Pilot D','Old Man Star',false,742e6],[34317,'Confessor','Demo Pilot E','Hek',false,134e6]];
+  const mk=(r,i)=>({ship:r[0],shipName:r[1],pilot:r[2],system:r[3],loss:r[4],value:r[5],time:Date.now()-i*36e5});
+  rows.forEach((r,i)=>{const m=mk(r,rows.length-i);count(m);addCard(m,true,i*.12)});
+  let n=0;setInterval(()=>{const r=rows[n++%rows.length];const m=mk(r,0);count(m);addCard(m)},6000);
+}
+
+(async()=>{
+  if(DEMO)return demo();
+  try{await resolveChar()}catch(e){}
+  try{await loadRecent()}catch(e){row.innerHTML='<div id="kfempty">AWAITING KILLMAILS</div>'}
+  try{live()}catch(e){}
+})();
+</script>
+</body>
+</html>
