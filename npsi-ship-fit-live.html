@@ -65,6 +65,8 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #msg{position:absolute;inset:46px 0 0 0;display:flex;align-items:center;justify-content:center;
   font:600 20px 'Orbitron';letter-spacing:6px;color:#7a6a9c;animation:blink 2.4s ease-in-out infinite}
 #msg.login{animation:none;flex-direction:column;gap:16px;text-align:center}
+#msg .err{display:block;font:600 14px/1.4 'Rajdhani';letter-spacing:.04em;color:var(--orange);max-width:520px;padding:0 20px;text-transform:none}
+#msg .cb{font:600 12px/1.4 'Rajdhani';letter-spacing:.05em;color:#7a6a9c;text-transform:none;word-break:break-all;padding:0 20px;animation:none}
 #lb{font:700 16px 'Orbitron';letter-spacing:4px;color:#fff;background:var(--purple);border:1px solid var(--violet);padding:12px 22px;cursor:pointer;
   box-shadow:0 0 18px rgba(163,92,255,.5)}
 #lb:hover{background:var(--steel)}
@@ -195,6 +197,8 @@ const b64url=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/
 const rnd=n=>b64url(crypto.getRandomValues(new Uint8Array(n)));
 
 async function login(){
+  if(!CLIENT_ID){showLogin('NO CLIENT ID – add ?client_id=YOUR_ID to the URL');return}
+  if(!(window.crypto&&crypto.subtle)){showLogin('This page must be opened over https');return}
   const v=rnd(48),state=rnd(16);
   const ch=b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));
   lsSet('npsi_pkce',JSON.stringify({v,s:state}));
@@ -205,7 +209,7 @@ async function login(){
 async function tokenReq(params){
   const r=await fetch('https://login.eveonline.com/v2/oauth/token',{method:'POST',
     headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:CLIENT_ID,...params})});
-  if(!r.ok)throw new Error('token '+r.status);
+  if(!r.ok){let b='';try{b=(await r.text()).slice(0,160)}catch(e){}throw new Error('token endpoint '+r.status+' '+b)}
   return r.json();
 }
 function saveTokens(t){
@@ -214,10 +218,12 @@ function saveTokens(t){
     exp:Date.now()+(t.expires_in-60)*1000,id:+pl.sub.split(':')[2],name:pl.name}));
 }
 async function handleCallback(){
+  if(QS.get('error')){history.replaceState(null,'',location.pathname);throw new Error('EVE said: '+QS.get('error')+' – '+(QS.get('error_description')||''))}
   const code=QS.get('code');if(!code)return;
   const saved=JSON.parse(lsGet('npsi_pkce')||'null');
   history.replaceState(null,'',location.pathname);
-  if(!saved||saved.s!==QS.get('state'))throw new Error('state');
+  if(!saved)throw new Error('login data lost (browser storage unavailable?)');
+  if(saved.s!==QS.get('state'))throw new Error('state mismatch');
   saveTokens(await tokenReq({grant_type:'authorization_code',code,code_verifier:saved.v}));
   lsDel('npsi_pkce');
 }
@@ -270,16 +276,17 @@ async function liveLoad(){
   render({key:key+'|'+sig,pilot:a.name,ship:sh.ship_type_id,shipName:(await getType(sh.ship_type_id)).name,
     note:sh.ship_name?'“'+sh.ship_name+'”':'Live from EVE',slots:fitCache});
 }
-function showLogin(){
+function showLogin(err){
   const m=$('msg');m.classList.add('login');
-  message('',`<div>CONNECT TO EVE ONLINE</div><button id="lb">LOGIN WITH EVE</button>`);
+  message('',`<div>${err?'<span class="err">'+esc(err)+'</span>':'CONNECT TO EVE ONLINE'}</div><button id="lb">LOGIN WITH EVE</button>
+    <span class="cb">Callback URL to register:<br>${esc(REDIRECT)}</span>`);
   $('lb').onclick=login;
 }
 
 (async()=>{
   if(DEMO){render(demoModel());return}
-  if(!CLIENT_ID){message('SET YOUR CLIENT ID – SEE SETUP');return}
-  try{await handleCallback()}catch(e){message('LOGIN FAILED – RELOAD AND TRY AGAIN');return}
+  if(!CLIENT_ID){showLogin('NO CLIENT ID – add ?client_id=YOUR_ID to the URL');return}
+  try{await handleCallback()}catch(e){showLogin('LOGIN FAILED: '+(e&&e.message||e));return}
   const run=async()=>{try{await liveLoad()}catch(e){if(!curKey)message('AWAITING DATA')}};
   run();setInterval(run,15000);
 })();
