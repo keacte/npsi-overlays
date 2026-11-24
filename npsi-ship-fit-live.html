@@ -59,17 +59,9 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
   -webkit-mask:radial-gradient(circle,transparent 0 30%,#000 31%);mask:radial-gradient(circle,transparent 0 30%,#000 31%);
   animation:spin 4.5s linear infinite}
 
-/* ===== blueprint style (default; add ?style=photo for the normal look) ===== */
-.bp #shipwrap:before{content:"";position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(circle,rgba(40,18,90,.55),rgba(20,8,50,.25) 70%,transparent 72%),
-    repeating-linear-gradient(0deg,rgba(185,139,255,.22) 0 1px,transparent 1px 10px),
-    repeating-linear-gradient(90deg,rgba(185,139,255,.22) 0 1px,transparent 1px 10px);
-  -webkit-mask:radial-gradient(circle,#000 0 70%,transparent 72%);mask:radial-gradient(circle,#000 0 70%,transparent 72%);
-  animation:gridshift 6s linear infinite}
-@keyframes gridshift{to{background-position:0 0,0 10px,10px 0}}
-.bp #ship{filter:url(#bp) drop-shadow(0 0 5px rgba(185,139,255,.8))}
-.bp #ship3d{filter:drop-shadow(0 0 6px rgba(185,139,255,.7))}
+/* ===== purple tone: the ship is recoloured in shades of purple (add ?style=photo for original colours) ===== */
+.tone #ship{filter:url(#tone) drop-shadow(0 0 10px rgba(163,92,255,.7))}
+.tone #ship3d{filter:url(#tone) drop-shadow(0 0 10px rgba(163,92,255,.6))}
 
 #info{position:absolute;left:206px;right:16px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:4px}
 #info>*{animation:txtin .6s both}
@@ -92,13 +84,14 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  <filter id="bp" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
-    <feConvolveMatrix in="SourceGraphic" order="3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1" preserveAlpha="false" edgeMode="none" result="e1"/>
-    <feConvolveMatrix in="SourceGraphic" order="3" kernelMatrix="1 1 1 1 -8 1 1 1 1" preserveAlpha="false" edgeMode="none" result="e2"/>
-    <feComposite in="e1" in2="e2" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="edges"/>
-    <feColorMatrix in="edges" type="matrix" values="0 0 0 0 0.86  0 0 0 0 0.77  0 0 0 0 1  1.6 1.6 1.6 1.2 0" result="lines"/>
-    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.2  0 0 0 0 0.7  0 0 0 0.3 0" result="fill"/>
-    <feMerge><feMergeNode in="fill"/><feMergeNode in="lines"/></feMerge>
+  <filter id="tone" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <!-- greyscale with a little contrast boost, then map brightness to a purple gradient: deep indigo -> violet -> pale lavender -->
+    <feColorMatrix type="matrix" values="0.45 0.7 0.25 0 0  0.45 0.7 0.25 0 0  0.45 0.7 0.25 0 0  0 0 0 1 0"/>
+    <feComponentTransfer>
+      <feFuncR type="table" tableValues="0.08 0.24 0.54 0.78 0.93"/>
+      <feFuncG type="table" tableValues="0.03 0.09 0.25 0.52 0.82"/>
+      <feFuncB type="table" tableValues="0.20 0.48 0.99 1 1"/>
+    </feComponentTransfer>
   </filter>
 </defs></svg>
 <div id="stage">
@@ -140,7 +133,6 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 const cv=document.getElementById('ship3d'),img=document.getElementById('ship');
-const BP=(new URLSearchParams(location.search).get('style')||'blueprint')!=='photo';
 const dbg=m=>{if(new URLSearchParams(location.search).has('debug')){let e=document.getElementById('dbg');if(!e){e=document.createElement('div');e.id='dbg';e.style.cssText='position:absolute;left:8px;bottom:4px;z-index:9;font:600 11px Rajdhani,sans-serif;color:#f58a1f;max-width:190px';document.getElementById('card').appendChild(e)}e.textContent='3D: '+m}};
 
 let R;try{R=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true})}catch(e){window.__wantModel=null;dbg('WebGL unavailable');throw e}
@@ -179,18 +171,9 @@ async function apply(){
     clear();model=g.scene;
     /* drop the file's own lights; we light the scene ourselves */
     const lights=[];model.traverse(o=>{if(o.isLight)lights.push(o)});lights.forEach(l=>l.parent.remove(l));
-    if(BP){   /* blueprint: dark translucent body + glowing hard-edge lines */
-      const meshes=[];model.traverse(o=>{if(o.isMesh)meshes.push(o)});
-      const body=new THREE.MeshBasicMaterial({color:0x1b0e3a,transparent:true,opacity:.62,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
-      const lineMat=new THREE.LineBasicMaterial({color:0xdcc6ff,transparent:true,opacity:1});
-      meshes.forEach(o=>{
-        o.add(new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry,32),lineMat));
-        o.material=body;
-      });
-    }
     const box=new THREE.Box3().setFromObject(model),c=box.getCenter(new THREE.Vector3()),sph=box.getBoundingSphere(new THREE.Sphere());
     model.position.sub(c);pivot.add(model);pivot.rotation.set(0,ANGLE,0);
-    const d=sph.radius/Math.sin(THREE.MathUtils.degToRad(15))*0.95;
+    const d=sph.radius/Math.sin(THREE.MathUtils.degToRad(15))*1.08;
     cam.position.set(0,d*.32,d);cam.lookAt(0,0,0);
     loadedUrl=want;show3d(true);dbg('ok');
   }catch(e){dbg('FAILED – '+(e&&e.message||e));if(my===token)show3d(false)}   /* keep the 2D render */
@@ -211,7 +194,7 @@ const CONFIG = {
 const QS=new URLSearchParams(location.search);
 const DEMO=QS.has('demo');
 const MODE=(QS.get('mode')||'live').toLowerCase();
-if((QS.get('style')||'blueprint')!=='photo')document.documentElement.classList.add('bp');
+if((QS.get('style')||'purple')!=='photo')document.documentElement.classList.add('tone');
 const CHAR=parseInt(QS.get('character')||'1376548045',10);
 const esi='https://esi.evetech.net/latest';
 const $=id=>document.getElementById(id);
