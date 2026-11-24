@@ -185,7 +185,7 @@ function demo(){
   totals={kills:14,losses:3,pods:2,ships:12,iskLost:1.8e9};head();
   const R=[[29990,'Loki','Tama',0,1.34e9],[35683,'Hecate','Amamake',0,212e6],[34562,'Svipul','Rancer',1,88e6],[29984,'Tengu','Old Man Star',0,742e6],[34317,'Confessor','Hek',0,134e6],
     [11202,'Ares','Jita',0,9e6],[11184,'Crusader','Perimeter',1,21e6],[17738,'Machariel','Sosala',0,980e6],[24690,'Hurricane','Aufay',0,64e6],[22456,'Sabre','Otela',0,47e6],[11567,'Avatar','Tama',0,95e9]];
-  const mk=(r,i)=>({id:Math.random(),ship:r[0],shipName:r[1],pilot:'Demo Pilot',system:r[2],loss:!!r[3],value:r[4],time:Date.now()-i*18e5});
+  const mk=(r,i)=>({id:Math.random(),ship:r[0],shipName:r[1],pilot:'Demo Pilot',system:r[2],loss:!!r[3],value:r[4],time:new Date(Date.now()-i*18e5).toISOString()});
   R.slice(0,10).reverse().forEach((r,i)=>addCard(mk(r,10-i),i*.1));
   let n=0;setInterval(()=>addCard(mk(R[n++%R.length],0)),6000);
 }
