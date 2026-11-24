@@ -6,21 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-/* OBS Browser Source: width 560, height 200 (any size with the same ratio works), transparent background */
+/* OBS Browser Source: width 400, height 340 (any size with the same ratio works), transparent background */
 :root{
   --steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif;
   --purple:#8a3ffc;--violet:#b98bff;--glow:#a35cff;--dim:#2a1747;--white:#f4efff;--orange:#f58a1f;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;background:transparent;overflow:hidden}
-#stage{position:absolute;left:0;top:0;width:560px;height:200px;transform-origin:0 0;font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--white)}
+#stage{position:absolute;left:0;top:0;width:400px;height:340px;transform-origin:0 0;font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--white)}
 @keyframes blink{50%{opacity:.15}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes bob{50%{transform:translateY(-5px)}}
 @keyframes sweepx{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
-@keyframes scan{to{top:200px}}
+@keyframes scan{to{top:340px}}
 @keyframes shipin{from{opacity:0;transform:translateX(-50px) scale(.7);filter:blur(10px)}}
-@keyframes txtin{from{opacity:0;transform:translateX(30px)}}
+@keyframes txtin{from{opacity:0;transform:translateY(16px)}}
 @keyframes flash{0%{opacity:.9}100%{opacity:0}}
 
 #card{position:absolute;inset:0;border:1px solid var(--purple);background:rgba(5,3,8,.72);overflow:hidden;
@@ -31,7 +31,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #flash{position:absolute;inset:0;background:radial-gradient(circle at 25% 50%,rgba(185,139,255,.8),transparent 60%);opacity:0;pointer-events:none}
 #flash.go{animation:flash .9s ease-out}
 
-#shipwrap{position:absolute;left:14px;top:9px;width:180px;height:180px;display:flex;align-items:center;justify-content:center}
+#shipwrap{position:absolute;left:109px;top:13px;width:180px;height:180px;display:flex;align-items:center;justify-content:center}
 #shipwrap svg{position:absolute;inset:0;overflow:visible}
 .r1{transform-origin:90px 90px;animation:spin 30s linear infinite}
 .r2{transform-origin:90px 90px;animation:spin 18s linear infinite reverse}
@@ -63,11 +63,11 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 .tone #ship{filter:url(#tone) drop-shadow(0 0 10px rgba(163,92,255,.7))}
 .tone #ship3d{filter:url(#tone) drop-shadow(0 0 10px rgba(163,92,255,.6))}
 
-#info{position:absolute;left:206px;right:16px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:4px}
+#info{position:absolute;left:20px;right:20px;top:200px;bottom:12px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px}
 #info>*{animation:txtin .6s both}
-#lab{display:flex;align-items:center;gap:10px;font:700 13px 'Orbitron';letter-spacing:4px;color:var(--violet)}
+#lab{display:flex;align-items:center;justify-content:center;gap:10px;font:700 13px 'Orbitron';letter-spacing:4px;color:var(--violet)}
 #lab i{width:9px;height:9px;border-radius:50%;background:#ff2b3d;box-shadow:0 0 10px #ff2b3d;animation:blink 1.4s steps(2) infinite}
-#sname{font:800 46px/1.02 var(--head);text-shadow:0 0 20px rgba(166,92,255,.7);white-space:pre;animation-delay:.1s}
+#sname{width:100%;font:800 46px/1.02 var(--head);text-shadow:0 0 20px rgba(166,92,255,.7);white-space:pre;animation-delay:.1s}
 #scls{font:700 15px 'Orbitron';letter-spacing:3px;color:var(--steel);text-shadow:0 0 12px rgba(166,92,255,.6);text-transform:uppercase;animation-delay:.18s}
 #cust{font:600 18px 'Rajdhani';color:var(--violet);letter-spacing:.04em;animation-delay:.24s}
 #pil{margin-top:6px;padding-top:6px;border-top:1px solid var(--dim);display:flex;justify-content:space-between;font:600 14px 'Orbitron';letter-spacing:3px;color:#a898c4;text-transform:uppercase;animation-delay:.3s}
@@ -199,9 +199,9 @@ const $=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ago=t=>{const m=Math.max(0,Math.round((Date.now()-new Date(t))/60000));return m<1?'just now':m<60?m+'m ago':m<1440?Math.floor(m/60)+'h ago':Math.floor(m/1440)+'d ago'};
 
-/* scale 560x200 stage to any source size */
+/* scale 400x340 stage to any source size */
 const stage=$('stage');
-function fit(){const s=Math.min(innerWidth/560,innerHeight/200);stage.style.transform=`translate(${(innerWidth-560*s)/2}px,${(innerHeight-200*s)/2}px) scale(${s})`}
+function fit(){const s=Math.min(innerWidth/400,innerHeight/340);stage.style.transform=`translate(${(innerWidth-400*s)/2}px,${(innerHeight-340*s)/2}px) scale(${s})`}
 addEventListener('resize',fit);fit();
 
 /* ---- ESI helpers ---- */
@@ -309,7 +309,7 @@ async function killboardLoad(){
 let nameNow='';
 function setName(n){nameNow=n;fitName()}
 function fitName(){
-  const el=$('sname'),max=el.clientWidth||338,n=nameNow;
+  const el=$('sname'),max=el.clientWidth||360,n=nameNow;
   if(!n)return;
   const fits=()=>el.scrollWidth<=max+0.5;
   el.textContent=n;el.style.fontSize='46px';
