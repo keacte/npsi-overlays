@@ -138,6 +138,11 @@ async function load(){
       {name:'Capital Hunt',fc:'Demo FC',time:new Date(n+50*h).toISOString(),type:'Pochven',doctrine:'Cruisers',staging:'Niarja'}];return}
   const src=QS.get('src');
   if(src){try{const r=await fetch(src,{cache:'no-store'});const j=await r.json();fleets=Array.isArray(j)?j:(j.fleets||j.events||[])}catch(e){fleets=FLEETS}return}
+  /* 1) fleets.json, refreshed every 10 min by a GitHub Action in the same repo (same site = no CORS problems) */
+  try{const r=await fetch('fleets.json?'+Date.now(),{cache:'no-store'});const j=await r.json();
+    if(j.updated&&Date.now()-new Date(j.updated)<2*864e5){fleets=j.fleets||[];dbg('fleets.json ok: '+fleets.length+' (updated '+j.updated+')');return}
+    dbg('fleets.json missing or stale')}catch(e){dbg('fleets.json not available')}
+  /* 2) otherwise pull the schedule live from npsi.rocks */
   try{fleets=await loadNpsi()}catch(e){if(!fleets.length)fleets=FLEETS}
 }
 load().then(render);setInterval(()=>load().then(render),REFRESH_MS);
