@@ -28,7 +28,7 @@ for (const f of fleets) {
   const file = 'logos/' + f.hostImage.split('/').pop().replace(/[^A-Za-z0-9._-]/g, '_');
   if (!existsSync(file)) {
     try {
-      const url = /^https?:/.test(f.hostImage) ? f.hostImage : 'https://npsi.rocks' + f.hostImage;
+      const url = /^https?:/.test(f.hostImage) ? f.hostImage : 'https://media.npsi.rocks' + f.hostImage;
       const r = await fetch(url, { headers: { 'User-Agent': 'npsi-overlays (fleet schedule widget)' } });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       writeFileSync(file, Buffer.from(await r.arrayBuffer()));
