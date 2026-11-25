@@ -66,7 +66,7 @@ const FLEETS=[
 ];
 const PAGE=Math.min(8,Math.max(1,parseInt(new URLSearchParams(location.search).get('max')||'8',10))),PAGE_MS=10000;   /* rows per page; extra fleets rotate in pages */
 const API='https://npsi.rocks/events/api/events/',DAYS_AHEAD=Math.min(14,Math.max(1,parseInt(new URLSearchParams(location.search).get('days')||'7',10)));
-const LIVE_MS=3*3600e3, SOON_MS=60*60e3, REFRESH_MS=5*60e3;
+let lastLive=0;const LIVE_EVERY=30*60e3,LIVE_MS=3*3600e3, SOON_MS=60*60e3, REFRESH_MS=5*60e3;
 /* ========================================== */
 
 const QS=new URLSearchParams(location.search),list=document.getElementById('list');
@@ -138,11 +138,13 @@ async function load(){
       {name:'Capital Hunt',fc:'Demo FC',time:new Date(n+50*h).toISOString(),type:'Pochven',doctrine:'Cruisers',staging:'Niarja'}];return}
   const src=QS.get('src');
   if(src){try{const r=await fetch(src,{cache:'no-store'});const j=await r.json();fleets=Array.isArray(j)?j:(j.fleets||j.events||[])}catch(e){fleets=FLEETS}return}
-  /* 1) fleets.json, refreshed every 10 min by a GitHub Action in the same repo (same site = no CORS problems) */
+  /* 1) fleets.json, refreshed every 30 min by a GitHub Action in the same repo (same site = no CORS problems) */
   try{const r=await fetch('fleets.json?'+Date.now(),{cache:'no-store'});const j=await r.json();
     if(j.updated&&Date.now()-new Date(j.updated)<2*864e5){fleets=j.fleets||[];dbg('fleets.json ok: '+fleets.length+' (updated '+j.updated+')');return}
     dbg('fleets.json missing or stale')}catch(e){dbg('fleets.json not available')}
   /* 2) otherwise pull the schedule live from npsi.rocks */
+  if(fleets.length&&Date.now()-lastLive<LIVE_EVERY)return;        /* live fallback calls npsi.rocks at most once every 30 minutes */
+  lastLive=Date.now();
   try{fleets=await loadNpsi()}catch(e){if(!fleets.length)fleets=FLEETS}
 }
 load().then(render);setInterval(()=>load().then(render),REFRESH_MS);

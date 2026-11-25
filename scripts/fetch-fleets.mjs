@@ -1,9 +1,9 @@
-// Pulls the npsi.rocks fleet schedule (yesterday + next 14 days) and writes fleets.json next to the widgets,
+// Pulls the npsi.rocks fleet schedule (yesterday + next 7 days) and writes fleets.json next to the widgets,
 // so the stream view can read it from the same site (no CORS problems).
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 const API = 'https://npsi.rocks/events/api/events/';
 const pad = n => String(n).padStart(2, '0');
-const days = Array.from({ length: 16 }, (_, i) => new Date(Date.now() + (i - 1) * 864e5));
+const days = Array.from({ length: 9 }, (_, i) => new Date(Date.now() + (i - 1) * 864e5));
 const seen = new Map();
 let ok = 0;
 for (const d of days) {
