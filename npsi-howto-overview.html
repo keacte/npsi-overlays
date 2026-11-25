@@ -43,7 +43,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #pts .p small{display:block;font:600 17px/1.2 'Rajdhani';letter-spacing:.1em;color:#a898c4;text-transform:uppercase}
 #prog{position:absolute;left:0;right:0;bottom:0;height:8px;background:rgba(138,63,252,.2)}
 #prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--violet));box-shadow:0 0 12px var(--glow)}
-#nav{position:absolute;left:110px;right:110px;top:852px;display:grid;grid-template-columns:repeat(10,1fr);gap:10px;z-index:3}
+#nav{position:absolute;left:110px;right:110px;top:852px;display:grid;grid-template-columns:repeat(8,1fr);gap:10px;z-index:3}
 #nav .n{padding:9px 10px;background:rgba(5,3,8,.6);border-left:3px solid var(--steel-dim);transition:all .35s;min-width:0}
 #nav .n b{display:block;font:800 17px 'Orbitron';color:var(--steel)}
 #nav .n small{display:block;font:600 14px/1.15 'Rajdhani';letter-spacing:.06em;color:#a898c4;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -74,26 +74,22 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 /* ===== EDIT ME ===== */
 const SECONDS = 10;   // time on each guide (or add ?seconds=15 to the URL)
 const GUIDES = [
- {s:'START HERE',t:'Your First NPSI Fleet',sub:'Everything a new pilot needs to know',tl:'NPSI fleets are <b>public PvP roams open to everyone</b>. Pick a fleet, prepare your ship, join comms and follow the FC.',
-  p:[['Find a fleet','Use the NPSI calendar'],['Prepare your ship','Right fit, ammo, PvP clone'],['XUP when asked','Then follow the FC'],['Losing ships is normal','Have fun']]},
- {s:'FIND A FLEET',t:'How to Find a Fleet',sub:'Finding public fleets on NPSI.rocks',tl:'Everything is on the <b>NPSI calendar</b>. Fleets are mostly advertised up to a week ahead.',
-  p:[['npsi.rocks/calendar','Every upcoming fleet'],['Read the listing','Staging, time, ship, FC'],['Follow your hosts','Get Discord reminders'],['Start with cheap roams','Frigates and cruisers']]},
- {s:'JOIN A FLEET',t:'How to Join Your First Fleet',sub:'Adverts, invites and joining instructions',tl:'Read the advert, be at staging early, join comms, then <b>wait for the FC to prompt you to XUP</b>.',
-  p:[['Read the advert','Time, staging, ship, comms'],['Move to staging','Days before, not minutes'],['XUP on the call','"x Caracal" style'],['Accept the invite','Then read the MOTD']]},
- {s:'WHAT IS NPSI?',t:'What Does NPSI Mean?',sub:'Not Purple Shoot It explained',tl:'Fleet members show <b>purple</b> on your overview. Anything that is not purple is a valid target. No blues, no strings, just content.',
+ {s:'WHAT IS NPSI',t:'What Is NPSI?',sub:'Not Purple Shoot It explained',tl:'Fleet members show <b>purple</b> on your overview. Anything that is not purple is a valid target. No blues, no strings, just content.',
   p:[['Purple = friend','In your fleet'],['Not purple = target','Shoot what the FC calls'],['Open to everyone','No corp, no standings'],['Learn the lingo','FC, XUP, MOTD, GF']]},
- {s:'ETIQUETTE',t:'How to Fly With Strangers',sub:'Etiquette, communication, expectations',tl:'<b>Be on time, be prepared, listen to the FC</b> and keep comms clear. Everyone was new once.',
-  p:[['Be on time and ready','Right ship, right fit'],['Follow instructions','No backseat flying'],['Keep comms short','What, where, how many'],['Be kind','Say thanks and GF']]},
- {s:'TIMEZONES',t:'Fleets for Your Timezone',sub:'Finding EU, US and AU fleets',tl:'<b>EVE time is UTC.</b> Convert fleet times, then check the calendar for your evening.',
+ {s:'WHAT IS NPSI.ROCKS',t:'What Is NPSI.rocks?',sub:'The central hub for public EVE fleets',tl:'<b>One calendar for public fleets</b> from many hosts, so you never hunt through Discords for tonight\'s fleet.',
+  p:[['Calendar','Every upcoming fleet'],['Hosts','20+ communities'],['Roam reports and leaderboards','See how fleets went'],['Discord and Fluffy bot','Announcements and reminders']]},
+ {s:'HOW TO GET INVOLVED',t:'How to Get Involved',sub:'Find a fleet, join it and fly',tl:'Find a fleet, read the advert, move to staging, then <b>XUP when the FC asks</b>. No sign-up needed.',
+  p:[['Find a fleet','Use the NPSI calendar'],['Read the advert','Staging, time, ship, comms'],['Join comms and XUP','"x Caracal" style'],['Accept the invite','Read the MOTD, follow the FC']]},
+ {s:'WHEN TO GET INVOLVED',t:'When to Get Involved',sub:'Finding fleets at your time of day',tl:'<b>EVE time is UTC.</b> Fleets are advertised up to a week ahead. Convert the time, then check the calendar.',
   p:[['EU','Late afternoon to late evening'],['US','Evening in the Americas'],['AU','Evening in Australia'],['Check the calendar','Hosts set their own times']]},
- {s:'PREPARE',t:'How to Prepare for a Fleet',sub:'Ships, fits, ammo, clones and supplies',tl:'<b>Right ship, correct fit, ammo, paste, drugs, drones, a PvP clone</b> and home station set to staging.',
-  p:[['Ship at staging','Move it days ahead'],['Fit, ammo, paste, drones','Load before formup'],['Cheap PvP clone','Never risk precious implants'],['Test your comms','Mic and speakers']]},
- {s:'ON JOINING',t:'What to Do When You Join Fleet',sub:'Mumble, chat, broadcasts, instructions',tl:'<b>Join voice, read the MOTD</b>, load your overview and watch the broadcasts. Listen to the FC.',
-  p:[['Read the MOTD','Before asking questions'],['Join voice comms','Push-to-talk, stay short'],['Watch broadcasts','Align, warp, target'],['Volunteer','Scout or D-scan']]},
- {s:'LOSSES',t:'What Happens If I Lose My Ship?',sub:'Losses, replacements and expectations',tl:'<b>You will lose ships. It is normal.</b> Fly what you can afford to lose, say GF and reship.',
-  p:[['Stay calm','Say "GF"'],['Home station = staging','Pod out, reship, rejoin'],['Check for handouts','Replacement rules vary by host'],['Learn from the killmail','Then fly again']]},
- {s:'BECOME A REGULAR',t:'Become a Regular NPSI Pilot',sub:'Finding communities and building friendships',tl:'<b>Show up regularly</b>, join a few communities and be reliable. Soon you will know half the fleet.',
-  p:[['Pick a weekly slot','Consistency builds friendships'],['Try different hosts','20+ hosts on NPSI.rocks'],['Join their Discords','Say hello'],['Give feedback','Fill in the fleet form']]}
+ {s:'SURVIVING YOUR FIRST FLEET',t:'Surviving Your First Fleet',sub:'Prepare, fly, lose a ship, come back',tl:'<b>Right ship, correct fit, a PvP clone</b> and home station at staging. Losing ships is normal. Say GF and reship.',
+  p:[['Ship at staging','Move it days ahead'],['Ammo, paste, drugs, drones','Load before formup'],['Stay with the fleet','Follow the FC'],['Lost it? Say GF','Reship and rejoin']]},
+ {s:'GETTING INVOLVED',t:'Getting Involved',sub:'From first fleet to regular pilot',tl:'<b>Show up regularly</b>, join a few communities and be reliable. Soon you will know half the fleet.',
+  p:[['Pick a weekly slot','Consistency builds friendships'],['Try different hosts','Find your style'],['Join their Discords','Say hello'],['Volunteer and give feedback','Scout, D-scan, one day FC']]},
+ {s:'FLEET ETIQUETTE',t:'Fleet Etiquette',sub:'How to fly well with strangers',tl:'<b>Be on time, be prepared, listen to the FC</b> and follow instructions. Everyone was new once.',
+  p:[['Be on time and ready','Right ship, right fit'],['Follow instructions','No backseat flying'],['Keep it positive','Say thanks and GF'],['Feedback after','Two-minute form']]},
+ {s:'COMMS',t:'Comms',sub:'Voice, fleet chat and broadcasts',tl:'<b>Test your voice comms before the fleet.</b> Use push-to-talk, keep calls short and watch the broadcasts.',
+  p:[['Join the right channel','Test mic and speakers'],['Say what, where, how many','Then stop'],['Read the MOTD','Before asking questions'],['Watch broadcasts','Align, warp, target']]}
 ];
 const TICKER='NPSI.ROCKS  //  FLY TOGETHER, WIN TOGETHER  //  NOT PURPLE? SHOOT IT!  //  NO BLUES, NO STRINGS, JUST CONTENT  //  FULL GUIDES AT NPSI.ROCKS  //  JOIN THE DISCORD WITH !discord  //  ';
 /* =================== */
