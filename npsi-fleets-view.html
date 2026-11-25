@@ -28,10 +28,14 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 @keyframes fin{from{opacity:0;transform:translateX(-50px)}}
 .f.soon{border-left-color:var(--violet);background:linear-gradient(90deg,rgba(185,139,255,.20),rgba(5,3,8,.75) 70%);box-shadow:0 0 16px rgba(163,92,255,.35)}
 .f.live{border-left-color:var(--red);background:linear-gradient(90deg,rgba(255,43,61,.16),rgba(5,3,8,.75) 70%);box-shadow:0 0 16px rgba(255,43,61,.25)}
-.f .tm{flex:none;width:92px;text-align:center}
+.f .tm{flex:none;width:84px;text-align:center}
 .f .tm b{display:block;font:500 22px/1 'Orbitron';letter-spacing:1px;color:var(--violet);font-variant-numeric:tabular-nums}
 .f .tm small{display:block;margin-top:6px;font:500 11px 'Orbitron';letter-spacing:2px;color:#8a7bb0;text-transform:uppercase;white-space:nowrap}
 .f.soon .tm b{color:#fff}.f.live .tm b{color:var(--red)}
+.f .lg{flex:none;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(138,63,252,.12);border:1px solid var(--dim);overflow:hidden}
+.f .lg img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.f .lg span{font:500 15px 'Orbitron';letter-spacing:1px;color:var(--violet)}
+.f.gold .lg{border-color:rgba(255,200,61,.5);background:rgba(255,200,61,.1)}.f.gold .lg span{color:var(--gold)}
 .f .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
 .f .tx b{font:400 21px/1.1 var(--head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f .tx span{font:500 16px/1.15 'Rajdhani';color:#cbbbe8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -89,6 +93,13 @@ function upcoming(){const now=Date.now(),today=new Date().toISOString().slice(0,
 const track=document.getElementById('track'),ROW=76,GAP=6;
 let shown='',first=true,off=0,cycle=0,last=performance.now(),startAt=0;
 const DELAY=parseFloat(new URLSearchParams(location.search).get('delay')||'5')*1000;   /* seconds to hold still after the feed loads, before scrolling starts */
+const initials=h=>(String(h||'?').replace(/[^A-Za-z0-9 ]/g,' ').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('')||'?').toUpperCase();
+function logo(f){
+  const fb=`<span>${esc(initials(f.host))}</span>`;
+  if(!f.hostImage)return fb;
+  const u=/^https?:/.test(f.hostImage)?f.hostImage:'https://npsi.rocks'+(f.hostImage[0]==='/'?'':'/')+f.hostImage;
+  return `<img alt="" src="${esc(u)}" referrerpolicy="no-referrer" onerror="this.parentNode.innerHTML=this.dataset.fb" data-fb="${esc(fb)}">`;
+}
 function build(up){
   track.innerHTML='';
   if(!up.length){track.innerHTML='<div id="empty">NO UPCOMING FLEETS</div>';cycle=0;return}
@@ -98,6 +109,7 @@ function build(up){
     const sub=[f.fc&&('FC '+f.fc),f.staging,f.host].filter(Boolean).join(' · ');
     const det=[f.type,f.doctrine].filter(Boolean).join(' · ');
     e.innerHTML=`<div class="tm"><b>${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}</b><small>${dayLabel(d)}</small></div>
+      <div class="lg">${logo(f)}</div>
       <div class="tx"><b>${esc(f.name)}</b>${sub?`<span>${esc(sub)}</span>`:''}${det?`<span class="d">${esc(det)}</span>`:''}</div><div class="tag" hidden></div>`;
     e.className='f';return e};
   up.forEach((f,i)=>track.appendChild(mk(f,i,false)));
@@ -147,7 +159,7 @@ async function loadNpsi(){
   if(res.every(r=>r===null))throw new Error('schedule unreachable');
   const seen=new Set(),out=[];
   res.flat().filter(Boolean).forEach(e=>{if(seen.has(e.id))return;seen.add(e.id);
-    out.push({name:e.name,host:e.host,fc:e.fc,staging:e.location,time:e.start,end:e.end,ended:!!e.ended})});
+    out.push({name:e.name,host:e.host,fc:e.fc,staging:e.location,time:e.start,end:e.end,ended:!!e.ended,hostImage:e.hostImage||null})});
   return out;
 }
 async function load(){

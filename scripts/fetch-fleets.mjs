@@ -15,7 +15,7 @@ for (const d of days) {
     if (!Array.isArray(j.events)) throw new Error('no events array');
     ok++;
     for (const e of j.events) if (!seen.has(e.id))
-      seen.set(e.id, { id: e.id, name: e.name, host: e.host, fc: e.fc, staging: e.location, time: e.start, end: e.end, ended: !!e.ended });
+      seen.set(e.id, { id: e.id, name: e.name, host: e.host, fc: e.fc, staging: e.location, time: e.start, end: e.end, ended: !!e.ended, hostImage: e.hostImage || null });
   } catch (e) { console.error(day, 'failed:', e.message); }
 }
 if (!ok) { console.error('No day could be loaded; leaving fleets.json unchanged'); process.exit(0); }
