@@ -1,1 +1,245 @@
-{"updated":null,"fleets":[]}
+{
+ "updated": "2026-11-25T10:07:20.873Z",
+ "fleets": [
+  {
+   "id": 5802,
+   "name": "SC Cheap Yeet!",
+   "host": "Shadow Cartel NPSI",
+   "fc": "Dietcoke650",
+   "staging": "Adirain",
+   "time": "2026-11-24T00:30:00+00:00",
+   "end": "2026-11-24T02:30:00+00:00",
+   "ended": true
+  },
+  {
+   "id": 5786,
+   "name": "T3D Tuesday",
+   "host": "Spectre Fleet",
+   "fc": "taylor parker",
+   "staging": "Jita",
+   "time": "2026-11-24T19:00:00+00:00",
+   "end": "2026-11-24T21:00:00+00:00",
+   "ended": true
+  },
+  {
+   "id": 5757,
+   "name": "Slop Fleet, Caldari Faction Warfare",
+   "host": "EVE LinkNet",
+   "fc": "Edmine Codie",
+   "staging": "Oisio",
+   "time": "2026-11-25T02:30:00+00:00",
+   "end": "2026-11-25T04:30:00+00:00",
+   "ended": true
+  },
+  {
+   "id": 5814,
+   "name": "Rocket Party!",
+   "host": "Spectre Fleet",
+   "fc": "Virion Stoneshard",
+   "staging": "Jita",
+   "time": "2026-11-25T17:00:00+00:00",
+   "end": "2026-11-25T19:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5790,
+   "name": "Wednesday Whaling",
+   "host": "Bombers Bar",
+   "fc": "Lord InsidiousTroll",
+   "staging": "Thera",
+   "time": "2026-11-25T23:50:00+00:00",
+   "end": "2026-11-26T01:50:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5797,
+   "name": "K-FLEET: ShrinkWrapped pew pew!",
+   "host": "F.U.N. Inc.",
+   "fc": "keacte",
+   "staging": "Jita",
+   "time": "2026-11-26T19:30:00+00:00",
+   "end": "2026-11-26T23:30:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5736,
+   "name": "Broken Daggers Funtime Faction Warfare - T1/Navy Cruisers and below",
+   "host": "EVE LinkNet",
+   "fc": "Broken Daggers",
+   "staging": "Oisio - LinkNet Central Station",
+   "time": "2026-11-27T02:30:00+00:00",
+   "end": "2026-11-27T04:30:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5804,
+   "name": "Friday Armada",
+   "host": "Bombers Bar",
+   "fc": "moyraine",
+   "staging": "",
+   "time": "2026-11-27T18:00:00+00:00",
+   "end": "2026-11-27T20:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5813,
+   "name": "Friday Yarrrr!",
+   "host": "Friday Yarrrr!",
+   "fc": "Muon Farstrider",
+   "staging": "Hek",
+   "time": "2026-11-27T23:30:00+00:00",
+   "end": "2026-11-28T02:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5809,
+   "name": "Zythe's Saturday NPSI fleet",
+   "host": "Lynne Rankin",
+   "fc": "Zythe0",
+   "staging": "Jita 4-4",
+   "time": "2026-11-28T02:00:00+00:00",
+   "end": "2026-11-28T08:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5733,
+   "name": "Tooters",
+   "host": "Tooters",
+   "fc": "--",
+   "staging": "Jita",
+   "time": "2026-11-28T12:00:00+00:00",
+   "end": "2026-11-28T14:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5780,
+   "name": "GRIP: Problem Fleet",
+   "host": "EVE LinkNet",
+   "fc": "Sloots Mckeenzie",
+   "staging": "Oisio",
+   "time": "2026-11-28T23:00:00+00:00",
+   "end": "2026-11-29T01:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5815,
+   "name": "NPSI C5 Roaching - Newbro Friendly",
+   "host": "Squatch Squad NPSI",
+   "fc": "--",
+   "staging": "",
+   "time": "2026-11-29T02:00:00+00:00",
+   "end": "2026-11-29T04:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5811,
+   "name": "\"The broad side of an astrahus\"",
+   "host": "Spectre Fleet",
+   "fc": "taylor parker",
+   "staging": "Jita",
+   "time": "2026-11-29T18:00:00+00:00",
+   "end": "2026-11-29T20:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5745,
+   "name": "Lowsec Roam",
+   "host": "Deutsche Public Fleet",
+   "fc": "Jack Firm",
+   "staging": " Egghelende",
+   "time": "2026-11-30T19:00:00+00:00",
+   "end": "2026-11-30T21:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5792,
+   "name": "T3D Tuesday",
+   "host": "Spectre Fleet",
+   "fc": "taylor parker",
+   "staging": "Jita",
+   "time": "2026-12-01T18:00:00+00:00",
+   "end": "2026-12-01T20:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5756,
+   "name": "Slop Fleet, Caldari Faction Warfare",
+   "host": "EVE LinkNet",
+   "fc": "Edmine Codie",
+   "staging": "Oisio",
+   "time": "2026-12-02T02:30:00+00:00",
+   "end": "2026-12-02T04:30:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5795,
+   "name": "K-FLEET: ShrinkWrapped pew pew!",
+   "host": "F.U.N. Inc.",
+   "fc": "keacte",
+   "staging": "Jita",
+   "time": "2026-12-03T19:30:00+00:00",
+   "end": "2026-12-03T23:30:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5751,
+   "name": "Broken Daggers Funtime Faction Warfare - T1/Navy Cruisers and below",
+   "host": "EVE LinkNet",
+   "fc": "Broken Daggers",
+   "staging": "Oisio - LinkNet Central Station",
+   "time": "2026-12-04T02:30:00+00:00",
+   "end": "2026-12-04T04:30:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5779,
+   "name": "super armada !!! w/haz an odins ",
+   "host": "Bombers Bar",
+   "fc": "hazzzzard haz",
+   "staging": "",
+   "time": "2026-12-04T18:00:00+00:00",
+   "end": "2026-12-04T20:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5761,
+   "name": "Tooters",
+   "host": "Tooters",
+   "fc": "--",
+   "staging": "Jita",
+   "time": "2026-12-05T12:00:00+00:00",
+   "end": "2026-12-05T14:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5796,
+   "name": "K-FLEET: ShrinkWrapped pew pew!",
+   "host": "F.U.N. Inc.",
+   "fc": "keacte",
+   "staging": "Jita",
+   "time": "2026-12-05T19:30:00+00:00",
+   "end": "2026-12-05T23:30:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5810,
+   "name": "T3D Tuesday",
+   "host": "Spectre Fleet",
+   "fc": "taylor parker",
+   "staging": "Jita",
+   "time": "2026-12-08T19:00:00+00:00",
+   "end": "2026-12-08T21:00:00+00:00",
+   "ended": false
+  },
+  {
+   "id": 5776,
+   "name": "Slop Fleet, Caldari Faction Warfare",
+   "host": "EVE LinkNet",
+   "fc": "Edmine Codie",
+   "staging": "Oisio",
+   "time": "2026-12-09T02:30:00+00:00",
+   "end": "2026-12-09T04:30:00+00:00",
+   "ended": false
+  }
+ ]
+}
