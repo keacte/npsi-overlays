@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-25T10:31:39.589Z",
+ "updated": "2026-11-25T20:02:46.766Z",
  "fleets": [
   {
    "id": 5802,
@@ -45,7 +45,7 @@
    "staging": "Jita",
    "time": "2026-11-25T17:00:00+00:00",
    "end": "2026-11-25T19:00:00+00:00",
-   "ended": false,
+   "ended": true,
    "hostImage": "/providers/2026/10/28/spectre-fleet-49100b7f.webp",
    "logo": "logos/spectre-fleet-49100b7f.webp"
   },
@@ -84,6 +84,18 @@
    "ended": false,
    "hostImage": "/providers/2026/10/28/eve-linknet-eff0a25d.webp",
    "logo": "logos/eve-linknet-eff0a25d.webp"
+  },
+  {
+   "id": 5816,
+   "name": "Friday Night Roam",
+   "host": "Spectre Fleet",
+   "fc": "Kaeser",
+   "staging": "Jita",
+   "time": "2026-11-27T09:31:00+00:00",
+   "end": "2026-11-27T11:31:00+00:00",
+   "ended": false,
+   "hostImage": "/providers/2026/10/28/spectre-fleet-49100b7f.webp",
+   "logo": "logos/spectre-fleet-49100b7f.webp"
   },
   {
    "id": 5804,
