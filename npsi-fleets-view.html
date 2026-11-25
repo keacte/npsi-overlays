@@ -63,7 +63,7 @@ addEventListener('resize',fit);fit();
 /* ================= CONFIG =================
    Times are EVE time (UTC), ISO format with a trailing Z.
    Fleets are pulled live from the npsi.rocks schedule API (next 7 days), refreshed every 5 minutes.
-   Options:  ?debug=1 (shows how each day loaded)  ?speed=22 (scroll speed)   ?days=7   ?demo=1   ?src=https://.../fleets.json  (your own JSON, same fields as FLEETS below)
+   Options:  ?debug=1 (shows how each day loaded)  ?speed=22 (scroll speed)  ?delay=5 (seconds before scrolling starts)   ?days=7   ?demo=1   ?src=https://.../fleets.json  (your own JSON, same fields as FLEETS below)
    FLEETS below is only used as a fallback if the live schedule can't be loaded.                        */
 const FLEETS=[
   // {name:'T3D Tuesday', host:'Spectre Fleet', fc:'taylor parker', time:'2026-12-01T19:00:00Z', type:'Low/Null sec roaming', doctrine:'T3 Destroyers', staging:'Jita'},
@@ -87,7 +87,8 @@ function upcoming(){const now=Date.now(),today=new Date().toISOString().slice(0,
   return [...all.filter(f=>!over(f)),                                  /* live + upcoming first */
           ...all.filter(f=>over(f)&&new Date(f.t).toISOString().slice(0,10)===today).map(f=>({...f,over:true}))]}   /* then today's finished fleets */
 const track=document.getElementById('track'),ROW=76,GAP=6;
-let shown='',first=true,off=0,cycle=0,last=performance.now();
+let shown='',first=true,off=0,cycle=0,last=performance.now(),startAt=0;
+const DELAY=parseFloat(new URLSearchParams(location.search).get('delay')||'5')*1000;   /* seconds to hold still after the feed loads, before scrolling starts */
 function build(up){
   track.innerHTML='';
   if(!up.length){track.innerHTML='<div id="empty">NO UPCOMING FLEETS</div>';cycle=0;return}
@@ -103,6 +104,7 @@ function build(up){
   cycle=up.length*(ROW+GAP);
   if(cycle>list.clientHeight+4)up.forEach((f,i)=>track.appendChild(mk(f,i,true)));   /* second copy for a seamless loop */
   else off=0;
+  if(first)startAt=performance.now()+DELAY;
   first=false;
 }
 function render(){
@@ -120,7 +122,7 @@ function render(){
 }
 /* slow continuous scroll upwards, looping seamlessly */
 function tick(n){const dt=Math.min(.1,(n-last)/1000);last=n;
-  if(cycle>0&&track.children.length>1){off=(off+SPEED*dt)%cycle;track.style.transform=`translateY(${-off}px)`}else track.style.transform='';
+  if(cycle>0&&track.children.length>1&&startAt&&n>=startAt){off=(off+SPEED*dt)%cycle;track.style.transform=`translateY(${-off}px)`}else track.style.transform='';
   requestAnimationFrame(tick)}
 requestAnimationFrame(tick);
 const dayCache={},dbgLines=[];
