@@ -17,21 +17,22 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 @keyframes sweepx{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
 #head .t{display:flex;align-items:center;gap:10px;font:500 15px 'Orbitron';letter-spacing:4px}
 #head .t i{width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:blink 1.4s steps(2) infinite}
+#pg{font:500 13px 'Orbitron';letter-spacing:3px;color:#a898c4;float:right;margin-top:6px}
 #head .t span{margin-left:auto;font:500 13px 'Orbitron';letter-spacing:3px;color:#a898c4}
 #next small{display:block;font:500 10px 'Orbitron';letter-spacing:3px;color:var(--violet);margin-bottom:6px}
 #next b{font:400 34px/1 var(--head);letter-spacing:2px;font-variant-numeric:tabular-nums;text-shadow:0 0 14px var(--glow)}
 #next em{font:500 16px 'Rajdhani';font-style:normal;letter-spacing:.12em;color:#a898c4;margin-left:14px;text-transform:uppercase}
 #list{flex:1;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
-.f{flex:none;height:96px;position:relative;display:flex;align-items:center;gap:14px;padding:0 14px 0 4px;background:rgba(5,3,8,.7);border:1px solid var(--dim);border-left:3px solid var(--purple);overflow:hidden;animation:fin .7s cubic-bezier(.2,.8,.2,1) both}
+.f{flex:none;height:76px;position:relative;display:flex;align-items:center;gap:14px;padding:0 14px 0 4px;background:rgba(5,3,8,.7);border:1px solid var(--dim);border-left:3px solid var(--purple);overflow:hidden;animation:fin .7s cubic-bezier(.2,.8,.2,1) both}
 @keyframes fin{from{opacity:0;transform:translateX(-50px)}}
 .f.soon{border-left-color:var(--gold);background:linear-gradient(90deg,rgba(255,200,61,.16),rgba(5,3,8,.75) 70%);box-shadow:0 0 16px rgba(255,200,61,.25)}
 .f.live{border-left-color:var(--red);background:linear-gradient(90deg,rgba(255,43,61,.16),rgba(5,3,8,.75) 70%);box-shadow:0 0 16px rgba(255,43,61,.25)}
 .f .tm{flex:none;width:92px;text-align:center}
-.f .tm b{display:block;font:500 24px/1 'Orbitron';letter-spacing:1px;color:var(--violet);font-variant-numeric:tabular-nums}
+.f .tm b{display:block;font:500 22px/1 'Orbitron';letter-spacing:1px;color:var(--violet);font-variant-numeric:tabular-nums}
 .f .tm small{display:block;margin-top:6px;font:500 11px 'Orbitron';letter-spacing:2px;color:#8a7bb0;text-transform:uppercase;white-space:nowrap}
 .f.soon .tm b{color:var(--gold)}.f.live .tm b{color:var(--red)}
-.f .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
-.f .tx b{font:400 23px/1.1 var(--head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.f .tx b{font:400 21px/1.1 var(--head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f .tx span{font:500 16px/1.15 'Rajdhani';color:#cbbbe8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .f .tx span.d{color:var(--violet);letter-spacing:.06em;text-transform:uppercase;font-size:14px}
 .f .tag{position:absolute;right:0;top:0;padding:2px 10px;font:500 10px 'Orbitron';letter-spacing:2px;background:var(--gold);color:#000}
@@ -43,7 +44,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 <div id="stage">
   <div id="head">
     <div class="t"><i></i>UPCOMING FLEETS<span>NPSI.ROCKS</span></div>
-    <div id="next"><small>NEXT FLEET IN</small><b id="cd">--:--:--</b><em id="nn"></em></div>
+    <div id="next"><small>NEXT FLEET IN<span id="pg"></span></small><b id="cd">--:--:--</b><em id="nn"></em></div>
   </div>
   <div id="list"><div id="empty">NO UPCOMING FLEETS</div></div>
 </div>
@@ -55,12 +56,12 @@ addEventListener('resize',fit);fit();
 /* ================= CONFIG =================
    Times are EVE time (UTC), ISO format with a trailing Z.
    Fleets are pulled live from the npsi.rocks schedule API (next 7 days), refreshed every 5 minutes.
-   Options:  ?max=6   ?days=7   ?demo=1   ?src=https://.../fleets.json  (your own JSON, same fields as FLEETS below)
+   Options:  ?max=8   ?days=7   ?demo=1   ?src=https://.../fleets.json  (your own JSON, same fields as FLEETS below)
    FLEETS below is only used as a fallback if the live schedule can't be loaded.                        */
 const FLEETS=[
   // {name:'T3D Tuesday', host:'Spectre Fleet', fc:'taylor parker', time:'2026-12-01T19:00:00Z', type:'Low/Null sec roaming', doctrine:'T3 Destroyers', staging:'Jita'},
 ];
-const MAX=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get('max')||'6',10)));
+const PAGE=Math.min(8,Math.max(1,parseInt(new URLSearchParams(location.search).get('max')||'8',10))),PAGE_MS=10000;   /* rows per page; extra fleets rotate in pages */
 const API='https://npsi.rocks/events/api/events/',DAYS_AHEAD=Math.min(14,Math.max(1,parseInt(new URLSearchParams(location.search).get('days')||'7',10)));
 const LIVE_MS=3*3600e3, SOON_MS=60*60e3, REFRESH_MS=5*60e3;
 /* ========================================== */
@@ -73,10 +74,12 @@ function dayLabel(d){const t=new Date();const k=x=>Date.UTC(x.getUTCFullYear(),x
   const diff=Math.round((k(d)-k(t))/864e5);return diff===0?'TODAY':diff===1?'TOMORROW':`${DAYS[d.getUTCDay()]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]}`}
 let fleets=[];
 function upcoming(){const now=Date.now();
-  return fleets.map(f=>({...f,t:new Date(f.time).getTime(),e:f.end?new Date(f.end).getTime():NaN})).filter(f=>!isNaN(f.t)&&(isNaN(f.e)?f.t+LIVE_MS:f.e)>now).sort((a,b)=>a.t-b.t).slice(0,MAX)}
-let shown='';
+  return fleets.map(f=>({...f,t:new Date(f.time).getTime(),e:f.end?new Date(f.end).getTime():NaN})).filter(f=>!isNaN(f.t)&&(isNaN(f.e)?f.t+LIVE_MS:f.e)>now).sort((a,b)=>a.t-b.t)}
+let shown='',page=0;setInterval(()=>{page++},PAGE_MS);
 function render(){
-  const up=upcoming(),key=JSON.stringify(up.map(f=>[f.time,f.name]));
+  const all=upcoming(),pages=Math.max(1,Math.ceil(all.length/PAGE)),cp=page%pages,up=all.slice(cp*PAGE,cp*PAGE+PAGE);
+  document.getElementById('pg').textContent=all.length?`${all.length} FLEETS${pages>1?` · ${cp+1}/${pages}`:''}`:'';
+  const key=JSON.stringify([cp,up.map(f=>[f.time,f.name])]);
   if(key!==shown){shown=key;
     list.innerHTML=up.length?'':'<div id="empty">NO UPCOMING FLEETS</div>';
     up.forEach((f,i)=>{const e=document.createElement('div');e.dataset.t=f.t;e.style.animationDelay=i*.08+'s';
@@ -90,10 +93,10 @@ function render(){
   list.querySelectorAll('.f,[data-t]').forEach(e=>{e.classList.add('f');const t=+e.dataset.t,tag=e.querySelector('.tag');
     const live=now>=t,soon=!live&&t-now<SOON_MS;
     e.classList.toggle('live',live);e.classList.toggle('soon',soon);tag.hidden=!(live||soon);tag.textContent=live?'LIVE NOW':'STARTING SOON'});
-  const nx=up.find(f=>f.t>now),cd=document.getElementById('cd'),nn=document.getElementById('nn');
+  const nx=all.find(f=>f.t>now),cd=document.getElementById('cd'),nn=document.getElementById('nn');
   if(nx){let s=Math.max(0,Math.floor((nx.t-now)/1000));const dd=Math.floor(s/86400);s%=86400;
     cd.textContent=(dd?dd+'d ':'')+`${pad(Math.floor(s/3600))}:${pad(Math.floor(s%3600/60))}:${pad(s%60)}`;nn.textContent=nx.name}
-  else{cd.textContent=up.length?'IN PROGRESS':'--:--:--';nn.textContent=''}
+  else{cd.textContent=all.length?'IN PROGRESS':'--:--:--';nn.textContent=''}
 }
 async function getDay(d){
   const url=API+`${pad(d.getUTCDate())}-${pad(d.getUTCMonth()+1)}-${d.getUTCFullYear()}`;
@@ -102,7 +105,7 @@ async function getDay(d){
     return (await (await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{cache:'no-store'})).json()).events||[]}
 }
 async function loadNpsi(){
-  const days=Array.from({length:DAYS_AHEAD},(_,i)=>new Date(Date.now()+i*864e5));
+  const days=Array.from({length:DAYS_AHEAD+1},(_,i)=>new Date(Date.now()+(i-1)*864e5));
   const res=await Promise.all(days.map(d=>getDay(d).catch(()=>null)));
   if(res.every(r=>r===null))throw new Error('schedule unreachable');
   const seen=new Set(),out=[];
