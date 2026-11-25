@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NPSI.ROCKS – New Eden Weather Channel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050308;--steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif; --purple:#8a3ffc; --violet:#b98bff; --glow:#a35cff;
+  --dim:#2a1747; --white:#f4efff; --orange:#f58a1f;--red:#ff2b3d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:transparent;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;
+  background:transparent;
+  font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--white);overflow:hidden}
+
+/* stream paused badge */
+.feed{position:absolute;right:40px;top:36px;border:1px solid var(--purple);padding:12px 20px;
+  background:rgba(5,3,8,.55);font:600 18px 'Orbitron';letter-spacing:4px;display:flex;gap:18px;justify-content:space-between;align-items:center;z-index:3}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.15}}
+
+/* center */
+.center{position:absolute;left:0;right:0;top:130px;bottom:150px;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.rings{position:absolute;width:760px;height:760px;opacity:.9}
+.rings svg{width:100%;height:100%;overflow:visible}
+.r1{transform-origin:380px 380px;animation:spin 40s linear infinite}
+.r2{transform-origin:380px 380px;animation:spin 25s linear infinite reverse}
+.r3{transform-origin:380px 380px;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulsering{transform-origin:380px 380px;animation:ping 3.5s ease-out infinite}
+@keyframes ping{from{transform:scale(.6);opacity:.8}to{transform:scale(1.25);opacity:0}}
+.title{position:relative;font:900 132px/1 'Orbitron';letter-spacing:10px;text-align:center;
+  text-shadow:0 0 30px var(--glow),0 0 70px rgba(138,63,252,.7);animation:flick 7s infinite}
+.title:before,.title:after{content:attr(data-t);position:absolute;left:0;right:0;top:0;opacity:.0}
+.title:before{color:#ff4fd8;animation:gl1 5s infinite}
+.title:after{color:#4fd8ff;animation:gl2 5s infinite}
+@keyframes gl1{0%,92%,100%{opacity:0}93%{opacity:.8;transform:translate(-6px,2px);clip-path:inset(10% 0 60% 0)}96%{opacity:.8;transform:translate(5px,-2px);clip-path:inset(55% 0 15% 0)}}
+@keyframes gl2{0%,92%,100%{opacity:0}94%{opacity:.8;transform:translate(6px,-2px);clip-path:inset(60% 0 10% 0)}97%{opacity:.8;transform:translate(-5px,2px);clip-path:inset(15% 0 55% 0)}}
+@keyframes flick{0%,95%,100%{opacity:1}96%{opacity:.7}97%{opacity:1}98%{opacity:.8}}
+.sub{margin-top:22px;font:700 32px 'Rajdhani';letter-spacing:14px;color:var(--violet);position:relative}
+.sub i{font-style:normal;animation:blink 1.2s steps(2) infinite}
+.bar{position:relative;margin-top:34px;width:560px;height:10px;border:1px solid var(--purple);overflow:hidden}
+.bar:after{content:"";position:absolute;top:0;bottom:0;width:140px;
+  background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweep 2.2s ease-in-out infinite}
+@keyframes sweep{from{left:-140px}to{left:560px}}
+.status{position:relative;margin-top:18px;display:flex;gap:46px;font:600 17px 'Orbitron';letter-spacing:4px;color:#9a86c4}
+.status b{color:var(--white);font-weight:600}
+#count{font:900 54px 'Orbitron';margin-top:20px;letter-spacing:8px;color:var(--orange);text-shadow:0 0 18px rgba(245,138,31,.6);position:relative;display:none}
+
+
+/* ---------- weather channel ---------- */
+.rings{opacity:.55}
+.wtitle{position:relative;font:900 76px/1 'Orbitron';letter-spacing:8px;text-align:center;text-shadow:0 0 26px var(--glow),0 0 60px rgba(138,63,252,.7);animation:flick 7s infinite}
+.wsub{position:relative;margin-top:14px;font:700 24px 'Rajdhani';letter-spacing:12px;color:var(--violet)}
+.wsub i{font-style:normal;animation:blink 1.2s steps(2) infinite}
+.panel{position:relative;margin-top:34px;width:1260px;height:360px;border:1px solid var(--purple);background:rgba(5,3,8,.72);overflow:hidden}
+.panel:before{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweepx 3.6s ease-in-out infinite}
+@keyframes sweepx{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
+.fc{position:absolute;inset:0;padding:34px 44px;display:flex;gap:40px;align-items:center;opacity:0;transform:translateX(60px);transition:opacity .7s,transform .7s}
+.fc.on{opacity:1;transform:none}
+.fc.out{opacity:0;transform:translateX(-60px)}
+.fc .ico{flex:none;width:230px;height:230px}
+.fc .ico svg{width:100%;height:100%;overflow:visible}
+.fc .body{flex:1;min-width:0}
+.fc .loc{font:900 64px/1 'Orbitron';letter-spacing:6px;color:var(--white);text-shadow:0 0 22px var(--glow)}
+.fc .cond{margin-top:8px;font:600 26px 'Orbitron';letter-spacing:6px;color:var(--violet);text-transform:uppercase}
+.fc .txt{margin-top:18px;font:600 36px/1.25 'Rajdhani';letter-spacing:.03em;color:var(--white)}
+.chips{display:flex;gap:14px;margin-top:20px}
+.chips span{padding:6px 16px;background:rgba(138,63,252,.18);border-left:3px solid var(--purple);font:600 16px 'Orbitron';letter-spacing:3px;color:#a898c4;white-space:nowrap}
+.chips b{color:var(--white);font-weight:600;margin-left:8px}
+.chips b.bad{color:var(--red)}
+.outlook{position:relative;margin-top:16px;width:1260px;display:flex;gap:10px}
+.outlook div{flex:1;padding:10px 14px;background:rgba(5,3,8,.6);border-left:3px solid var(--steel-dim);min-width:0}
+.outlook small{display:block;font:500 13px 'Orbitron';letter-spacing:3px;color:var(--violet)}
+.outlook b{display:block;margin-top:4px;font:600 21px 'Rajdhani';letter-spacing:.06em;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bub{animation:drift 5s ease-in-out infinite}.bub:nth-child(2){animation-delay:-1.4s}.bub:nth-child(3){animation-delay:-2.8s}.bub:nth-child(4){animation-delay:-4s}
+@keyframes drift{50%{transform:translateY(-14px)}}
+.rain line{animation:fall 1.1s linear infinite}.rain line:nth-child(2n){animation-delay:-.4s}.rain line:nth-child(3n){animation-delay:-.8s}
+@keyframes fall{from{transform:translateY(-18px);opacity:0}30%{opacity:1}to{transform:translateY(24px);opacity:0}}
+.bolt{animation:flick2 3s infinite}@keyframes flick2{0%,88%,100%{opacity:.25}90%,94%{opacity:1}92%{opacity:.4}}
+.sweepr{transform-origin:115px 115px;animation:spin 3s linear infinite}
+
+/* corner brackets */
+.br{position:absolute;width:60px;height:60px;border:2px solid var(--purple);animation:blink 3s infinite}
+.br.tl{left:30px;top:30px;border-right:0;border-bottom:0}
+.br.bl{left:30px;bottom:150px;border-right:0;border-top:0}
+.br.tr{right:30px;top:30px;border-left:0;border-bottom:0}
+.br.brr{right:30px;bottom:150px;border-left:0;border-top:0}
+
+/* ticker */
+.ticker{position:absolute;left:0;right:0;bottom:0;height:52px;background:#000;border-top:1px solid var(--purple);
+  display:flex;align-items:center;z-index:4}
+.tickwrap{flex:1;height:100%;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+.tickwrap div{display:inline-block;padding-left:100%;font:600 24px 'Rajdhani';letter-spacing:2px;animation:tick 70s linear infinite}
+@keyframes tick{to{transform:translateX(-100%)}}
+.clock{flex:none;padding:0 28px;font:700 22px 'Orbitron';letter-spacing:3px;color:var(--violet);background:#000;font-variant-numeric:tabular-nums}
+
+/* logo */
+#logo{position:absolute;left:50%;top:22px;height:104px;transform:translateX(-50%);z-index:3;
+  filter:drop-shadow(0 0 14px rgba(163,92,255,.75));animation:bob 4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateX(-50%) translateY(-6px)}}
+
+/* command bar */
+#cmdbar{position:absolute;left:30px;right:30px;bottom:72px;display:flex;gap:14px;z-index:3}
+#cmdbar .c{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:10px 16px;min-width:0;
+  background:rgba(5,3,8,.55);border-left:3px solid var(--steel-dim);animation:cin .6s both;transition:all .35s}
+#cmdbar .c b{font:700 28px/1.1 var(--head);letter-spacing:.03em;color:var(--text)}
+#cmdbar .c small{font:600 15px/1.2 'Rajdhani';letter-spacing:.1em;color:#a898c4;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmdbar .c.on{border-left-color:#fff;background:rgba(166,92,255,.28);box-shadow:0 0 18px rgba(163,92,255,.45);transform:translateY(-4px)}
+#cmdbar .c.on b{color:#fff}
+@keyframes cin{from{opacity:0;transform:translateY(24px)}}
+</style>
+</head>
+<body>
+<div id="stage">
+  
+  <div class="center">
+    <div class="rings">
+      <svg viewBox="0 0 760 760">
+        <g fill="none" stroke="#8a3ffc">
+          <circle class="pulsering" cx="380" cy="380" r="200" stroke-width="2"/>
+          <g class="r1"><circle cx="380" cy="380" r="370" stroke-width="1.5" stroke-dasharray="4 14" opacity=".7"/>
+            <circle cx="380" cy="380" r="355" stroke-width="5" stroke-dasharray="120 300" stroke="#b98bff"/></g>
+          <g class="r2"><circle cx="380" cy="380" r="310" stroke-width="2" stroke-dasharray="40 20 4 20" opacity=".8"/>
+            <circle cx="380" cy="380" r="295" stroke-width="8" stroke-dasharray="80 500" stroke="#a35cff"/></g>
+          <g class="r3"><circle cx="380" cy="380" r="250" stroke-width="1" stroke-dasharray="2 8"/></g>
+        </g>
+      </svg>
+    </div>
+    <div class="wtitle" data-t="NEW EDEN WEATHER CHANNEL">NEW EDEN WEATHER CHANNEL</div>
+    <div class="wsub">YOUR FORECAST FOR THE CLUSTER<i>_</i></div>
+    <div class="panel" id="panel"></div>
+    <div class="outlook" id="outlook"></div>
+  </div>
+
+  <div class="feed"><span>LIVE FORECAST</span><span class="dot"></span></div>
+
+  <div class="br tl"></div><div class="br bl"></div><div class="br tr"></div><div class="br brr"></div>
+
+  <img id="logo" alt="NPSI logo" src="data:image/png;base64,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">
+  <div id="cmdbar"></div>
+
+  <div class="ticker"><div class="tickwrap"><div id="tick"></div></div><div class="clock" id="clock">00:00:00 UTC</div></div>
+</div>
+
+<script>
+/* ===== EDIT ME ===== */
+const CONFIG = {
+  commands: [
+    ['!discord','community'], ['!npsi','website'], ['!funinc','FUN INC NPSI'],
+    ['!keacte','FC'], ['!zkillkeacte','keacte zkill'], ['!zkillfuninc','FUN INC zkill']
+  ],
+  ticker: 'NPSI.ROCKS  //  NEW EDEN WEATHER CHANNEL  //  FORECASTS ARE ACCURATE UNTIL SOMEONE LIGHTS A CYNO  //  NO REFUNDS FOR LOST CRUISERS  //  JOIN THE DISCORD WITH !discord  //  FLY TOGETHER, WIN TOGETHER  //  ',
+  seconds: 9,                       // how long each forecast stays on screen
+  // icon: bubbles | storm | rain | calm | wh    chips: [label, value, bad?]
+  forecasts: [
+    {loc:'TAMA',      cond:'Heavy bubbles',          icon:'bubbles', text:'Heavy bubbles expected around Tama. Visibility poor. High probability of losing your expensive cruiser.',
+      chips:[['VISIBILITY','POOR',1],['BUBBLES','97%',1],['CRUISER LOSS','HIGH',1]]},
+    {loc:'JITA',      cond:'Dense traffic',          icon:'rain',    text:'Dense traffic over Jita 4-4. Local lag likely. Scattered scams in the trade channel, clearing by Tuesday.',
+      chips:[['LAG','SEVERE',1],['SCAMS','SCATTERED'],['UNDOCKING','UNWISE',1]]},
+    {loc:'THERA',     cond:'Unstable wormholes',     icon:'wh',      text:'Wormhole conditions unstable. Mass limits approaching. Expect sudden collapse just as you are halfway home.',
+      chips:[['MASS','CRITICAL',1],['LIFESPAN','< 4 HOURS'],['HOME','CUT OFF',1]]},
+    {loc:'AMAMAKE',   cond:'Frigate showers',        icon:'rain',    text:'Frigate showers over Amamake. Scattered tackle, sunny spells of kiting. Bring an umbrella and a spare hull.',
+      chips:[['FRIGATES','RAINING'],['KITING','LIKELY'],['SPARE HULL','ESSENTIAL',1]]},
+    {loc:'DELVE',     cond:'Blue doughnut',          icon:'calm',    text:'Blue doughnut conditions over Delve. Light drifting, with a strong chance of nothing at all happening.',
+      chips:[['EXCITEMENT','NONE'],['DRIFTING','STEADY'],['COFFEE','REQUIRED']]},
+    {loc:'PERIMETER', cond:'Gate camp front',        icon:'storm',   text:'A gate camp front is moving in over Perimeter. Smartbombs likely. Do not under any circumstances click Jump.',
+      chips:[['SMARTBOMBS','LIKELY',1],['CAMP','24/7'],['POD LOSS','PROBABLE',1]]},
+    {loc:'POCHVEN',   cond:'Triglavian storm',       icon:'storm',   text:'Triglavian storm surge over Pochven. Filaments advised. Rapid weather changes and an unlikely escape.',
+      chips:[['FILAMENTS','ADVISED'],['EXITS','LIMITED',1],['VIBES','CHAOTIC']]},
+    {loc:'HEK',       cond:'Clear skies',            icon:'calm',    text:'Clear skies over Hek. Nobody is coming to rescue you. Probably.',
+      chips:[['VISIBILITY','EXCELLENT'],['RESCUE','UNLIKELY',1],['BUBBLES','NONE']]},
+    {loc:'RANCER',    cond:'Smartbomb outbreak',     icon:'bubbles', text:'Smartbomb outbreaks over Rancer. Pod rain likely overnight. Wear a clone and remember to dock early.',
+      chips:[['PODS','RAINING',1],['CLONE','ADVISED'],['DOCKING','URGENT',1]]},
+  ],
+  outlook: [
+    ['JITA','Scams · Lag'],['AMARR','Haze · Prayers'],['OSMON','Hot drops'],['TAMA','Bubbles · Tears'],['NULLSEC','Doctrine change']
+  ],
+};
+// Optional: add ?seconds=6 to speed up the forecasts
+/* =================== */
+
+const bar=document.getElementById('cmdbar');
+bar.innerHTML=CONFIG.commands.map((c,i)=>`<div class="c" style="animation-delay:${i*.12}s"><b>${c[0]}</b><small>${c[1]}</small></div>`).join('');
+const cs=[...bar.children]; let ci=0;
+(function cyc(){cs.forEach((e,i)=>e.classList.toggle('on',i===ci));ci=(ci+1)%cs.length;setTimeout(cyc,2200)})();
+document.getElementById('tick').textContent = CONFIG.ticker.repeat(3);
+
+// scale 1920x1080 stage to any window / OBS source size
+const stage = document.getElementById('stage');
+function fit(){
+  const s = Math.min(innerWidth/1920, innerHeight/1080);
+  stage.style.transform = `translate(${(innerWidth-1920*s)/2}px,${(innerHeight-1080*s)/2}px) scale(${s})`;
+}
+addEventListener('resize',fit); fit();
+
+// UTC clock
+const clk = document.getElementById('clock');
+setInterval(()=>{ clk.textContent = new Date().toISOString().substr(11,8)+' UTC'; },1000);
+
+// ---- forecasts ----
+const ICONS={
+  bubbles:`<svg viewBox="0 0 230 230"><g fill="none" stroke="#b98bff" stroke-width="3"><circle class="bub" cx="95" cy="120" r="70" fill="rgba(163,92,255,.12)"/><circle class="bub" cx="165" cy="85" r="38"/><circle class="bub" cx="150" cy="170" r="30"/><circle class="bub" cx="55" cy="50" r="18"/></g><g fill="#fff" opacity=".8"><circle cx="72" cy="95" r="7"/><circle cx="150" cy="70" r="5"/></g></svg>`,
+  storm:`<svg viewBox="0 0 230 230"><g fill="rgba(163,92,255,.15)" stroke="#b98bff" stroke-width="3"><path d="M60 140a38 38 0 0 1 8-75 52 52 0 0 1 98 12 32 32 0 0 1-6 63z"/></g><path class="bolt" d="M118 120 L96 168 L118 168 L104 212 L148 152 L124 152 L140 120z" fill="#ff2b3d" stroke="#fff" stroke-width="2"/></svg>`,
+  rain:`<svg viewBox="0 0 230 230"><g fill="rgba(163,92,255,.15)" stroke="#b98bff" stroke-width="3"><path d="M60 120a38 38 0 0 1 8-75 52 52 0 0 1 98 12 32 32 0 0 1-6 63z"/></g><g class="rain" stroke="#b98bff" stroke-width="5" stroke-linecap="round"><line x1="75" y1="150" x2="68" y2="172"/><line x1="105" y1="155" x2="98" y2="177"/><line x1="135" y1="150" x2="128" y2="172"/><line x1="165" y1="155" x2="158" y2="177"/><line x1="90" y1="185" x2="83" y2="207"/><line x1="150" y1="188" x2="143" y2="210"/></g></svg>`,
+  calm:`<svg viewBox="0 0 230 230"><g fill="none" stroke="#b98bff" stroke-width="3"><circle cx="115" cy="115" r="46" fill="rgba(163,92,255,.18)"/><circle cx="115" cy="115" r="84" stroke-dasharray="4 12"/></g><g stroke="#b98bff" stroke-width="4" stroke-linecap="round"><line x1="115" y1="14" x2="115" y2="34"/><line x1="115" y1="196" x2="115" y2="216"/><line x1="14" y1="115" x2="34" y2="115"/><line x1="196" y1="115" x2="216" y2="115"/></g></svg>`,
+  wh:`<svg viewBox="0 0 230 230"><g fill="none" stroke="#b98bff" stroke-width="3"><circle cx="115" cy="115" r="90" stroke-dasharray="6 10"/><circle cx="115" cy="115" r="62"/><circle cx="115" cy="115" r="34" fill="rgba(163,92,255,.3)"/></g><path class="sweepr" d="M115 115 L115 25 A90 90 0 0 1 190 70z" fill="rgba(185,139,255,.4)"/></svg>`
+};
+const panel=document.getElementById('panel');
+panel.innerHTML=CONFIG.forecasts.map(f=>`<div class="fc"><div class="ico">${ICONS[f.icon]||ICONS.calm}</div><div class="body">
+  <div class="loc">${f.loc}</div><div class="cond">${f.cond}</div><div class="txt">${f.text}</div>
+  <div class="chips">${f.chips.map(c=>`<span>${c[0]}<b class="${c[2]?'bad':''}">${c[1]}</b></span>`).join('')}</div></div></div>`).join('');
+document.getElementById('outlook').innerHTML=CONFIG.outlook.map(o=>`<div><small>${o[0]}</small><b>${o[1]}</b></div>`).join('');
+const sec=parseFloat(new URLSearchParams(location.search).get('seconds'))||CONFIG.seconds, fcs=[...panel.children];
+let fi=-1;
+(function nextFc(){
+  const prev=fcs[fi]; if(prev){prev.classList.remove('on');prev.classList.add('out')}
+  fi=(fi+1)%fcs.length; const cur=fcs[fi]; cur.classList.remove('out'); void cur.offsetWidth; cur.classList.add('on');
+  setTimeout(()=>{if(prev)prev.classList.remove('out')},800);
+  setTimeout(nextFc,sec*1000);
+})();
+
+</script>
+</body>
+</html>
