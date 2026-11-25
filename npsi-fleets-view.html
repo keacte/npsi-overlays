@@ -54,12 +54,14 @@ addEventListener('resize',fit);fit();
 
 /* ================= CONFIG =================
    Times are EVE time (UTC), ISO format with a trailing Z.
-   Either edit FLEETS below, or load a JSON file with the same fields:  ?src=https://your-host/fleets.json
-   Other options:  ?max=6   ?demo=1                                                                     */
+   Fleets are pulled live from the npsi.rocks schedule API (next 7 days), refreshed every 5 minutes.
+   Options:  ?max=6   ?days=7   ?demo=1   ?src=https://.../fleets.json  (your own JSON, same fields as FLEETS below)
+   FLEETS below is only used as a fallback if the live schedule can't be loaded.                        */
 const FLEETS=[
   // {name:'T3D Tuesday', host:'Spectre Fleet', fc:'taylor parker', time:'2026-12-01T19:00:00Z', type:'Low/Null sec roaming', doctrine:'T3 Destroyers', staging:'Jita'},
 ];
 const MAX=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get('max')||'6',10)));
+const API='https://npsi.rocks/events/api/events/',DAYS_AHEAD=Math.min(14,Math.max(1,parseInt(new URLSearchParams(location.search).get('days')||'7',10)));
 const LIVE_MS=3*3600e3, SOON_MS=60*60e3, REFRESH_MS=5*60e3;
 /* ========================================== */
 
@@ -71,7 +73,7 @@ function dayLabel(d){const t=new Date();const k=x=>Date.UTC(x.getUTCFullYear(),x
   const diff=Math.round((k(d)-k(t))/864e5);return diff===0?'TODAY':diff===1?'TOMORROW':`${DAYS[d.getUTCDay()]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]}`}
 let fleets=[];
 function upcoming(){const now=Date.now();
-  return fleets.map(f=>({...f,t:new Date(f.time).getTime()})).filter(f=>!isNaN(f.t)&&f.t+LIVE_MS>now).sort((a,b)=>a.t-b.t).slice(0,MAX)}
+  return fleets.map(f=>({...f,t:new Date(f.time).getTime(),e:f.end?new Date(f.end).getTime():NaN})).filter(f=>!isNaN(f.t)&&(isNaN(f.e)?f.t+LIVE_MS:f.e)>now).sort((a,b)=>a.t-b.t).slice(0,MAX)}
 let shown='';
 function render(){
   const up=upcoming(),key=JSON.stringify(up.map(f=>[f.time,f.name]));
@@ -93,6 +95,21 @@ function render(){
     cd.textContent=(dd?dd+'d ':'')+`${pad(Math.floor(s/3600))}:${pad(Math.floor(s%3600/60))}:${pad(s%60)}`;nn.textContent=nx.name}
   else{cd.textContent=up.length?'IN PROGRESS':'--:--:--';nn.textContent=''}
 }
+async function getDay(d){
+  const url=API+`${pad(d.getUTCDate())}-${pad(d.getUTCMonth()+1)}-${d.getUTCFullYear()}`;
+  try{return (await (await fetch(url,{cache:'no-store'})).json()).events||[]}
+  catch(e){                                         /* fallback if the browser blocks the direct request (CORS) */
+    return (await (await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{cache:'no-store'})).json()).events||[]}
+}
+async function loadNpsi(){
+  const days=Array.from({length:DAYS_AHEAD},(_,i)=>new Date(Date.now()+i*864e5));
+  const res=await Promise.all(days.map(d=>getDay(d).catch(()=>null)));
+  if(res.every(r=>r===null))throw new Error('schedule unreachable');
+  const seen=new Set(),out=[];
+  res.flat().filter(Boolean).forEach(e=>{if(e.ended||seen.has(e.id))return;seen.add(e.id);
+    out.push({name:e.name,host:e.host,fc:e.fc,staging:e.location,time:e.start,end:e.end})});
+  return out;
+}
 async function load(){
   if(QS.has('demo')){const n=Date.now(),h=3600e3;
     fleets=[{name:'Armor Assault Frigates',host:'Shadow Cartel NPSI',fc:'Dietcoke650',time:new Date(n-.5*h).toISOString(),type:'Low/Null sec roaming',doctrine:'Armor Assault Frigates',staging:'Jita'},
@@ -101,8 +118,8 @@ async function load(){
       {name:'Hecate Hooligans',fc:'Demo FC',time:new Date(n+22*h).toISOString(),type:'Nullsec roam',doctrine:'T3 Destroyers',staging:'Amamake'},
       {name:'Capital Hunt',fc:'Demo FC',time:new Date(n+50*h).toISOString(),type:'Pochven',doctrine:'Cruisers',staging:'Niarja'}];return}
   const src=QS.get('src');
-  if(src){try{const r=await fetch(src,{cache:'no-store'});const j=await r.json();fleets=Array.isArray(j)?j:(j.fleets||j.events||[])}catch(e){}}
-  else fleets=FLEETS;
+  if(src){try{const r=await fetch(src,{cache:'no-store'});const j=await r.json();fleets=Array.isArray(j)?j:(j.fleets||j.events||[])}catch(e){fleets=FLEETS}return}
+  try{fleets=await loadNpsi()}catch(e){if(!fleets.length)fleets=FLEETS}
 }
 load().then(render);setInterval(()=>load().then(render),REFRESH_MS);
 setInterval(render,1000);
