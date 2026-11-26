@@ -56,7 +56,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #scls{font:700 24px 'Orbitron';letter-spacing:5px;color:var(--steel);text-transform:uppercase;margin-top:4px}
 
 /* fit lists */
-#fit{position:absolute;left:60px;top:560px;width:1800px;height:440px;z-index:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px;align-content:start}
+#fit{position:absolute;left:60px;top:560px;width:1800px;height:440px;z-index:2;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;align-content:start}
 .col{display:flex;flex-direction:column;gap:14px;min-width:0}
 .sec{background:rgba(5,3,8,.78);border:1px solid var(--dim);border-left:4px solid var(--c);padding:8px 10px 8px;animation:rowin .5s both}
 .sec h3{display:flex;justify-content:space-between;font:700 14px 'Orbitron';letter-spacing:4px;color:var(--c);margin-bottom:8px}
@@ -70,10 +70,9 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 .m .q{flex:none;font:700 16px 'Orbitron';color:#fff;background:rgba(138,63,252,.4);padding:2px 8px}
 .m.e{opacity:.35}.m.e .ph{width:32px;height:32px;flex:none;border:1px dashed var(--c)}
 .m.e b{font-weight:600;color:#a898c4}
-#cargo{position:absolute;left:1290px;top:140px;width:570px;z-index:2}
-#cargo .sec{--c:var(--c-cargo);animation:rowin .5s both}
-#cargo .cg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}#cargo .m .q{font-size:13px;padding:2px 6px}#cargo .m{gap:8px}
-#cargo .m{height:38px}#cargo .m b{font-size:15px}#cargo .m img{width:28px;height:28px}#cargo .more{padding:8px 4px;font:700 14px 'Orbitron';letter-spacing:3px;color:#a898c4}
+#c6 .sec{--c:var(--c-cargo)}
+#c6 .more{padding:8px 4px;font:700 14px 'Orbitron';letter-spacing:3px;color:#a898c4}
+#c6 .m .q{font-size:14px;padding:2px 6px}
 #note{position:absolute;right:60px;top:1006px;font:600 14px 'Orbitron';letter-spacing:3px;color:#7a6a9c;z-index:3}
 
 /* messages */
@@ -131,8 +130,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
     </div>
   </div>
 
-  <div id="cargo"></div>
-  <div id="fit"><div class="col" id="c1"></div><div class="col" id="c2"></div><div class="col" id="c3"></div><div class="col" id="c4"></div><div class="col" id="c5"></div></div>
+  <div id="fit"><div class="col" id="c1"></div><div class="col" id="c2"></div><div class="col" id="c3"></div><div class="col" id="c4"></div><div class="col" id="c5"></div><div class="col" id="c6"></div></div>
   <div id="note"></div>
   <div id="msg">LOADING…</div>
 
@@ -325,9 +323,9 @@ function render(m){
   const f=$('flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');
   const h=Object.fromEntries(SECS.map(([k,t])=>[k,secHTML(k,t,m)]));
   $('c1').innerHTML=h.high;$('c2').innerHTML=h.mid;$('c3').innerHTML=h.low;$('c4').innerHTML=h.rig+h.sub;$('c5').innerHTML=h.drone;
-  const cg=(m.slots.cargo||[]),MAXC=18,shown=cg.slice(0,MAXC);
-  $('cargo').innerHTML=`<div class="sec"><h3>CARGO HOLD<span>${cg.length} ITEM${cg.length===1?'':'S'}</span></h3>`+
-    (cg.length?`<div class="cg">${shown.map((x,i)=>`<div class="m" style="animation-delay:${(i*.03).toFixed(2)}s"><img alt="" src="https://images.evetech.net/types/${x.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0"><div class="t"><b>${esc(x.name)}</b></div><span class="q">${x.qty>=1e4?Math.round(x.qty/1e3)+'k':x.qty.toLocaleString('en-GB')}</span></div>`).join('')}</div>${cg.length>MAXC?`<div class="more">+${cg.length-MAXC} MORE</div>`:''}`:`<div class="more">EMPTY</div>`)+'</div>';
+  const cg=(m.slots.cargo||[]),MAXC=cg.length>9?8:9,shown=cg.slice(0,MAXC);
+  $('c6').innerHTML=`<div class="sec"><h3>CARGO HOLD<span>${cg.length} ITEM${cg.length===1?'':'S'}</span></h3>`+
+    (cg.length?`<div>${shown.map((x,i)=>`<div class="m" style="animation-delay:${(i*.03).toFixed(2)}s"><img alt="" src="https://images.evetech.net/types/${x.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0"><div class="t"><b>${esc(x.name)}</b></div><span class="q">${x.qty>=1e4?Math.round(x.qty/1e3)+'k':x.qty.toLocaleString('en-GB')}</span></div>`).join('')}</div>${cg.length>MAXC?`<div class="more">+${cg.length-MAXC} MORE</div>`:''}`:`<div class="more">EMPTY</div>`)+'</div>';
   /* shrink long module / ammo names to fit their row (single line, min size) so 9 modules per column always fit */
   document.querySelectorAll('.m b,.m small').forEach(el=>{let fs=parseFloat(getComputedStyle(el).fontSize);const min=el.tagName==='B'?12:10;
     while(el.scrollWidth>el.clientWidth&&fs>min){fs-=.5;el.style.fontSize=fs+'px'}});
