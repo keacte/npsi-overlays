@@ -58,6 +58,8 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 /* fit lists */
 #fit{position:absolute;left:60px;top:560px;width:1800px;height:440px;z-index:2;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;align-content:start}
 .col{height:440px;overflow:hidden;min-width:0}
+.col .rows{will-change:transform}
+#c6 .vp{height:336px;overflow:hidden}
 .col .sc{display:flex;flex-direction:column;gap:14px;will-change:transform}
 .sec{background:rgba(5,3,8,.78);border:1px solid var(--dim);border-left:4px solid var(--c);padding:8px 10px 8px;animation:rowin .5s both}
 .sec h3{display:flex;justify-content:space-between;font:700 14px 'Orbitron';letter-spacing:4px;color:var(--c);margin-bottom:8px}
@@ -313,7 +315,7 @@ function fitName(){
 /* ---- gentle auto-scroll for columns whose content overflows: wait 10s, scroll at 50px/s, hold 10s, scroll back ---- */
 const SC_WAIT=10000,SC_SPEED=50;let scs=[];
 function setupScroll(){
-  scs=[...document.querySelectorAll('#fit .col')].map(c=>{const sc=c.querySelector('.sc');return{sc,c,y:0,ph:0,t:performance.now()}});
+  scs=[...document.querySelectorAll('#c1,#c2,#c3,#c4,#c5,#c6')].map(c=>{const vp=c.querySelector('.vp');return{sc:c.querySelector(vp?'.rows':'.sc'),c:vp||c,y:0,ph:0,t:performance.now()}}).filter(s=>s.sc);
   scs.forEach(s=>{s.sc.style.transform='';s.max=Math.max(0,Math.ceil(s.sc.offsetHeight-s.c.clientHeight)+6)});
 }
 function scTick(now){
@@ -356,8 +358,8 @@ function render(m){
   $('c1').innerHTML=h.high;$('c2').innerHTML=h.mid;$('c3').innerHTML=h.low;$('c4').innerHTML=h.rig+h.sub;$('c5').innerHTML=h.drone;
   const cg=(m.slots.cargo||[]),shown=cg;
   $('c6').innerHTML=`<div class="sec"><h3>CARGO HOLD<span>${cg.length} ITEM${cg.length===1?'':'S'}</span></h3>`+
-    (cg.length?`<div>${shown.map((x,i)=>`<div class="m" style="animation-delay:${(i*.03).toFixed(2)}s"><img alt="" src="https://images.evetech.net/types/${x.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0"><div class="t"><b>${esc(x.name)}</b></div><span class="q">${x.qty>=1e4?Math.round(x.qty/1e3)+'k':x.qty.toLocaleString('en-GB')}</span></div>`).join('')}</div>${''}`:`<div class="more">EMPTY</div>`)+'</div>';
-  document.querySelectorAll('#fit .col').forEach(c=>{const w=document.createElement('div');w.className='sc';while(c.firstChild)w.appendChild(c.firstChild);c.appendChild(w)});
+    (cg.length?`<div class="vp"><div class="rows">${shown.map((x,i)=>`<div class="m" style="animation-delay:${(i*.03).toFixed(2)}s"><img alt="" src="https://images.evetech.net/types/${x.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0"><div class="t"><b>${esc(x.name)}</b></div><span class="q">${x.qty>=1e4?Math.round(x.qty/1e3)+'k':x.qty.toLocaleString('en-GB')}</span></div>`).join('')}</div></div>`:`<div class="more">EMPTY</div>`)+'</div>';
+  document.querySelectorAll('#c1,#c2,#c3,#c4,#c5').forEach(c=>{const w=document.createElement('div');w.className='sc';while(c.firstChild)w.appendChild(c.firstChild);c.appendChild(w)});
   /* shrink long module / ammo names to fit their row (single line, min size) so 9 modules per column always fit */
   document.querySelectorAll('.m b,.m small').forEach(el=>{let fs=parseFloat(getComputedStyle(el).fontSize);const min=el.tagName==='B'?12:10;
     while(el.scrollWidth>el.clientWidth&&fs>min){fs-=.5;el.style.fontSize=fs+'px'}});
