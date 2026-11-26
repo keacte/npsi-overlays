@@ -221,12 +221,13 @@ async function login(){
 }
 async function tokenReq(params){
   const r=await fetch('https://login.eveonline.com/v2/oauth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:CLIENT_ID,...params})});
-  if(!r.ok){let b='';try{b=(await r.text()).slice(0,160)}catch(e){}throw new Error('token endpoint '+r.status+' '+b)}
+  if(!r.ok){let b='';try{b=(await r.text()).slice(0,160)}catch(e){}const er=new Error('token endpoint '+r.status+' '+b);er.status=r.status;throw er}
   return r.json();
 }
 function saveTokens(t){
+  let old=null;try{old=JSON.parse(lsGet('npsi_auth')||'null')}catch(e){}
   const pl=JSON.parse(atob(t.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-  lsSet('npsi_auth',JSON.stringify({access:t.access_token,refresh:t.refresh_token,exp:Date.now()+(t.expires_in-60)*1000,id:+pl.sub.split(':')[2],name:pl.name,scope:SCOPES}));
+  lsSet('npsi_auth',JSON.stringify({access:t.access_token,refresh:t.refresh_token||(old&&old.refresh),exp:Date.now()+(t.expires_in-60)*1000,id:+pl.sub.split(':')[2],name:pl.name,scope:SCOPES}));
 }
 async function handleCallback(){
   if(QS.get('error')){history.replaceState(null,'',location.pathname);throw new Error('EVE said: '+QS.get('error')+' – '+(QS.get('error_description')||''))}
@@ -238,15 +239,29 @@ async function handleCallback(){
   saveTokens(await tokenReq({grant_type:'authorization_code',code,code_verifier:saved.v}));
   lsDel('npsi_pkce');
 }
-async function bearer(){
-  let a=JSON.parse(lsGet('npsi_auth')||'null');if(!a)return null;
-  if(Date.now()>a.exp){
-    try{saveTokens(await tokenReq({grant_type:'refresh_token',refresh_token:a.refresh}));a=JSON.parse(lsGet('npsi_auth'))}
-    catch(e){lsDel('npsi_auth');return null}
-  }
+/* Only a definite rejection of the refresh token (400/401 from SSO) logs out. Network errors, 5xx and rate limits keep the saved login and retry on the next poll. */
+let refreshing=null;
+function refreshTokens(){
+  if(refreshing)return refreshing;
+  refreshing=(async()=>{
+    const a=JSON.parse(lsGet('npsi_auth')||'null');if(!a||!a.refresh)return null;
+    try{saveTokens(await tokenReq({grant_type:'refresh_token',refresh_token:a.refresh}));return JSON.parse(lsGet('npsi_auth'))}
+    catch(e){if(e.status===400||e.status===401){lsDel('npsi_auth');return null}throw new Error('transient: '+(e&&e.message||e))}
+  })().finally(()=>{refreshing=null});
+  return refreshing;
+}
+async function bearer(force){
+  const a=JSON.parse(lsGet('npsi_auth')||'null');if(!a)return null;
+  if(force||Date.now()>a.exp)return refreshTokens();
   return a;
 }
-const esiAuth=(path,a)=>fetch(esi+path,{headers:{Authorization:'Bearer '+a.access}});
+let authFails=0;
+/* on 401 refresh the token once and retry before giving up */
+async function esiAuth(path,a){
+  let r=await fetch(esi+path,{headers:{Authorization:'Bearer '+a.access}});
+  if(r.status===401){const n=await bearer(true);if(n){a.access=n.access;r=await fetch(esi+path,{headers:{Authorization:'Bearer '+n.access}})}}
+  return r;
+}
 
 /* ================= live ship + fit (ship from /ship/, modules from /assets/) ================= */
 const FLAGMAP=f=>{let m;
@@ -260,7 +275,8 @@ const FLAGMAP=f=>{let m;
   return null};
 async function slotsFromAssets(a,shipItemId){
   const first=await esiAuth(`/characters/${a.id}/assets/?page=1`,a);
-  if(first.status===403||first.status===401)throw new Error('scope');
+  if(first.status===403)throw new Error('scope');
+  if(!first.ok)throw new Error('assets '+first.status);
   const pages=+first.headers.get('x-pages')||1;
   let all=await first.json();
   const rest=await Promise.all(Array.from({length:pages-1},(_,i)=>esiAuth(`/characters/${a.id}/assets/?page=${i+2}`,a).then(r=>r.json())));
@@ -275,12 +291,14 @@ async function liveLoad(){
   const a=await bearer();
   if(!a){showLogin();return}
   const r=await esiAuth(`/characters/${a.id}/ship/`,a);
-  if(r.status===401||r.status===403){lsDel('npsi_auth');showLogin();return}
+  if(r.status===401||r.status===403){if(++authFails>=3){lsDel('npsi_auth');showLogin();return}throw new Error('auth '+r.status)}
+  authFails=0;
+  if(!r.ok)throw new Error('ship '+r.status);
   const sh=await r.json();
   const key=sh.ship_item_id+':'+sh.ship_type_id;
   if(key!==lastShip||Date.now()-lastAssets>(fitKnown?300000:60000)){
     try{fitCache=await slotsFromAssets(a,sh.ship_item_id)}
-    catch(e){if(e.message==='scope'){lsDel('npsi_auth');showLogin('Login again to allow reading your ship fitting (assets scope)');return}fitCache=EMPTY();fitKnown=true}
+    catch(e){if(e.message==='scope'){lsDel('npsi_auth');showLogin('Login again to allow reading your ship fitting (assets scope)');return}if(lastShip===key)return;fitCache=EMPTY();fitKnown=true}
     lastShip=key;lastAssets=Date.now();
   }
   const t=await getType(sh.ship_type_id);
@@ -378,7 +396,7 @@ function showLogin(err){
   if(DEMO){render(demoModel());return}
   if(!CLIENT_ID){showLogin('NO CLIENT ID – add ?client_id=YOUR_ID to the URL');return}
   try{await handleCallback()}catch(e){showLogin('LOGIN FAILED: '+(e&&e.message||e));return}
-  const run=async()=>{try{await liveLoad()}catch(e){if(!curKey)message('AWAITING DATA')}};
+  let busy=false;const run=async()=>{if(busy)return;busy=true;try{await liveLoad()}catch(e){if(!curKey)message('AWAITING DATA')}finally{busy=false}};
   run();setInterval(run,30000);
 })();
 </script>
