@@ -148,8 +148,8 @@ function addCard(d,delay=0){
   [...row.querySelectorAll('.k:not(.out)')].slice(MAX).forEach(x=>{x.classList.add('out');setTimeout(()=>x.remove(),500)});
 }
 
-/* ---------- auto-scroll: 5 s after the newest kill, scroll the list at 10 px/s; at the end wait 5 s and go back to the top (header stays frozen) ---------- */
-const SCROLL_DELAY=5000,SCROLL_SPEED=10,vp=$('kfvp');
+/* ---------- auto-scroll: 5 s after the newest kill, scroll the list at 30 px/s; at the end wait 5 s and go back to the top (header stays frozen) ---------- */
+const SCROLL_DELAY=5000,SCROLL_SPEED=30,vp=$('kfvp');
 let sc={ph:0,t:performance.now(),y:0};          // ph 0 wait at top, 1 scrolling down, 2 wait at bottom, 3 returning
 function scrollReset(){sc={ph:0,t:performance.now(),y:0};row.style.transform=''}
 function scTick(now){
