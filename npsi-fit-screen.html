@@ -266,9 +266,11 @@ async function slotsFromAssets(a,shipItemId){
   const rest=await Promise.all(Array.from({length:pages-1},(_,i)=>esiAuth(`/characters/${a.id}/assets/?page=${i+2}`,a).then(r=>r.json())));
   rest.forEach(r=>all=all.concat(r));
   const items=all.filter(i=>i.location_id===shipItemId).map(i=>({item_type_id:i.type_id,flag:FLAGMAP(i.location_flag),quantity:i.quantity})).filter(i=>i.flag!==null);
-  return slotsFromItems(items);
+  const out=await slotsFromItems(items);
+  fitKnown=all.some(i=>i.item_id===shipItemId);
+  return out;
 }
-let lastShip=null,lastAssets=0,fitCache=EMPTY();
+let lastShip=null,lastAssets=0,fitCache=EMPTY(),fitKnown=true;
 async function liveLoad(){
   const a=await bearer();
   if(!a){showLogin();return}
@@ -276,15 +278,15 @@ async function liveLoad(){
   if(r.status===401||r.status===403){lsDel('npsi_auth');showLogin();return}
   const sh=await r.json();
   const key=sh.ship_item_id+':'+sh.ship_type_id;
-  if(key!==lastShip||Date.now()-lastAssets>300000){
+  if(key!==lastShip||Date.now()-lastAssets>(fitKnown?300000:60000)){
     try{fitCache=await slotsFromAssets(a,sh.ship_item_id)}
-    catch(e){if(e.message==='scope'){lsDel('npsi_auth');showLogin('Login again to allow reading your ship fitting (assets scope)');return}fitCache=EMPTY()}
+    catch(e){if(e.message==='scope'){lsDel('npsi_auth');showLogin('Login again to allow reading your ship fitting (assets scope)');return}fitCache=EMPTY();fitKnown=true}
     lastShip=key;lastAssets=Date.now();
   }
   const t=await getType(sh.ship_type_id);
   const g=await getGroup(t.group_id);
   const sig=Object.values(fitCache).flat().map(x=>x.id+(x.charge||'')+x.qty).join(',');
-  render({key:key+'|'+sig,ship:sh.ship_type_id,shipName:t.name,cls:g.name,counts:slotCounts(sh.ship_type_id),slots:fitCache});
+  render({pending:!fitKnown,key:key+'|'+sig+(fitKnown?'':'|p'),ship:sh.ship_type_id,shipName:t.name,cls:g.name,counts:slotCounts(sh.ship_type_id),slots:fitCache});
 }
 function demoModel(){
   const m=(id,name,idx,charge='',qty=0)=>({id,name,idx,charge,qty});
@@ -365,7 +367,7 @@ function render(m){
     while(el.scrollWidth>el.clientWidth&&fs>min){fs-=.5;el.style.fontSize=fs+'px'}});
   setupScroll();
   const any=Object.values(m.slots).some(a=>a.length);
-  $('note').textContent=any?'FIT UPDATES WITHIN A FEW MINUTES OF CHANGES':'NO FIT DATA RETURNED BY EVE';
+  $('note').textContent=m.pending?'NEW SHIP – EVE UPDATES FITTING DATA WITHIN ~1 HOUR. CHECKING EVERY MINUTE':any?'FIT UPDATES WITHIN A FEW MINUTES OF CHANGES':'NO FIT DATA RETURNED BY EVE';
 }
 function showLogin(err){
   const m=$('msg');m.classList.add('login');
