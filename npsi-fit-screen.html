@@ -8,7 +8,7 @@
 <style>
 /* OBS Browser Source: 1920 x 1080, transparent background. Shows the ship you are flying and its fitted modules, live from EVE. */
 :root{--bg:#050308;--steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif;--purple:#8a3ffc;--violet:#b98bff;--glow:#a35cff;--dim:#2a1747;--white:#f4efff;--orange:#f58a1f;
-  --c-high:#f58a1f;--c-mid:#a65cff;--c-low:#cdb4ff;--c-rig:#8f7fb5;--c-sub:#ffffff;--c-drone:#b98bff}
+  --c-high:#f58a1f;--c-mid:#a65cff;--c-low:#cdb4ff;--c-rig:#8f7fb5;--c-sub:#ffffff;--c-cargo:#d9c8ff;--c-drone:#b98bff}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--white);overflow:hidden}
@@ -50,9 +50,9 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
   animation:spin 4.5s linear infinite}
 #rimg{position:relative;z-index:1;width:322px;height:322px;object-fit:contain;filter:url(#tone) drop-shadow(0 0 14px rgba(163,92,255,.7))}
 #rimg.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
-#sinfo{position:absolute;left:470px;width:1000px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
+#sinfo{position:absolute;left:470px;width:780px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
 #lab{display:inline-flex;gap:10px;align-items:center;font:700 16px 'Orbitron';letter-spacing:6px;color:var(--violet)}
-#sname{font:800 80px/1.05 var(--head);max-width:1000px;text-shadow:0 0 22px rgba(166,92,255,.7);margin-top:6px;white-space:nowrap;overflow-wrap:anywhere}
+#sname{font:800 80px/1.05 var(--head);max-width:780px;text-shadow:0 0 22px rgba(166,92,255,.7);margin-top:6px;white-space:nowrap;overflow-wrap:anywhere}
 #scls{font:700 24px 'Orbitron';letter-spacing:5px;color:var(--steel);text-transform:uppercase;margin-top:4px}
 
 /* fit lists */
@@ -70,6 +70,10 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 .m .q{flex:none;font:700 16px 'Orbitron';color:#fff;background:rgba(138,63,252,.4);padding:2px 8px}
 .m.e{opacity:.35}.m.e .ph{width:32px;height:32px;flex:none;border:1px dashed var(--c)}
 .m.e b{font-weight:600;color:#a898c4}
+#cargo{position:absolute;left:1290px;top:140px;width:570px;z-index:2}
+#cargo .sec{--c:var(--c-cargo);animation:rowin .5s both}
+#cargo .cg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}#cargo .m .q{font-size:13px;padding:2px 6px}#cargo .m{gap:8px}
+#cargo .m{height:38px}#cargo .m b{font-size:15px}#cargo .m img{width:28px;height:28px}#cargo .more{padding:8px 4px;font:700 14px 'Orbitron';letter-spacing:3px;color:#a898c4}
 #note{position:absolute;right:60px;top:1006px;font:600 14px 'Orbitron';letter-spacing:3px;color:#7a6a9c;z-index:3}
 
 /* messages */
@@ -127,6 +131,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
     </div>
   </div>
 
+  <div id="cargo"></div>
   <div id="fit"><div class="col" id="c1"></div><div class="col" id="c2"></div><div class="col" id="c3"></div><div class="col" id="c4"></div><div class="col" id="c5"></div></div>
   <div id="note"></div>
   <div id="msg">LOADING…</div>
@@ -160,17 +165,19 @@ const types={},groups={};
 async function getType(id){if(types[id])return types[id];const r=await fetch(`${esi}/universe/types/${id}/`);return types[id]=await r.json()}
 async function getGroup(id){if(groups[id])return groups[id];const r=await fetch(`${esi}/universe/groups/${id}/`);return groups[id]=await r.json()}
 const BASE={high:27,mid:19,low:11,rig:92,sub:125};
-const SLOT=f=>f>=27&&f<=34?'high':f>=19&&f<=26?'mid':f>=11&&f<=18?'low':f>=92&&f<=94?'rig':f>=125&&f<=132?'sub':f===87?'drone':null;
+const SLOT=f=>f===5?'cargo':f>=27&&f<=34?'high':f>=19&&f<=26?'mid':f>=11&&f<=18?'low':f>=92&&f<=94?'rig':f>=125&&f<=132?'sub':f===87?'drone':null;
 function slotCounts(shipId){
   const at={};((types[shipId]||{}).dogma_attributes||[]).forEach(a=>at[a.attribute_id]=a.value);
   return{high:at[14]|0,mid:at[13]|0,low:at[12]|0,rig:at[1137]|0,sub:at[1367]|0};
 }
-const EMPTY=()=>({high:[],mid:[],low:[],rig:[],sub:[],drone:[]});
+const EMPTY=()=>({high:[],mid:[],low:[],rig:[],sub:[],drone:[],cargo:[]});
 async function slotsFromItems(items){
   await Promise.all([...new Set(items.map(i=>i.item_type_id))].map(getType));
   const by={};
-  items.forEach(i=>{const s=SLOT(i.flag);if(s)(by[i.flag]??=[]).push(i)});
+  const cg={};
+  items.forEach(i=>{const s=SLOT(i.flag);if(s==='cargo')cg[i.item_type_id]=(cg[i.item_type_id]||0)+(i.quantity||1);else if(s)(by[i.flag]??=[]).push(i)});
   const out=EMPTY();
+  out.cargo=Object.entries(cg).map(([id,q])=>({id:+id,name:types[id].name,qty:q})).sort((a,b)=>a.name.localeCompare(b.name));
   Object.keys(by).sort((a,b)=>a-b).forEach(f=>{
     const list=by[f],slot=SLOT(+f);
     const mod=list.find(i=>types[i.item_type_id].category_id!==8)||list[0];
@@ -232,6 +239,7 @@ const esiAuth=(path,a)=>fetch(esi+path,{headers:{Authorization:'Bearer '+a.acces
 /* ================= live ship + fit (ship from /ship/, modules from /assets/) ================= */
 const FLAGMAP=f=>{let m;
   if(f==='DroneBay')return 87;
+  if(f==='Cargo')return 5;
   if(m=f.match(/^HiSlot(\d)$/))return 27+ +m[1];
   if(m=f.match(/^MedSlot(\d)$/))return 19+ +m[1];
   if(m=f.match(/^LoSlot(\d)$/))return 11+ +m[1];
@@ -274,7 +282,8 @@ function demoModel(){
     low:[m(519,'Gyrostabilizer II',0),m(519,'Gyrostabilizer II',1),m(519,'Gyrostabilizer II',2),m(2048,'Damage Control II',3)],
     rig:[m(26436,'Medium Core Defense Field Extender I',0),m(26436,'Medium Core Defense Field Extender I',1)],
     sub:[m(45609,'Loki Defensive - Covert Reconfiguration',0),m(45610,'Loki Electronics - Immobility Drivers',1),m(45611,'Loki Offensive - Launcher Efficiency Configuration',2),m(45612,'Loki Propulsion - Intercalated Nanofibers',3),m(45613,'Loki Core - Dissolution Sequencer',4)],
-    drone:[m(2488,'Warrior II',0,'',5),m(2488,'Hobgoblin II',1,'',3)]}};
+    drone:[m(2488,'Warrior II',0,'',5),m(2488,'Hobgoblin II',1,'',3)],
+    cargo:[['Scourge Rage Heavy Missile',2400],['Nanite Repair Paste',100],['Synth Blue Pill Booster',5],['Warrior II',5],['Sensor Booster II',1],['Scourge Fury Heavy Missile',1200],['Cap Booster 400',20],['Hornet EC-300',2]].map((x,i)=>({id:2488+i,name:x[0],qty:x[1]}))}};
 }
 
 /* ship name: one line at full size; if too long, shrink and wrap onto two lines (shrinks further only if two lines still overflow) */
@@ -316,6 +325,9 @@ function render(m){
   const f=$('flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');
   const h=Object.fromEntries(SECS.map(([k,t])=>[k,secHTML(k,t,m)]));
   $('c1').innerHTML=h.high;$('c2').innerHTML=h.mid;$('c3').innerHTML=h.low;$('c4').innerHTML=h.rig+h.sub;$('c5').innerHTML=h.drone;
+  const cg=(m.slots.cargo||[]),MAXC=18,shown=cg.slice(0,MAXC);
+  $('cargo').innerHTML=`<div class="sec"><h3>CARGO HOLD<span>${cg.length} ITEM${cg.length===1?'':'S'}</span></h3>`+
+    (cg.length?`<div class="cg">${shown.map((x,i)=>`<div class="m" style="animation-delay:${(i*.03).toFixed(2)}s"><img alt="" src="https://images.evetech.net/types/${x.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0"><div class="t"><b>${esc(x.name)}</b></div><span class="q">${x.qty>=1e4?Math.round(x.qty/1e3)+'k':x.qty.toLocaleString('en-GB')}</span></div>`).join('')}</div>${cg.length>MAXC?`<div class="more">+${cg.length-MAXC} MORE</div>`:''}`:`<div class="more">EMPTY</div>`)+'</div>';
   /* shrink long module / ammo names to fit their row (single line, min size) so 9 modules per column always fit */
   document.querySelectorAll('.m b,.m small').forEach(el=>{let fs=parseFloat(getComputedStyle(el).fontSize);const min=el.tagName==='B'?12:10;
     while(el.scrollWidth>el.clientWidth&&fs>min){fs-=.5;el.style.fontSize=fs+'px'}});
