@@ -26,12 +26,12 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #hd i{width:10px;height:10px;border-radius:50%;background:#ff2a2a;box-shadow:0 0 10px #ff2a2a;animation:blink 1.4s steps(2) infinite}
 
 /* ship card */
-#ship{position:absolute;left:60px;top:150px;width:690px;height:850px;overflow:visible;z-index:2}
+#ship{position:absolute;left:60px;top:140px;width:1800px;height:360px;overflow:visible;z-index:2}
 #flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(185,139,255,.8),transparent 60%);opacity:0;pointer-events:none}
 #flash.go{animation:flash .9s ease-out}
-#rwrap{position:absolute;left:55px;top:40px;width:580px;height:580px;display:flex;align-items:center;justify-content:center}
+#rwrap{position:absolute;left:0;top:0;width:360px;height:360px;display:flex;align-items:center;justify-content:center}
 /* ===== HUD around the (static) ship ===== */
-#hud{position:absolute;left:0;top:0;width:580px;height:580px;z-index:2;pointer-events:none}
+#hud{position:absolute;left:0;top:0;width:360px;height:360px;z-index:2;pointer-events:none}
 .hl{position:absolute;inset:0;width:100%;height:100%;overflow:visible;will-change:transform,opacity}
 .h-cw{transform-origin:50% 50%;animation:spin 40s linear infinite}
 .h-ccw{transform-origin:50% 50%;animation:spin 24s linear infinite reverse}
@@ -44,31 +44,31 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 @keyframes breathe{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.07);opacity:.5}}
 @keyframes ping{from{transform:scale(.45);opacity:.8}to{transform:scale(1.15);opacity:0}}
 
-#radar{will-change:transform;position:absolute;left:50%;top:50%;width:438px;height:438px;margin:-219px 0 0 -219px;border-radius:50%;z-index:2;pointer-events:none;
+#radar{will-change:transform;position:absolute;left:50%;top:50%;width:272px;height:272px;margin:-136px 0 0 -136px;border-radius:50%;z-index:2;pointer-events:none;
   background:conic-gradient(from 0deg,rgba(166,92,255,0) 0deg,rgba(166,92,255,0) 280deg,rgba(185,139,255,.38) 358deg,rgba(255,255,255,.55) 360deg);
   -webkit-mask:radial-gradient(circle,transparent 0 30%,#000 31%);mask:radial-gradient(circle,transparent 0 30%,#000 31%);
   animation:spin 4.5s linear infinite}
-#rimg{position:relative;z-index:1;width:445px;height:445px;object-fit:contain;filter:url(#tone) drop-shadow(0 0 14px rgba(163,92,255,.7))}
+#rimg{position:relative;z-index:1;width:276px;height:276px;object-fit:contain;filter:url(#tone) drop-shadow(0 0 14px rgba(163,92,255,.7))}
 #rimg.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
-#sinfo{position:absolute;left:40px;right:40px;top:640px;text-align:center}
-#lab{display:inline-flex;gap:10px;align-items:center;font:700 14px 'Orbitron';letter-spacing:5px;color:var(--violet)}
-#sname{font:800 62px/1.05 var(--head);text-shadow:0 0 22px rgba(166,92,255,.7);margin-top:6px;white-space:nowrap;overflow-wrap:anywhere}
-#scls{font:700 20px 'Orbitron';letter-spacing:4px;color:var(--steel);text-transform:uppercase;margin-top:4px}
+#sinfo{position:absolute;left:410px;width:1000px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
+#lab{display:inline-flex;gap:10px;align-items:center;font:700 16px 'Orbitron';letter-spacing:6px;color:var(--violet)}
+#sname{font:800 80px/1.05 var(--head);max-width:1000px;text-shadow:0 0 22px rgba(166,92,255,.7);margin-top:6px;white-space:nowrap;overflow-wrap:anywhere}
+#scls{font:700 24px 'Orbitron';letter-spacing:5px;color:var(--steel);text-transform:uppercase;margin-top:4px}
 
 /* fit lists */
-#fit{position:absolute;left:790px;top:150px;width:1070px;height:850px;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:26px;align-content:start}
-.col{display:flex;flex-direction:column;gap:18px;min-width:0}
-.sec{background:rgba(5,3,8,.78);border:1px solid var(--dim);border-left:4px solid var(--c);padding:10px 14px 12px;animation:rowin .5s both}
-.sec h3{display:flex;justify-content:space-between;font:700 15px 'Orbitron';letter-spacing:5px;color:var(--c);margin-bottom:8px}
+#fit{position:absolute;left:60px;top:520px;width:1800px;height:480px;z-index:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px;align-content:start}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sec{background:rgba(5,3,8,.78);border:1px solid var(--dim);border-left:4px solid var(--c);padding:8px 10px 8px;animation:rowin .5s both}
+.sec h3{display:flex;justify-content:space-between;font:700 14px 'Orbitron';letter-spacing:4px;color:var(--c);margin-bottom:8px}
 .sec h3 span{color:#a898c4;letter-spacing:2px}
-.m{display:flex;align-items:center;gap:12px;height:40px;padding:0 6px;border-bottom:1px solid rgba(42,23,71,.8);animation:rowin .45s both}
+.m{display:flex;align-items:center;gap:10px;min-height:42px;padding:3px 2px;border-bottom:1px solid rgba(42,23,71,.8);animation:rowin .45s both}
 .m:last-child{border-bottom:0}
-.m img{width:34px;height:34px;flex:none;border:1px solid var(--c);background:#0a0514}
+.m img{width:32px;height:32px;flex:none;border:1px solid var(--c);background:#0a0514}
 .m .t{min-width:0;flex:1}
-.m b{display:block;font:700 21px/1.05 var(--head);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.m small{display:block;font:600 14px/1.1 'Rajdhani';letter-spacing:.08em;color:var(--violet);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font:700 18px/1.05 var(--head);color:#fff;overflow:hidden}
+.m small{display:block;font:600 13px/1.1 'Rajdhani';letter-spacing:.06em;color:var(--violet);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .m .q{flex:none;font:700 16px 'Orbitron';color:#fff;background:rgba(138,63,252,.4);padding:2px 8px}
-.m.e{opacity:.35}.m.e .ph{width:34px;height:34px;flex:none;border:1px dashed var(--c)}
+.m.e{opacity:.35}.m.e .ph{width:32px;height:32px;flex:none;border:1px dashed var(--c)}
 .m.e b{font-weight:600;color:#a898c4}
 #note{position:absolute;right:60px;top:1006px;font:600 14px 'Orbitron';letter-spacing:3px;color:#7a6a9c;z-index:3}
 
@@ -127,7 +127,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
     </div>
   </div>
 
-  <div id="fit"><div class="col" id="c1"></div><div class="col" id="c2"></div></div>
+  <div id="fit"><div class="col" id="c1"></div><div class="col" id="c2"></div><div class="col" id="c3"></div><div class="col" id="c4"></div><div class="col" id="c5"></div></div>
   <div id="note"></div>
   <div id="msg">LOADING…</div>
 
@@ -280,10 +280,10 @@ function demoModel(){
 /* ship name: one line at full size; if too long, shrink and wrap onto two lines (shrinks further only if two lines still overflow) */
 function fitName(){
   const el=$('sname');
-  el.style.whiteSpace='nowrap';el.style.fontSize='62px';el.style.lineHeight='1.05';
+  el.style.whiteSpace='nowrap';el.style.fontSize='80px';el.style.lineHeight='1.05';
   if(el.scrollWidth<=el.clientWidth)return;
   el.style.whiteSpace='normal';
-  for(let fs=50;fs>=26;fs-=2){
+  for(let fs=64;fs>=30;fs-=2){
     el.style.fontSize=fs+'px';
     const lines=Math.round(el.scrollHeight/(fs*1.05));
     if(lines<=2&&el.scrollWidth<=el.clientWidth)return;
@@ -315,8 +315,7 @@ function render(m){
   img.src=`https://images.evetech.net/types/${m.ship}/render?size=512`;img.classList.add('in');
   const f=$('flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');
   const h=Object.fromEntries(SECS.map(([k,t])=>[k,secHTML(k,t,m)]));
-  $('c1').innerHTML=h.high+h.mid;
-  $('c2').innerHTML=h.low+h.rig+h.sub+h.drone;
+  $('c1').innerHTML=h.high;$('c2').innerHTML=h.mid;$('c3').innerHTML=h.low;$('c4').innerHTML=h.rig+h.sub;$('c5').innerHTML=h.drone;
   const any=Object.values(m.slots).some(a=>a.length);
   $('note').textContent=any?'FIT UPDATES WITHIN A FEW MINUTES OF CHANGES':'NO FIT DATA RETURNED BY EVE';
 }
