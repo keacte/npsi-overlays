@@ -17,7 +17,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 @keyframes blink{50%{opacity:.15}}
 /* ===== killfeed (NPSI redesign of the socketkill ticker) ===== */
 #kf{position:absolute;left:0;top:0;width:560px;height:800px;display:flex;flex-direction:column;gap:8px;z-index:3}
-#kfhead{height:112px;flex:none;border:1px solid var(--purple);background:rgba(5,3,8,.7);padding:10px 16px;
+#kfhead{height:112px;flex:none;z-index:5;border:1px solid var(--purple);background:rgba(5,3,8,.92);padding:10px 16px;
   display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
 #kfhead:before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;
   background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweepx 3.6s ease-in-out infinite}
@@ -31,7 +31,8 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #kfhead .st b{display:inline-block;font-variant-numeric:tabular-nums}
 #kfhead .st b.bump{animation:bump .5s ease-out}
 @keyframes bump{0%{transform:scale(1.35);text-shadow:0 0 16px var(--glow)}100%{transform:scale(1)}}
-#kfrow{flex:1;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
+#kfvp{flex:1;min-height:0;overflow:hidden;position:relative;z-index:1}
+#kfrow{display:flex;flex-direction:column;gap:6px;min-height:100%;will-change:transform}
 .k{flex:none;height:62px;position:relative;display:flex;align-items:center;gap:12px;padding:0 14px 0 4px;
   background:rgba(5,3,8,.7);border:1px solid var(--dim);border-left:3px solid var(--steel);overflow:hidden;
   animation:kin .7s cubic-bezier(.2,.8,.2,1) both}
@@ -78,7 +79,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
         <span><small class="l">LOSS VALUE</small><b class="l" id="si">–</b></span>
       </div>
     </div>
-    <div id="kfrow"><div id="kfempty">LOADING KILLMAILS…</div></div>
+    <div id="kfvp"><div id="kfrow"><div id="kfempty">LOADING KILLMAILS…</div></div></div>
   </div>
 </div>
 <script>
@@ -86,10 +87,10 @@ const stage=document.getElementById('stage');
 function fit(){const s=Math.min(innerWidth/560,innerHeight/800);stage.style.transform=`scale(${s})`}
 addEventListener('resize',fit);fit();
 
-/* ================= CONFIG (or use the URL: ?character=ID&max=10&demo=1&debug=1) ================= */
+/* ================= CONFIG (or use the URL: ?character=ID&max=500&demo=1&debug=1) ================= */
 const QS=new URLSearchParams(location.search);
 const CHAR=parseInt(QS.get('character')||'1376548045',10);
-const MAX=Math.min(10,Math.max(1,parseInt(QS.get('max')||'10',10)));
+const MAX=Math.max(1,parseInt(QS.get('max')||'500',10));   /* every kill in the last 24h (raise/lower with ?max=) */
 const HIGH_VALUE=1e9;                               /* kills worth at least this much are highlighted gold */
 const POLL_MS=300000,WINDOW_MS=24*3600*1000;      /* only kills from the last 24 hours */
 /* ================================================================================================ */
@@ -141,10 +142,27 @@ function addCard(d,delay=0){
   el.innerHTML=`<div class="tm">${utc(d.time)}</div><div class="sh"><img alt="" src="https://images.evetech.net/types/${d.ship}/render?size=64" onerror="this.onerror=null;this.src='https://images.evetech.net/types/${d.ship}/icon?size=64'"></div>
    <div class="tx"><b>${esc(d.shipName)}</b></div><div class="isk">${fmtIsk(d.value)}</div>`;
   /* keep newest first: insert before the first card that is older */
-  const after=[...row.querySelectorAll('.k:not(.out)')].find(x=>new Date(x.dataset.t)<new Date(d.time));
+  const cards=[...row.querySelectorAll('.k:not(.out)')],after=cards.find(x=>new Date(x.dataset.t)<new Date(d.time));
   after?row.insertBefore(el,after):row.appendChild(el);
+  if(!cards.length||after===cards[0])scrollReset();                      /* a newer kill than anything shown: back to the top, wait 5 s again */
   [...row.querySelectorAll('.k:not(.out)')].slice(MAX).forEach(x=>{x.classList.add('out');setTimeout(()=>x.remove(),500)});
 }
+
+/* ---------- auto-scroll: 5 s after the newest kill, scroll the list at 10 px/s; at the end wait 5 s and go back to the top (header stays frozen) ---------- */
+const SCROLL_DELAY=5000,SCROLL_SPEED=10,vp=$('kfvp');
+let sc={ph:0,t:performance.now(),y:0};          // ph 0 wait at top, 1 scrolling down, 2 wait at bottom, 3 returning
+function scrollReset(){sc={ph:0,t:performance.now(),y:0};row.style.transform=''}
+function scTick(now){
+  const max=Math.max(0,row.scrollHeight-vp.clientHeight),dt=(now-sc.t)/1000;
+  if(max<=2){if(sc.y){scrollReset()}}
+  else if(sc.ph===0){if(dt*1000>=SCROLL_DELAY){sc.ph=1;sc.t=now;sc.y0=0}}
+  else if(sc.ph===1){sc.y=Math.min(max,dt*SCROLL_SPEED);if(sc.y>=max){sc.ph=2;sc.t=now}}
+  else if(sc.ph===2){if(dt*1000>=SCROLL_DELAY){sc.ph=3;sc.t=now;sc.from=sc.y}}
+  else{const p=Math.min(1,dt/2),e=1-Math.pow(1-p,3);sc.y=sc.from*(1-e);if(p>=1){sc.ph=0;sc.t=now;sc.y=0}}
+  row.style.transform=sc.y?`translateY(${-sc.y}px)`:'';
+  requestAnimationFrame(scTick);
+}
+requestAnimationFrame(scTick);
 
 setInterval(()=>{
   document.querySelectorAll('.k').forEach(k=>{
@@ -162,8 +180,9 @@ async function refresh(){
     if(!Array.isArray(K)||!Array.isArray(L))throw new Error('unexpected zKillboard reply');
     const all=[...K,...L].sort((x,y)=>y.killmail_id-x.killmail_id).slice(0,MAX);
     const fresh=all.filter(z=>!shown.has(z.killmail_id)),done=computeTotals(K,L);
+    await pool(fresh,6,z=>getKm(z));
     let i=0;
-    for(const z of fresh.reverse()){shown.add(z.killmail_id);try{const d=await buildCard(z);if(Date.now()-new Date(d.time)<WINDOW_MS)addCard(d,first?i++*.1:0)}catch(e){shown.delete(z.killmail_id)}}
+    for(const z of fresh.reverse()){shown.add(z.killmail_id);try{const d=await buildCard(z);if(Date.now()-new Date(d.time)<WINDOW_MS)addCard(d,first?Math.min(i++*.1,1):0)}catch(e){shown.delete(z.killmail_id)}}
     await done;
     if(first)empty('NO KILLS IN THE LAST 24 HOURS');
     first=false;
@@ -179,8 +198,8 @@ function demo(){
   const R=[[29990,'Loki','Tama',0,1.34e9],[35683,'Hecate','Amamake',0,212e6],[34562,'Svipul','Rancer',1,88e6],[29984,'Tengu','Old Man Star',0,742e6],[34317,'Confessor','Hek',0,134e6],
     [11202,'Ares','Jita',0,9e6],[11184,'Crusader','Perimeter',1,21e6],[17738,'Machariel','Sosala',0,980e6],[24690,'Hurricane','Aufay',0,64e6],[22456,'Sabre','Otela',0,47e6],[11567,'Avatar','Tama',0,95e9]];
   const mk=(r,i)=>({id:Math.random(),ship:r[0],shipName:r[1],pilot:'Demo Pilot',system:r[2],loss:!!r[3],value:r[4],time:new Date(Date.now()-i*18e5).toISOString()});
-  R.slice(0,10).reverse().forEach((r,i)=>addCard(mk(r,10-i),i*.1));
-  let n=0;setInterval(()=>addCard(mk(R[n++%R.length],0)),6000);
+  const N=+QS.get('n')||24;for(let i=N;i>=1;i--)addCard(mk(R[i%R.length],i),Math.min((N-i)*.05,1));
+  let n=0;if(QS.has('adds'))setInterval(()=>addCard(mk(R[n++%R.length],0)),60000);
 }
 
 if(QS.has('demo'))demo();else{title();refresh();setInterval(refresh,POLL_MS)}
