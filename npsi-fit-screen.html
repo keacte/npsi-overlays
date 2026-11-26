@@ -50,9 +50,9 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
   animation:spin 4.5s linear infinite}
 #rimg{position:relative;z-index:1;width:322px;height:322px;object-fit:contain;filter:url(#tone) drop-shadow(0 0 14px rgba(163,92,255,.7))}
 #rimg.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
-#sinfo{position:absolute;left:470px;width:780px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
+#sinfo{position:absolute;left:470px;width:540px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
 #lab{display:inline-flex;gap:10px;align-items:center;font:700 16px 'Orbitron';letter-spacing:6px;color:var(--violet)}
-#sname{font:800 80px/1.05 var(--head);max-width:780px;text-shadow:0 0 22px rgba(166,92,255,.7);margin-top:6px;white-space:nowrap;overflow-wrap:anywhere}
+#sname{font:800 80px/1.05 var(--head);max-width:540px;text-shadow:0 0 22px rgba(166,92,255,.7);margin-top:6px;white-space:nowrap;overflow-wrap:anywhere}
 #scls{font:700 24px 'Orbitron';letter-spacing:5px;color:var(--steel);text-transform:uppercase;margin-top:4px}
 
 /* fit lists */
@@ -73,6 +73,16 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #c6 .sec{--c:var(--c-cargo)}
 #c6 .more{padding:8px 4px;font:700 14px 'Orbitron';letter-spacing:3px;color:#a898c4}
 #c6 .m .q{font-size:14px;padding:2px 6px}
+#cam{position:absolute;left:1050px;top:0;width:747px;height:420px;z-index:2;animation:camin .9s cubic-bezier(.2,.8,.2,1) both .2s}
+@keyframes camin{from{opacity:0;transform:translateX(50px) scale(.92);filter:blur(8px)}}
+#cam .fr{position:absolute;inset:0;border:1px solid rgba(138,63,252,.55);box-shadow:0 0 28px rgba(138,63,252,.25),inset 0 0 40px rgba(138,63,252,.12);overflow:hidden}
+#cam .fr:after{content:'';position:absolute;top:0;bottom:0;width:30%;left:0;background:linear-gradient(90deg,transparent,rgba(166,92,255,.16),transparent);animation:sweepx 6s ease-in-out infinite}
+#cam i{position:absolute;width:34px;height:34px;border:3px solid #a65cff;filter:drop-shadow(0 0 8px #8a3ffc)}
+#cam i.a{left:-6px;top:-6px;border-right:0;border-bottom:0}#cam i.b{right:-6px;top:-6px;border-left:0;border-bottom:0}
+#cam i.c{left:-6px;bottom:-6px;border-right:0;border-top:0}#cam i.d{right:-6px;bottom:-6px;border-left:0;border-top:0}
+#cam .tag{position:absolute;left:18px;top:14px;display:flex;align-items:center;gap:10px;font:700 14px 'Orbitron';letter-spacing:4px;color:#cdb4ff;text-shadow:0 0 10px rgba(166,92,255,.8)}
+#cam .tag u{width:10px;height:10px;border-radius:50%;background:#ff2d3d;box-shadow:0 0 10px #ff2d3d;animation:blink 1.4s infinite}
+#cam .cn{position:absolute;right:18px;bottom:12px;font:600 12px 'Orbitron';letter-spacing:3px;color:#7a6a9c}
 #note{position:absolute;right:60px;top:1006px;font:600 14px 'Orbitron';letter-spacing:3px;color:#7a6a9c;z-index:3}
 
 /* messages */
@@ -124,7 +134,8 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
       <div id="radar"></div>
       <img id="rimg" alt="" onerror="this.style.visibility='hidden'" onload="this.style.visibility='visible'">
     </div>
-    <div id="sinfo">
+    <div id="cam"><div class="fr"></div><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><div class="tag"><u></u>LIVE CAM</div><div class="cn">NPSI.ROCKS</div></div>
+  <div id="sinfo">
       <div id="lab"><i style="width:9px;height:9px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--glow);animation:blink 1.4s steps(2) infinite"></i><span id="labt">NOW FLYING</span></div>
       <div id="sname">—</div><div id="scls"></div>
     </div>
