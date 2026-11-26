@@ -1,30 +1,6 @@
 {
- "updated": "2026-11-25T20:02:46.766Z",
+ "updated": "2026-11-26T02:58:51.903Z",
  "fleets": [
-  {
-   "id": 5802,
-   "name": "SC Cheap Yeet!",
-   "host": "Shadow Cartel NPSI",
-   "fc": "Dietcoke650",
-   "staging": "Adirain",
-   "time": "2026-11-24T00:30:00+00:00",
-   "end": "2026-11-24T02:30:00+00:00",
-   "ended": true,
-   "hostImage": "/providers/2026/11/01/shadow-cartel-npsi-aa76ff28.webp",
-   "logo": "logos/shadow-cartel-npsi-aa76ff28.webp"
-  },
-  {
-   "id": 5786,
-   "name": "T3D Tuesday",
-   "host": "Spectre Fleet",
-   "fc": "taylor parker",
-   "staging": "Jita",
-   "time": "2026-11-24T19:00:00+00:00",
-   "end": "2026-11-24T21:00:00+00:00",
-   "ended": true,
-   "hostImage": "/providers/2026/10/28/spectre-fleet-49100b7f.webp",
-   "logo": "logos/spectre-fleet-49100b7f.webp"
-  },
   {
    "id": 5757,
    "name": "Slop Fleet, Caldari Faction Warfare",
@@ -50,6 +26,18 @@
    "logo": "logos/spectre-fleet-49100b7f.webp"
   },
   {
+   "id": 5817,
+   "name": "Casual Camp then Null Roam? ESS? Who knows!",
+   "host": "Shadow Cartel NPSI",
+   "fc": "Dietcoke650",
+   "staging": "Amamake",
+   "time": "2026-11-25T23:00:00+00:00",
+   "end": "2026-11-26T01:00:00+00:00",
+   "ended": true,
+   "hostImage": "/providers/2026/11/01/shadow-cartel-npsi-aa76ff28.webp",
+   "logo": "logos/shadow-cartel-npsi-aa76ff28.webp"
+  },
+  {
    "id": 5790,
    "name": "Wednesday Whaling",
    "host": "Bombers Bar",
@@ -57,7 +45,7 @@
    "staging": "Thera",
    "time": "2026-11-25T23:50:00+00:00",
    "end": "2026-11-26T01:50:00+00:00",
-   "ended": false,
+   "ended": true,
    "hostImage": "/providers/2026/10/28/bombers-bar-fa2ee367.webp",
    "logo": "logos/bombers-bar-fa2ee367.webp"
   },
@@ -216,6 +204,18 @@
    "ended": false,
    "hostImage": "/providers/2026/10/28/eve-linknet-eff0a25d.webp",
    "logo": "logos/eve-linknet-eff0a25d.webp"
+  },
+  {
+   "id": 5795,
+   "name": "K-FLEET: ShrinkWrapped pew pew!",
+   "host": "F.U.N. Inc.",
+   "fc": "keacte",
+   "staging": "Jita",
+   "time": "2026-12-03T19:30:00+00:00",
+   "end": "2026-12-03T23:30:00+00:00",
+   "ended": false,
+   "hostImage": "/providers/2026/10/28/fun-inc-0c6a80c2.webp",
+   "logo": "logos/fun-inc-0c6a80c2.webp"
   }
  ]
 }
