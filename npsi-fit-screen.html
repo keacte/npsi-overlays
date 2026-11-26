@@ -57,7 +57,8 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 
 /* fit lists */
 #fit{position:absolute;left:60px;top:560px;width:1800px;height:440px;z-index:2;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;align-content:start}
-.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.col{height:440px;overflow:hidden;min-width:0}
+.col .sc{display:flex;flex-direction:column;gap:14px;will-change:transform}
 .sec{background:rgba(5,3,8,.78);border:1px solid var(--dim);border-left:4px solid var(--c);padding:8px 10px 8px;animation:rowin .5s both}
 .sec h3{display:flex;justify-content:space-between;font:700 14px 'Orbitron';letter-spacing:4px;color:var(--c);margin-bottom:8px}
 .sec h3 span{color:#a898c4;letter-spacing:2px}
@@ -285,7 +286,7 @@ async function liveLoad(){
 }
 function demoModel(){
   const m=(id,name,idx,charge='',qty=0)=>({id,name,idx,charge,qty});
-  return{key:'demo',ship:29990,shipName:'Loki',cls:'Strategic Cruiser',counts:{high:5,mid:5,low:5,rig:3,sub:5},slots:{
+  const M={key:'demo',ship:29990,shipName:'Loki',cls:'Strategic Cruiser',counts:{high:5,mid:5,low:5,rig:3,sub:5},slots:{
     high:[m(2929,'Heavy Missile Launcher II',0,'Scourge Rage Heavy Missile'),m(2929,'Heavy Missile Launcher II',1,'Scourge Rage Heavy Missile'),m(2929,'Heavy Missile Launcher II',2,'Scourge Rage Heavy Missile'),m(2929,'Heavy Missile Launcher II',3,'Scourge Rage Heavy Missile')],
     mid:[m(447,'Warp Scrambler II',0),m(448,'Stasis Webifier II',1),m(2281,'Medium Shield Extender II',2),m(2281,'Medium Shield Extender II',3),m(2024,'Sensor Booster II',4,'Targeting Range Script')],
     low:[m(519,'Gyrostabilizer II',0),m(519,'Gyrostabilizer II',1),m(519,'Gyrostabilizer II',2),m(2048,'Damage Control II',3)],
@@ -293,6 +294,8 @@ function demoModel(){
     sub:[m(45609,'Loki Defensive - Covert Reconfiguration',0),m(45610,'Loki Electronics - Immobility Drivers',1),m(45611,'Loki Offensive - Launcher Efficiency Configuration',2),m(45612,'Loki Propulsion - Intercalated Nanofibers',3),m(45613,'Loki Core - Dissolution Sequencer',4)],
     drone:[m(2488,'Warrior II',0,'',5),m(2488,'Hobgoblin II',1,'',3)],
     cargo:[['Scourge Rage Heavy Missile',2400],['Nanite Repair Paste',100],['Synth Blue Pill Booster',5],['Warrior II',5],['Sensor Booster II',1],['Scourge Fury Heavy Missile',1200],['Cap Booster 400',20],['Hornet EC-300',2]].map((x,i)=>({id:2488+i,name:x[0],qty:x[1]}))}};
+  {const n=+new URLSearchParams(location.search).get('cargo')||0;for(let i=8;i<n;i++)M.slots.cargo.push({id:2488,name:'Demo Item '+(i+1),qty:i+1})}
+  return M;
 }
 
 /* ship name: one line at full size; if too long, shrink and wrap onto two lines (shrinks further only if two lines still overflow) */
@@ -307,6 +310,23 @@ function fitName(){
     if(lines<=2&&el.scrollWidth<=el.clientWidth)return;
   }
 }
+/* ---- gentle auto-scroll for columns whose content overflows: wait 10s, scroll at 50px/s, hold 10s, scroll back ---- */
+const SC_WAIT=10000,SC_SPEED=50;let scs=[];
+function setupScroll(){
+  scs=[...document.querySelectorAll('#fit .col')].map(c=>{const sc=c.querySelector('.sc');return{sc,c,y:0,ph:0,t:performance.now()}});
+  scs.forEach(s=>{s.sc.style.transform='';s.max=Math.max(0,Math.ceil(s.sc.offsetHeight-s.c.clientHeight)+6)});
+}
+function scTick(now){
+  scs.forEach(s=>{
+    if(s.max<=6)return;
+    const dt=now-s.t;
+    if(s.ph===0||s.ph===2){if(dt>=SC_WAIT){s.ph++;s.t=now}}
+    else{const y=Math.min(dt/1000*SC_SPEED,s.max);s.y=s.ph===1?y:s.max-y;s.sc.style.transform=`translateY(${-s.y}px)`;
+      if(y>=s.max){s.ph=(s.ph+1)%4;s.t=now}}
+  });
+  requestAnimationFrame(scTick);
+}
+requestAnimationFrame(scTick);
 /* ---- render ---- */
 const SECS=[['high','HIGH SLOTS'],['mid','MID SLOTS'],['low','LOW SLOTS'],['rig','RIGS'],['sub','SUBSYSTEMS'],['drone','DRONE BAY']];
 let curKey=null,order=0;
@@ -334,12 +354,14 @@ function render(m){
   const f=$('flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');
   const h=Object.fromEntries(SECS.map(([k,t])=>[k,secHTML(k,t,m)]));
   $('c1').innerHTML=h.high;$('c2').innerHTML=h.mid;$('c3').innerHTML=h.low;$('c4').innerHTML=h.rig+h.sub;$('c5').innerHTML=h.drone;
-  const cg=(m.slots.cargo||[]),MAXC=cg.length>9?8:9,shown=cg.slice(0,MAXC);
+  const cg=(m.slots.cargo||[]),shown=cg;
   $('c6').innerHTML=`<div class="sec"><h3>CARGO HOLD<span>${cg.length} ITEM${cg.length===1?'':'S'}</span></h3>`+
-    (cg.length?`<div>${shown.map((x,i)=>`<div class="m" style="animation-delay:${(i*.03).toFixed(2)}s"><img alt="" src="https://images.evetech.net/types/${x.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0"><div class="t"><b>${esc(x.name)}</b></div><span class="q">${x.qty>=1e4?Math.round(x.qty/1e3)+'k':x.qty.toLocaleString('en-GB')}</span></div>`).join('')}</div>${cg.length>MAXC?`<div class="more">+${cg.length-MAXC} MORE</div>`:''}`:`<div class="more">EMPTY</div>`)+'</div>';
+    (cg.length?`<div>${shown.map((x,i)=>`<div class="m" style="animation-delay:${(i*.03).toFixed(2)}s"><img alt="" src="https://images.evetech.net/types/${x.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0"><div class="t"><b>${esc(x.name)}</b></div><span class="q">${x.qty>=1e4?Math.round(x.qty/1e3)+'k':x.qty.toLocaleString('en-GB')}</span></div>`).join('')}</div>${''}`:`<div class="more">EMPTY</div>`)+'</div>';
+  document.querySelectorAll('#fit .col').forEach(c=>{const w=document.createElement('div');w.className='sc';while(c.firstChild)w.appendChild(c.firstChild);c.appendChild(w)});
   /* shrink long module / ammo names to fit their row (single line, min size) so 9 modules per column always fit */
   document.querySelectorAll('.m b,.m small').forEach(el=>{let fs=parseFloat(getComputedStyle(el).fontSize);const min=el.tagName==='B'?12:10;
     while(el.scrollWidth>el.clientWidth&&fs>min){fs-=.5;el.style.fontSize=fs+'px'}});
+  setupScroll();
   const any=Object.values(m.slots).some(a=>a.length);
   $('note').textContent=any?'FIT UPDATES WITHIN A FEW MINUTES OF CHANGES':'NO FIT DATA RETURNED BY EVE';
 }
