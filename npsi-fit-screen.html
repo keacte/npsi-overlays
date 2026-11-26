@@ -32,9 +32,25 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(185,139,255,.8),transparent 60%);opacity:0;pointer-events:none}
 #flash.go{animation:flash .9s ease-out}
 #rwrap{position:absolute;left:55px;top:40px;width:580px;height:580px;display:flex;align-items:center;justify-content:center}
-#rwrap svg{position:absolute;inset:0;overflow:visible;z-index:2;pointer-events:none}
-.r1{transform-origin:290px 290px;animation:spin 40s linear infinite}.r2{transform-origin:290px 290px;animation:spin 24s linear infinite reverse}.pulsering{transform-origin:290px 290px;animation:ping 3.5s ease-out infinite}
-#rimg{position:relative;z-index:1;width:470px;height:470px;object-fit:contain;filter:grayscale(1) contrast(1.15) sepia(1) hue-rotate(232deg) saturate(3.2) brightness(1.1) drop-shadow(0 0 18px rgba(163,92,255,.75))}
+/* ===== HUD around the (static) ship ===== */
+#hud{position:absolute;left:0;top:0;width:580px;height:580px;z-index:2;pointer-events:none}
+.hl{position:absolute;inset:0;width:100%;height:100%;overflow:visible;will-change:transform,opacity}
+.h-cw{transform-origin:50% 50%;animation:spin 40s linear infinite}
+.h-ccw{transform-origin:50% 50%;animation:spin 24s linear infinite reverse}
+.h-fast{transform-origin:50% 50%;animation:spin 9s linear infinite}
+.h-slow{transform-origin:50% 50%;animation:spin 70s linear infinite reverse}
+.h-orbit1{transform-origin:50% 50%;animation:spin 7s linear infinite}
+.h-orbit2{transform-origin:50% 50%;animation:spin 11s linear infinite reverse}
+.h-brk{transform-origin:50% 50%;animation:breathe 3.2s ease-in-out infinite}
+.h-ping{transform-origin:50% 50%;animation:ping 3.6s ease-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.07);opacity:.5}}
+@keyframes ping{from{transform:scale(.45);opacity:.8}to{transform:scale(1.15);opacity:0}}
+
+#radar{will-change:transform;position:absolute;left:50%;top:50%;width:438px;height:438px;margin:-219px 0 0 -219px;border-radius:50%;z-index:2;pointer-events:none;
+  background:conic-gradient(from 0deg,rgba(166,92,255,0) 0deg,rgba(166,92,255,0) 280deg,rgba(185,139,255,.38) 358deg,rgba(255,255,255,.55) 360deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 30%,#000 31%);mask:radial-gradient(circle,transparent 0 30%,#000 31%);
+  animation:spin 4.5s linear infinite}
+#rimg{position:relative;z-index:1;width:445px;height:445px;object-fit:contain;filter:url(#tone) drop-shadow(0 0 14px rgba(163,92,255,.7))}
 #rimg.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
 #sinfo{position:absolute;left:40px;right:40px;top:640px;text-align:center}
 #lab{display:inline-flex;gap:10px;align-items:center;font:700 14px 'Orbitron';letter-spacing:5px;color:var(--violet)}
@@ -73,6 +89,17 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="tone" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <!-- greyscale with a little contrast boost, then map brightness to a purple gradient: deep indigo -> violet -> pale lavender -->
+    <feColorMatrix type="matrix" values="0.45 0.7 0.25 0 0  0.45 0.7 0.25 0 0  0.45 0.7 0.25 0 0  0 0 0 1 0"/>
+    <feComponentTransfer>
+      <feFuncR type="table" tableValues="0.08 0.24 0.54 0.78 0.93"/>
+      <feFuncG type="table" tableValues="0.03 0.09 0.25 0.52 0.82"/>
+      <feFuncB type="table" tableValues="0.20 0.48 0.99 1 1"/>
+    </feComponentTransfer>
+  </filter>
+</defs></svg>
 <div id="stage">
   <div class="feed"><span>SHIP FITTING</span><span class="dot"></span></div>
   <div class="br tl"></div><div class="br bl"></div><div class="br tr"></div><div class="br brr"></div>
@@ -82,11 +109,18 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
   <div id="ship">
     <div id="flash"></div>
     <div id="rwrap">
-      <svg viewBox="0 0 580 580" fill="none" stroke="#8a3ffc">
-        <circle class="pulsering" cx="290" cy="290" r="150" stroke-width="2"/>
-        <g class="r1"><circle cx="290" cy="290" r="282" stroke-width="1.5" stroke-dasharray="4 14" opacity=".7"/><circle cx="290" cy="290" r="270" stroke-width="5" stroke-dasharray="100 300" stroke="#b98bff"/></g>
-        <g class="r2"><circle cx="290" cy="290" r="236" stroke-width="2" stroke-dasharray="36 18 4 18" opacity=".8"/><circle cx="290" cy="290" r="224" stroke-width="7" stroke-dasharray="70 400" stroke="#a35cff"/></g>
-      </svg>
+      <div id="hud">
+      <svg class="hl h-slow" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc"><circle cx="100" cy="100" r="97" stroke-width="3" stroke-dasharray="1.2 7.6" stroke="#b98bff" opacity=".8"/></svg>
+      <svg class="hl h-cw" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc"><circle cx="100" cy="100" r="94" stroke-width="1.5" stroke-dasharray="3 9" opacity=".7"/><circle cx="100" cy="100" r="91" stroke-width="4" stroke-dasharray="62 220" stroke="#b98bff"/></svg>
+      <svg class="hl h-ccw" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc"><circle cx="100" cy="100" r="82" stroke-width="2" stroke-dasharray="28 12 4 12" opacity=".8"/><circle cx="100" cy="100" r="79" stroke-width="5" stroke-dasharray="40 250" stroke="#a35cff"/></svg>
+      <svg class="hl h-fast" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc"><circle cx="100" cy="100" r="68" stroke-width="1" stroke-dasharray="2 5" opacity=".6"/></svg>
+      <svg class="hl h-ping" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc"><circle cx="100" cy="100" r="85" stroke-width="2" stroke="#b98bff"/></svg>
+      <svg class="hl h-orbit1" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc"><circle cx="100" cy="3" r="3" fill="#fff" stroke="none"/><circle cx="100" cy="3" r="7" stroke-width="1" stroke="#b98bff" opacity=".7"/></svg>
+      <svg class="hl h-orbit2" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc"><circle cx="197" cy="100" r="2.5" fill="#f58a1f" stroke="none"/></svg>
+      <svg class="hl h-brk" viewBox="0 0 200 200" fill="none" stroke="#b98bff" stroke-width="2" stroke-linecap="square"><path d="M44 62V44H62"/><path d="M138 44H156V62"/><path d="M156 138V156H138"/><path d="M62 156H44V138"/></svg>
+      <svg class="hl hs" viewBox="0 0 200 200" fill="none" stroke="#8a3ffc"><path d="M100 8v10M100 182v10M8 100h10M182 100h10" stroke="#b98bff" stroke-width="1.5" opacity=".6"/></svg>
+      </div>
+      <div id="radar"></div>
       <img id="rimg" alt="" onerror="this.style.visibility='hidden'" onload="this.style.visibility='visible'">
     </div>
     <div id="sinfo">
