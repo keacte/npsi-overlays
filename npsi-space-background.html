@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>NPSI.ROCKS space background</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+/* OBS: Browser Source 1920x1080, put it at the bottom of the scene. ?still=1 disables animation. ?stars=N sets star count. */
+html,body{margin:0;height:100%;background:#050308;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#150a2b 0%,#0a0516 55%,#050308 100%)}
+.neb{position:absolute;inset:-20%;mix-blend-mode:screen;will-change:transform;filter:blur(40px)}
+.n1{background:radial-gradient(ellipse 38% 30% at 22% 30%,rgba(138,63,252,.55),transparent 70%),radial-gradient(ellipse 30% 26% at 70% 70%,rgba(98,40,200,.45),transparent 70%);animation:d1 90s ease-in-out infinite alternate}
+.n2{background:radial-gradient(ellipse 34% 24% at 78% 24%,rgba(185,139,255,.32),transparent 70%),radial-gradient(ellipse 28% 30% at 30% 78%,rgba(80,30,170,.5),transparent 70%);animation:d2 120s ease-in-out infinite alternate}
+.n3{background:radial-gradient(ellipse 20% 14% at 50% 50%,rgba(166,92,255,.22),transparent 70%);animation:d1 70s ease-in-out infinite alternate-reverse}
+@keyframes d1{to{transform:translate(4%,-3%) scale(1.08) rotate(2deg)}}
+@keyframes d2{to{transform:translate(-5%,3%) scale(1.12) rotate(-2deg)}}
+canvas{position:absolute;inset:0}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(2,1,6,.75) 100%);pointer-events:none}
+#grain{position:absolute;inset:0;opacity:.05;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.5) 0 1px,transparent 1px 3px);pointer-events:none}
+</style></head><body>
+<div id="stage">
+  <div class="neb n1"></div><div class="neb n2"></div><div class="neb n3"></div>
+  <canvas id="cv" width="1920" height="1080"></canvas>
+  <div id="vig"></div><div id="grain"></div>
+</div>
+<script>
+const Q=new URLSearchParams(location.search),STILL=Q.has('still');
+const st=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);st.style.transform=`scale(${s})`;st.style.left=(innerWidth-1920*s)/2+'px';st.style.top=(innerHeight-1080*s)/2+'px'}
+addEventListener('resize',fit);fit();
+const cv=document.getElementById('cv'),g=cv.getContext('2d');
+const N=+Q.get('stars')||380,W=1920,H=1080;
+const COL=['255,255,255','226,208,255','185,139,255','166,92,255'];
+const R=(a,b)=>a+Math.random()*(b-a);
+const stars=Array.from({length:N},()=>{const z=Math.random();return{x:R(0,W),y:R(0,H),z,r:.4+z*z*1.9,c:COL[Math.random()*COL.length|0],v:3+z*14,t:R(0,6.28),ts:R(.5,2.2)}});
+let shoot=null,nextShoot=performance.now()+R(6000,14000);
+function draw(now,dt){
+  g.clearRect(0,0,W,H);
+  for(const s of stars){
+    if(!STILL){s.x-=s.v*dt;if(s.x<-4)s.x=W+4,s.y=R(0,H)}
+    const a=.35+.65*(.5+.5*Math.sin(s.t+now/1000*s.ts));
+    g.globalAlpha=a*(.4+.6*s.z);g.fillStyle=`rgb(${s.c})`;
+    g.beginPath();g.arc(s.x,s.y,s.r,0,6.283);g.fill();
+    if(s.r>1.8){g.globalAlpha=a*.25;g.beginPath();g.arc(s.x,s.y,s.r*3.2,0,6.283);g.fill()}
+  }
+  if(!STILL){
+    if(!shoot&&now>nextShoot){const ang=R(.35,.6);shoot={x:R(500,1900),y:R(0,350),vx:-Math.cos(ang)*1400,vy:Math.sin(ang)*1400,l:0};nextShoot=now+R(9000,20000)}
+    if(shoot){shoot.x+=shoot.vx*dt;shoot.y+=shoot.vy*dt;shoot.l+=dt;
+      const gr=g.createLinearGradient(shoot.x,shoot.y,shoot.x-shoot.vx*.12,shoot.y-shoot.vy*.12);
+      gr.addColorStop(0,'rgba(240,225,255,.95)');gr.addColorStop(1,'rgba(166,92,255,0)');
+      g.globalAlpha=Math.max(0,1-shoot.l/.8);g.strokeStyle=gr;g.lineWidth=2;g.beginPath();g.moveTo(shoot.x,shoot.y);g.lineTo(shoot.x-shoot.vx*.12,shoot.y-shoot.vy*.12);g.stroke();
+      if(shoot.l>.8||shoot.x<-100||shoot.y>H+100)shoot=null}
+  }
+  g.globalAlpha=1;
+}
+let last=performance.now();
+function loop(now){const dt=Math.min(.1,(now-last)/1000);last=now;draw(now,dt);if(!STILL)requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+if(STILL)draw(performance.now(),0);
+</script></body></html>
