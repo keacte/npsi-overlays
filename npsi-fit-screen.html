@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NPSI.ROCKS – Current Fit Screen (Live)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* OBS Browser Source: 1920 x 1080, transparent background. Shows the ship you are flying and its fitted modules, live from EVE. */
+:root{--bg:#050308;--steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif;--purple:#8a3ffc;--violet:#b98bff;--glow:#a35cff;--dim:#2a1747;--white:#f4efff;--orange:#f58a1f;
+  --c-high:#f58a1f;--c-mid:#a65cff;--c-low:#cdb4ff;--c-rig:#8f7fb5;--c-sub:#ffffff;--c-drone:#b98bff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:transparent;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--white);overflow:hidden}
+@keyframes blink{50%{opacity:.15}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes bob{50%{transform:translateY(-6px)}}
+@keyframes ping{from{transform:scale(.6);opacity:.8}to{transform:scale(1.25);opacity:0}}@keyframes tick{to{transform:translateX(-100%)}}
+@keyframes sweepx{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
+@keyframes shipin{from{opacity:0;transform:translateX(-50px) scale(.7);filter:blur(10px)}}
+@keyframes rowin{from{opacity:0;transform:translateX(26px)}}@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+.feed{position:absolute;right:40px;top:36px;border:1px solid var(--purple);padding:12px 20px;background:rgba(5,3,8,.55);font:600 18px 'Orbitron';letter-spacing:4px;display:flex;gap:18px;align-items:center;z-index:3}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px var(--orange);animation:blink 1s infinite}
+.br{position:absolute;width:60px;height:60px;border:2px solid var(--purple);animation:blink 3s infinite}
+.br.tl{left:30px;top:30px;border-right:0;border-bottom:0}.br.bl{left:30px;bottom:80px;border-right:0;border-top:0}.br.tr{right:30px;top:30px;border-left:0;border-bottom:0}.br.brr{right:30px;bottom:80px;border-left:0;border-top:0}
+#logo{position:absolute;left:50%;top:22px;height:104px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 0 14px rgba(163,92,255,.75));animation:bob 4s ease-in-out infinite}
+#hd{position:absolute;left:60px;top:48px;z-index:3;font:700 20px 'Orbitron';letter-spacing:8px;color:var(--violet);display:flex;gap:12px;align-items:center}
+#hd i{width:10px;height:10px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--glow);animation:blink 1.4s steps(2) infinite}
+
+/* ship card */
+#ship{position:absolute;left:60px;top:150px;width:690px;height:850px;border:1px solid var(--purple);border-left:4px solid #fff;background:rgba(5,3,8,.78);overflow:hidden;z-index:2;
+  clip-path:polygon(24px 0,100% 0,100% calc(100% - 24px),calc(100% - 24px) 100%,0 100%,0 0)}
+#ship:before{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:sweepx 3.6s ease-in-out infinite}
+#flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(185,139,255,.8),transparent 60%);opacity:0;pointer-events:none}
+#flash.go{animation:flash .9s ease-out}
+#rwrap{position:absolute;left:55px;top:40px;width:580px;height:580px;display:flex;align-items:center;justify-content:center}
+#rwrap svg{position:absolute;inset:0;overflow:visible}
+.r1{transform-origin:290px 290px;animation:spin 40s linear infinite}.r2{transform-origin:290px 290px;animation:spin 24s linear infinite reverse}.pulsering{transform-origin:290px 290px;animation:ping 3.5s ease-out infinite}
+#rimg{position:relative;width:470px;height:470px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(163,92,255,.75))}
+#rimg.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
+#sinfo{position:absolute;left:40px;right:40px;top:640px;text-align:center}
+#lab{display:inline-flex;gap:10px;align-items:center;font:700 14px 'Orbitron';letter-spacing:5px;color:var(--violet)}
+#sname{font:800 62px/1.05 var(--head);text-shadow:0 0 22px rgba(166,92,255,.7);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#scls{font:700 20px 'Orbitron';letter-spacing:4px;color:var(--orange);text-transform:uppercase;margin-top:4px}
+#cust{font:600 24px 'Rajdhani';color:var(--violet);margin-top:4px;min-height:30px}
+#pil{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--dim);display:flex;justify-content:space-between;font:600 16px 'Orbitron';letter-spacing:4px;color:#a898c4}
+#pil b{color:#fff;font-weight:600}
+
+/* fit lists */
+#fit{position:absolute;left:790px;top:150px;width:1070px;height:850px;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:26px;align-content:start}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.sec{background:rgba(5,3,8,.78);border:1px solid var(--dim);border-left:4px solid var(--c);padding:10px 14px 12px;animation:rowin .5s both}
+.sec h3{display:flex;justify-content:space-between;font:700 15px 'Orbitron';letter-spacing:5px;color:var(--c);margin-bottom:8px}
+.sec h3 span{color:#a898c4;letter-spacing:2px}
+.m{display:flex;align-items:center;gap:12px;height:40px;padding:0 6px;border-bottom:1px solid rgba(42,23,71,.8);animation:rowin .45s both}
+.m:last-child{border-bottom:0}
+.m img{width:34px;height:34px;flex:none;border:1px solid var(--c);background:#0a0514}
+.m .t{min-width:0;flex:1}
+.m b{display:block;font:700 21px/1.05 var(--head);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m small{display:block;font:600 14px/1.1 'Rajdhani';letter-spacing:.08em;color:var(--violet);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m .q{flex:none;font:700 16px 'Orbitron';color:#fff;background:rgba(138,63,252,.4);padding:2px 8px}
+.m.e{opacity:.35}.m.e .ph{width:34px;height:34px;flex:none;border:1px dashed var(--c)}
+.m.e b{font-weight:600;color:#a898c4}
+#note{position:absolute;right:60px;top:1006px;font:600 14px 'Orbitron';letter-spacing:3px;color:#7a6a9c;z-index:3}
+
+/* messages */
+#msg{position:absolute;left:60px;right:60px;top:150px;height:850px;z-index:5;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  background:rgba(5,3,8,.85);border:1px solid var(--purple);font:600 24px 'Orbitron';letter-spacing:6px;color:#7a6a9c;text-align:center}
+#msg.login{}
+#msg .err{display:block;font:600 22px/1.3 'Rajdhani';letter-spacing:.04em;color:var(--orange);max-width:900px;text-transform:none}
+#msg .cb{font:600 16px/1.3 'Rajdhani';letter-spacing:.05em;color:#7a6a9c;text-transform:none;word-break:break-all;max-width:1000px}
+#lb{font:700 20px 'Orbitron';letter-spacing:4px;color:#fff;background:var(--purple);border:1px solid var(--violet);padding:14px 28px;cursor:pointer;box-shadow:0 0 18px rgba(163,92,255,.5)}
+
+.ticker{position:absolute;left:0;right:0;bottom:0;height:52px;background:#000;border-top:1px solid var(--purple);display:flex;align-items:center;z-index:4}
+.tickwrap{flex:1;height:100%;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+.tickwrap div{display:inline-block;padding-left:100%;font:600 24px 'Rajdhani';letter-spacing:2px;animation:tick 70s linear infinite}
+.clock{flex:none;padding:0 28px;font:700 22px 'Orbitron';letter-spacing:3px;color:var(--violet);background:#000;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="feed"><span>SHIP FITTING</span><span class="dot"></span></div>
+  <div class="br tl"></div><div class="br bl"></div><div class="br tr"></div><div class="br brr"></div>
+  <img id="logo" alt="NPSI logo" src="data:image/png;base64,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">
+  <div id="hd"><i></i>CURRENT FIT</div>
+
+  <div id="ship">
+    <div id="flash"></div>
+    <div id="rwrap">
+      <svg viewBox="0 0 580 580" fill="none" stroke="#8a3ffc">
+        <circle class="pulsering" cx="290" cy="290" r="150" stroke-width="2"/>
+        <g class="r1"><circle cx="290" cy="290" r="282" stroke-width="1.5" stroke-dasharray="4 14" opacity=".7"/><circle cx="290" cy="290" r="270" stroke-width="5" stroke-dasharray="100 300" stroke="#b98bff"/></g>
+        <g class="r2"><circle cx="290" cy="290" r="236" stroke-width="2" stroke-dasharray="36 18 4 18" opacity=".8"/><circle cx="290" cy="290" r="224" stroke-width="7" stroke-dasharray="70 400" stroke="#a35cff"/></g>
+      </svg>
+      <img id="rimg" alt="" onerror="this.style.visibility='hidden'" onload="this.style.visibility='visible'">
+    </div>
+    <div id="sinfo">
+      <div id="lab"><i style="width:9px;height:9px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px var(--glow);animation:blink 1.4s steps(2) infinite"></i><span id="labt">NOW FLYING</span></div>
+      <div id="sname">—</div><div id="scls"></div><div id="cust"></div>
+      <div id="pil"><span>PILOT</span><b id="pilot"></b></div>
+    </div>
+  </div>
+
+  <div id="fit"><div class="col" id="c1"></div><div class="col" id="c2"></div></div>
+  <div id="note"></div>
+  <div id="msg">LOADING…</div>
+
+  <div class="ticker"><div class="tickwrap"><div id="tick"></div></div><div class="clock" id="clock">00:00:00 UTC</div></div>
+</div>
+<script>
+/* ===== EDIT ME ===== */
+const CONFIG = {
+  // Paste your EVE application Client ID here (developers.eveonline.com). Or add ?client_id=XXXX to the URL once; it is then remembered.
+  clientId: ''
+};
+const SHOW_EMPTY = true;      // show empty slots as dim placeholders (?empty=0 hides them)
+const TICKER = 'NPSI.ROCKS  //  FLY TOGETHER, WIN TOGETHER  //  NOT PURPLE? SHOOT IT!  //  NO BLUES, NO STRINGS, JUST CONTENT  //  JOIN THE DISCORD WITH !discord  //  ';
+/* =================== */
+
+const QS=new URLSearchParams(location.search);
+const DEMO=QS.has('demo');
+const EMPTY_OK=QS.get('empty')==='0'?false:SHOW_EMPTY;
+const esi='https://esi.evetech.net/latest';
+const $=id=>document.getElementById(id);
+const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const stage=$('stage');
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1920*s)/2}px,${(innerHeight-1080*s)/2}px) scale(${s})`}
+addEventListener('resize',fit);fit();
+$('tick').textContent=TICKER.repeat(3);
+setInterval(()=>{$('clock').textContent=new Date().toISOString().substr(11,8)+' UTC'},1000);
+
+/* ---- ESI helpers ---- */
+const types={},groups={};
+async function getType(id){if(types[id])return types[id];const r=await fetch(`${esi}/universe/types/${id}/`);return types[id]=await r.json()}
+async function getGroup(id){if(groups[id])return groups[id];const r=await fetch(`${esi}/universe/groups/${id}/`);return groups[id]=await r.json()}
+const BASE={high:27,mid:19,low:11,rig:92,sub:125};
+const SLOT=f=>f>=27&&f<=34?'high':f>=19&&f<=26?'mid':f>=11&&f<=18?'low':f>=92&&f<=94?'rig':f>=125&&f<=132?'sub':f===87?'drone':null;
+function slotCounts(shipId){
+  const at={};((types[shipId]||{}).dogma_attributes||[]).forEach(a=>at[a.attribute_id]=a.value);
+  return{high:at[14]|0,mid:at[13]|0,low:at[12]|0,rig:at[1137]|0,sub:at[1367]|0};
+}
+const EMPTY=()=>({high:[],mid:[],low:[],rig:[],sub:[],drone:[]});
+async function slotsFromItems(items){
+  await Promise.all([...new Set(items.map(i=>i.item_type_id))].map(getType));
+  const by={};
+  items.forEach(i=>{const s=SLOT(i.flag);if(s)(by[i.flag]??=[]).push(i)});
+  const out=EMPTY();
+  Object.keys(by).sort((a,b)=>a-b).forEach(f=>{
+    const list=by[f],slot=SLOT(+f);
+    const mod=list.find(i=>types[i.item_type_id].category_id!==8)||list[0];
+    const ch=list.find(i=>types[i.item_type_id].category_id===8&&i!==mod);
+    out[slot].push({id:mod.item_type_id,name:types[mod.item_type_id].name,idx:slot==='drone'?out.drone.length:(+f-BASE[slot]),
+      charge:ch?types[ch.item_type_id].name:'',qty:slot==='drone'?(mod.quantity||0):0});
+  });
+  return out;
+}
+function message(t,html){const m=$('msg');if(html){m.innerHTML=html}else{m.classList.remove('login');m.textContent=t}m.style.display='flex'}
+
+/* ================= EVE SSO (PKCE, no secret needed) ================= */
+const SCOPES='esi-location.read_ship_type.v1 esi-assets.read_assets.v1';
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const lsDel=k=>{try{localStorage.removeItem(k)}catch(e){}};
+if(QS.get('client_id'))lsSet('npsi_cid',QS.get('client_id'));
+const CLIENT_ID=(CONFIG.clientId||lsGet('npsi_cid')||'').trim();
+const REDIRECT=location.origin+location.pathname;
+const b64url=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const rnd=n=>b64url(crypto.getRandomValues(new Uint8Array(n)));
+async function login(){
+  if(!CLIENT_ID){showLogin('NO CLIENT ID – add ?client_id=YOUR_ID to the URL');return}
+  if(!(window.crypto&&crypto.subtle)){showLogin('This page must be opened over https');return}
+  const v=rnd(48),state=rnd(16);
+  const ch=b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));
+  lsSet('npsi_pkce',JSON.stringify({v,s:state}));
+  location.href='https://login.eveonline.com/v2/oauth/authorize/?'+new URLSearchParams({response_type:'code',redirect_uri:REDIRECT,client_id:CLIENT_ID,scope:SCOPES,code_challenge:ch,code_challenge_method:'S256',state});
+}
+async function tokenReq(params){
+  const r=await fetch('https://login.eveonline.com/v2/oauth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:CLIENT_ID,...params})});
+  if(!r.ok){let b='';try{b=(await r.text()).slice(0,160)}catch(e){}throw new Error('token endpoint '+r.status+' '+b)}
+  return r.json();
+}
+function saveTokens(t){
+  const pl=JSON.parse(atob(t.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+  lsSet('npsi_auth',JSON.stringify({access:t.access_token,refresh:t.refresh_token,exp:Date.now()+(t.expires_in-60)*1000,id:+pl.sub.split(':')[2],name:pl.name,scope:SCOPES}));
+}
+async function handleCallback(){
+  if(QS.get('error')){history.replaceState(null,'',location.pathname);throw new Error('EVE said: '+QS.get('error')+' – '+(QS.get('error_description')||''))}
+  const code=QS.get('code');if(!code)return;
+  const saved=JSON.parse(lsGet('npsi_pkce')||'null');
+  history.replaceState(null,'',location.pathname);
+  if(!saved)throw new Error('login data lost (browser storage unavailable?)');
+  if(saved.s!==QS.get('state'))throw new Error('state mismatch');
+  saveTokens(await tokenReq({grant_type:'authorization_code',code,code_verifier:saved.v}));
+  lsDel('npsi_pkce');
+}
+async function bearer(){
+  let a=JSON.parse(lsGet('npsi_auth')||'null');if(!a)return null;
+  if(Date.now()>a.exp){
+    try{saveTokens(await tokenReq({grant_type:'refresh_token',refresh_token:a.refresh}));a=JSON.parse(lsGet('npsi_auth'))}
+    catch(e){lsDel('npsi_auth');return null}
+  }
+  return a;
+}
+const esiAuth=(path,a)=>fetch(esi+path,{headers:{Authorization:'Bearer '+a.access}});
+
+/* ================= live ship + fit (ship from /ship/, modules from /assets/) ================= */
+const FLAGMAP=f=>{let m;
+  if(f==='DroneBay')return 87;
+  if(m=f.match(/^HiSlot(\d)$/))return 27+ +m[1];
+  if(m=f.match(/^MedSlot(\d)$/))return 19+ +m[1];
+  if(m=f.match(/^LoSlot(\d)$/))return 11+ +m[1];
+  if(m=f.match(/^RigSlot(\d)$/))return 92+ +m[1];
+  if(m=f.match(/^SubSystemSlot(\d)$/))return 125+ +m[1];
+  return null};
+async function slotsFromAssets(a,shipItemId){
+  const first=await esiAuth(`/characters/${a.id}/assets/?page=1`,a);
+  if(first.status===403||first.status===401)throw new Error('scope');
+  const pages=+first.headers.get('x-pages')||1;
+  let all=await first.json();
+  const rest=await Promise.all(Array.from({length:pages-1},(_,i)=>esiAuth(`/characters/${a.id}/assets/?page=${i+2}`,a).then(r=>r.json())));
+  rest.forEach(r=>all=all.concat(r));
+  const items=all.filter(i=>i.location_id===shipItemId).map(i=>({item_type_id:i.type_id,flag:FLAGMAP(i.location_flag),quantity:i.quantity})).filter(i=>i.flag!==null);
+  return slotsFromItems(items);
+}
+let lastShip=null,lastAssets=0,fitCache=EMPTY();
+async function liveLoad(){
+  const a=await bearer();
+  if(!a){showLogin();return}
+  const r=await esiAuth(`/characters/${a.id}/ship/`,a);
+  if(r.status===401||r.status===403){lsDel('npsi_auth');showLogin();return}
+  const sh=await r.json();
+  const key=sh.ship_item_id+':'+sh.ship_type_id;
+  if(key!==lastShip||Date.now()-lastAssets>300000){
+    try{fitCache=await slotsFromAssets(a,sh.ship_item_id)}
+    catch(e){if(e.message==='scope'){lsDel('npsi_auth');showLogin('Login again to allow reading your ship fitting (assets scope)');return}fitCache=EMPTY()}
+    lastShip=key;lastAssets=Date.now();
+  }
+  const t=await getType(sh.ship_type_id);
+  const g=await getGroup(t.group_id);
+  const sig=Object.values(fitCache).flat().map(x=>x.id+(x.charge||'')+x.qty).join(',');
+  render({key:key+'|'+sig,pilot:a.name,ship:sh.ship_type_id,shipName:t.name,cls:g.name,custom:sh.ship_name,counts:slotCounts(sh.ship_type_id),slots:fitCache});
+}
+function demoModel(){
+  const m=(id,name,idx,charge='',qty=0)=>({id,name,idx,charge,qty});
+  return{key:'demo',pilot:'Demo Pilot',ship:29990,shipName:'Loki',cls:'Strategic Cruiser',custom:'Demo Ship',counts:{high:5,mid:5,low:5,rig:3,sub:5},slots:{
+    high:[m(2929,'Heavy Missile Launcher II',0,'Scourge Rage Heavy Missile'),m(2929,'Heavy Missile Launcher II',1,'Scourge Rage Heavy Missile'),m(2929,'Heavy Missile Launcher II',2,'Scourge Rage Heavy Missile'),m(2929,'Heavy Missile Launcher II',3,'Scourge Rage Heavy Missile')],
+    mid:[m(447,'Warp Scrambler II',0),m(448,'Stasis Webifier II',1),m(2281,'Medium Shield Extender II',2),m(2281,'Medium Shield Extender II',3),m(2024,'Sensor Booster II',4,'Targeting Range Script')],
+    low:[m(519,'Gyrostabilizer II',0),m(519,'Gyrostabilizer II',1),m(519,'Gyrostabilizer II',2),m(2048,'Damage Control II',3)],
+    rig:[m(26436,'Medium Core Defense Field Extender I',0),m(26436,'Medium Core Defense Field Extender I',1)],
+    sub:[m(45609,'Loki Defensive - Covert Reconfiguration',0),m(45610,'Loki Electronics - Immobility Drivers',1),m(45611,'Loki Offensive - Launcher Efficiency Configuration',2),m(45612,'Loki Propulsion - Intercalated Nanofibers',3),m(45613,'Loki Core - Dissolution Sequencer',4)],
+    drone:[m(2488,'Warrior II',0,'',5),m(2488,'Hobgoblin II',1,'',3)]}};
+}
+
+/* ---- render ---- */
+const SECS=[['high','HIGH SLOTS'],['mid','MID SLOTS'],['low','LOW SLOTS'],['rig','RIGS'],['sub','SUBSYSTEMS'],['drone','DRONE BAY']];
+let curKey=null,order=0;
+function secHTML(kind,title,m){
+  const fitted=m.slots[kind]||[];
+  const n=kind==='drone'?fitted.length:Math.max((m.counts||{})[kind]||0,fitted.reduce((x,y)=>Math.max(x,y.idx+1),0));
+  if(!n&&!fitted.length)return'';
+  const by={};fitted.forEach(x=>by[x.idx]=x);
+  let rows='',count=0;
+  for(let i=0;i<n;i++){
+    const f=by[i];
+    const d=(order++*.035).toFixed(3);
+    if(f){count++;rows+=`<div class="m" style="animation-delay:${d}s"><img alt="" src="https://images.evetech.net/types/${f.id}/icon?size=64" onerror="this.onerror=null;this.style.opacity=0"><div class="t"><b>${esc(f.name)}</b>${f.charge?`<small>${esc(f.charge)}</small>`:''}</div>${f.qty?`<span class="q">x${f.qty}</span>`:''}</div>`}
+    else if(EMPTY_OK&&kind!=='drone')rows+=`<div class="m e" style="animation-delay:${d}s"><span class="ph"></span><div class="t"><b>Empty slot</b></div></div>`;
+  }
+  if(!rows)return'';
+  return`<div class="sec" style="--c:var(--c-${kind})"><h3>${title}<span>${kind==='drone'?count+' TYPES':count+' / '+n}</span></h3>${rows}</div>`;
+}
+function render(m){
+  $('msg').style.display='none';
+  if(m.key===curKey)return;curKey=m.key;order=0;
+  $('pilot').textContent=(m.pilot||'').toUpperCase();
+  $('sname').textContent=m.shipName;$('scls').textContent=m.cls||'';
+  $('cust').textContent=m.custom?'“'+m.custom+'”':'';
+  const img=$('rimg');img.classList.remove('in');void img.offsetWidth;
+  img.src=`https://images.evetech.net/types/${m.ship}/render?size=512`;img.classList.add('in');
+  const f=$('flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');
+  const h=Object.fromEntries(SECS.map(([k,t])=>[k,secHTML(k,t,m)]));
+  $('c1').innerHTML=h.high+h.mid;
+  $('c2').innerHTML=h.low+h.rig+h.sub+h.drone;
+  const any=Object.values(m.slots).some(a=>a.length);
+  $('note').textContent=any?'FIT UPDATES WITHIN A FEW MINUTES OF CHANGES':'NO FIT DATA RETURNED BY EVE';
+}
+function showLogin(err){
+  const m=$('msg');m.classList.add('login');
+  message('',`<div>${err?'<span class="err">'+esc(err)+'</span>':'CONNECT TO EVE ONLINE'}</div><button id="lb">LOGIN WITH EVE</button><span class="cb">Callback URL to register: ${esc(REDIRECT)}<br>Scopes: esi-location.read_ship_type.v1 esi-assets.read_assets.v1</span>`);
+  $('lb').onclick=login;
+}
+(async()=>{
+  if(DEMO){render(demoModel());return}
+  if(!CLIENT_ID){showLogin('NO CLIENT ID – add ?client_id=YOUR_ID to the URL');return}
+  try{await handleCallback()}catch(e){showLogin('LOGIN FAILED: '+(e&&e.message||e));return}
+  const run=async()=>{try{await liveLoad()}catch(e){if(!curKey)message('AWAITING DATA')}};
+  run();setInterval(run,30000);
+})();
+</script>
+</body>
+</html>
