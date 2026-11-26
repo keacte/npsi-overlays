@@ -32,9 +32,9 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(185,139,255,.8),transparent 60%);opacity:0;pointer-events:none}
 #flash.go{animation:flash .9s ease-out}
 #rwrap{position:absolute;left:55px;top:40px;width:580px;height:580px;display:flex;align-items:center;justify-content:center}
-#rwrap svg{position:absolute;inset:0;overflow:visible}
+#rwrap svg{position:absolute;inset:0;overflow:visible;z-index:2;pointer-events:none}
 .r1{transform-origin:290px 290px;animation:spin 40s linear infinite}.r2{transform-origin:290px 290px;animation:spin 24s linear infinite reverse}.pulsering{transform-origin:290px 290px;animation:ping 3.5s ease-out infinite}
-#rimg{position:relative;width:470px;height:470px;object-fit:contain;filter:grayscale(1) contrast(1.15) sepia(1) hue-rotate(232deg) saturate(3.2) brightness(1.1) drop-shadow(0 0 18px rgba(163,92,255,.75))}
+#rimg{position:relative;z-index:1;width:470px;height:470px;object-fit:contain;filter:grayscale(1) contrast(1.15) sepia(1) hue-rotate(232deg) saturate(3.2) brightness(1.1) drop-shadow(0 0 18px rgba(163,92,255,.75))}
 #rimg.in{animation:shipin .9s cubic-bezier(.2,.8,.2,1) both}
 #sinfo{position:absolute;left:40px;right:40px;top:640px;text-align:center}
 #lab{display:inline-flex;gap:10px;align-items:center;font:700 14px 'Orbitron';letter-spacing:5px;color:var(--violet)}
