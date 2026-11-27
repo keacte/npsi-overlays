@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>NPSI.ROCKS station interior background</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+/* OBS: Browser Source 1920x1080, put it at the bottom of the scene.
+   Options: ?still=1 (no animation)  ?speed=1 (corridor drift, 0 = stopped)  ?dust=60 (floating particles) */
+html,body{margin:0;height:100%;background:#050308;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#050308}
+canvas{position:absolute;inset:0;width:1920px;height:1080px}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 52%,transparent 38%,rgba(3,1,8,.55) 78%,rgba(3,1,8,.9) 100%);pointer-events:none}
+#scan{position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.09) 3px 4px);pointer-events:none;mix-blend-mode:multiply}
+</style></head><body>
+<div id="stage"><canvas id="c" width="1920" height="1080"></canvas><div id="scan"></div><div id="vig"></div></div>
+<script>
+const stage=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1920*s)/2}px,${(innerHeight-1080*s)/2}px) scale(${s})`}
+addEventListener('resize',fit);fit();
+const QS=new URLSearchParams(location.search),STILL=QS.get('still')==='1',SPEED=QS.has('speed')?+QS.get('speed'):1,DUST=+QS.get('dust')||60;
+const cv=document.getElementById('c'),g=cv.getContext('2d'),W=1920,H=1080,CX=960,CY=500,F=900;
+const HW=1.0,HH=0.66,DZ=1.15,N=16,NEAR=0.55;   /* half width, half height (world), rib spacing, rib count, near plane */
+const R=(a,b)=>a+Math.random()*(b-a);
+const P=(x,y,z)=>[CX+x*F/z,CY+y*F/z];
+const fog=z=>Math.max(0,Math.min(1,1-(z-NEAR)/(N*DZ*0.92)));
+const dust=[...Array(DUST)].map(()=>({x:R(-HW,HW),y:R(-HH,HH),z:R(NEAR,N*DZ),v:R(.02,.08),a:R(.2,.7)}));
+const beacons=[3,9,14];            /* rib numbers that carry a pulsing red beacon */
+let off=0,last=performance.now(),T=0;
+function poly(pts,fill){g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);g.closePath();g.fillStyle=fill;g.fill()}
+function draw(){
+  g.globalCompositeOperation='source-over';
+  const bg=g.createRadialGradient(CX,CY,10,CX,CY,900);bg.addColorStop(0,'#2b1650');bg.addColorStop(.35,'#120a26');bg.addColorStop(1,'#050308');
+  g.fillStyle=bg;g.fillRect(0,0,W,H);
+  /* ribs sorted far to near */
+  const zs=[];for(let i=N;i>=0;i--){const z=NEAR+((i+(1-off))%(N+1))*DZ*0;zs.push(i)}
+  const ribZ=i=>NEAR+(i-off)*DZ;                    /* depth of rib i (i from 0..N) */
+  for(let i=N;i>=1;i--){
+    const z0=ribZ(i),z1=ribZ(i-1);if(z1<NEAR)continue;const za=Math.max(z1,NEAR);
+    const f0=fog(z0),f1=fog(za);
+    const a=P(-HW,-HH,z0),b=P(HW,-HH,z0),c2=P(HW,HH,z0),d=P(-HW,HH,z0);
+    const a1=P(-HW,-HH,za),b1=P(HW,-HH,za),c1=P(HW,HH,za),d1=P(-HW,HH,za);
+    /* walls, ceiling, floor with a lit gradient fading into the distance */
+    const wl=g.createLinearGradient(a[0],0,a1[0],0);wl.addColorStop(0,`rgba(58,40,98,${.97*f0})`);wl.addColorStop(1,`rgba(36,24,66,${.97*f1})`);
+    poly([a,a1,d1,d],wl);
+    const wr=g.createLinearGradient(b[0],0,b1[0],0);wr.addColorStop(0,`rgba(58,40,98,${.97*f0})`);wr.addColorStop(1,`rgba(36,24,66,${.97*f1})`);
+    poly([b,b1,c1,c2],wr);
+    poly([a,b,b1,a1],`rgba(22,14,42,${.95*Math.max(f0,f1)})`);
+    poly([d,c2,c1,d1],`rgba(14,9,28,${.97*Math.max(f0,f1)})`);
+    /* wall panel seams (horizontal bands) */
+    g.lineWidth=1.2;
+    for(const yy of[-.33,0,.33]){g.strokeStyle=`rgba(138,63,252,${.20*Math.min(f0,f1)})`;
+      for(const sx of[-HW,HW]){const p0=P(sx,yy,z0),p1=P(sx,yy,za);g.beginPath();g.moveTo(p0[0],p0[1]);g.lineTo(p1[0],p1[1]);g.stroke()}}
+    /* industrial pipes along the side walls */
+    for(const [yy,col,lw] of [[-.5,'96,74,150',9],[-.4,'70,52,118',6],[.5,'80,60,132',8]]){for(const sx of[-HW,HW]){const k=sx<0?1:-1;const p0=P(sx+k*.02,yy,z0),p1=P(sx+k*.02,yy,za);
+        g.lineCap='butt';g.lineWidth=lw*F/((z0+za)/2)/F*2.2;g.strokeStyle=`rgba(${col},${.9*Math.min(f0,f1)})`;g.beginPath();g.moveTo(p0[0],p0[1]);g.lineTo(p1[0],p1[1]);g.stroke();
+        g.lineWidth*=.25;g.strokeStyle=`rgba(200,170,255,${.35*Math.min(f0,f1)})`;g.beginPath();g.moveTo(p0[0],p0[1]-g.lineWidth*1.2);g.lineTo(p1[0],p1[1]-g.lineWidth*1.2);g.stroke()}}
+    /* ceiling light strip and floor guide strips */
+    g.globalCompositeOperation='lighter';
+    const zm0=z0+(za-z0)*.3,zm1=z0+(za-z0)*.7,fm=fog((zm0+zm1)/2);
+    const cs=[P(-.16,-HH+.005,zm0),P(.16,-HH+.005,zm0),P(.16,-HH+.005,zm1),P(-.16,-HH+.005,zm1)];
+    const lit=.7+.2*Math.sin(T*1.3+i*1.7);poly(cs,`rgba(215,190,255,${.8*lit*fm})`);
+    /* lit window panels on both side walls, alternating segments */
+    if(i%2===0){for(const sx of[-HW,HW]){const w=[P(sx,-.2,zm0),P(sx,-.2,zm1),P(sx,.12,zm1),P(sx,.12,zm0)];poly(w,`rgba(${i%4===0?'255,200,90':'150,200,255'},${.38*fm})`)}}
+    /* hazard stripes along the floor edges */
+    for(let k=0;k<6;k++){if(k%2)continue;const q0=z0+(za-z0)*k/6,q1=z0+(za-z0)*(k+1)/6;for(const sx of[-1,1]){const q=[P(sx*HW*.9,HH,q0),P(sx*HW*.97,HH,q0),P(sx*HW*.97,HH,q1),P(sx*HW*.9,HH,q1)];poly(q,`rgba(255,200,61,${.45*Math.min(f0,f1)})`)}}
+    for(const sx of[-.78,.78]){const q=[P(sx-.03,HH,z0),P(sx+.03,HH,z0),P(sx+.03,HH,za),P(sx-.03,HH,za)];poly(q,`rgba(166,92,255,${.7*Math.min(f0,f1)})`)}
+    g.globalCompositeOperation='source-over';
+    /* floor grating cross lines */
+    for(let k=1;k<6;k++){const zz=z0+(za-z0)*k/6;const l=P(-HW,HH,zz),r=P(HW,HH,zz);g.strokeStyle=`rgba(90,50,160,${.22*fog(zz)})`;g.beginPath();g.moveTo(l[0],l[1]);g.lineTo(r[0],r[1]);g.stroke()}
+  }
+  /* bulkhead ribs, far to near, so near ones overlap far ones */
+  for(let i=N;i>=0;i--){const z=ribZ(i);if(z<NEAR||z>N*DZ)continue;const f=fog(z);if(f<=0)continue;
+    const T0=.14,o=1+T0;                                    /* rib thickness in world units */
+    const ol=P(-HW*o,-HH*o,z),or=P(HW*o,HH*o,z),il=P(-HW,-HH,z),ir=P(HW,HH,z);
+    g.fillStyle=`rgba(30,19,56,${.96*f})`;                  /* frame = outer minus inner */
+    g.beginPath();g.rect(ol[0],ol[1],or[0]-ol[0],or[1]-ol[1]);g.rect(il[0],il[1],ir[0]-il[0],ir[1]-il[1]);g.fill('evenodd');
+    g.lineWidth=Math.max(1,3*F/z/260);g.strokeStyle=`rgba(166,92,255,${.55*f})`;g.strokeRect(il[0],il[1],ir[0]-il[0],ir[1]-il[1]);
+    g.strokeStyle=`rgba(70,40,130,${.7*f})`;g.strokeRect(ol[0],ol[1],or[0]-ol[0],or[1]-ol[1]);
+    /* rivets along the frame */
+    g.fillStyle=`rgba(185,139,255,${.55*f})`;const rr=Math.max(1,2.2*F/z/260);
+    for(let k=0;k<=8;k++){const x=il[0]+(ir[0]-il[0])*k/8;for(const y of[(ol[1]+il[1])/2,(or[1]+ir[1])/2]){g.beginPath();g.arc(x,y,rr,0,6.283);g.fill()}}
+    /* warning beacon on selected ribs */
+    const id=(i+Math.round(off+1000))%(N+1);
+    if(beacons.includes(id)){const p=P(HW*.97,-HH*.9,z),ph=(Math.sin(T*3+id)+1)/2;g.globalCompositeOperation='lighter';
+      const rad=.12*F/z;const rg=g.createRadialGradient(p[0],p[1],0,p[0],p[1],rad);rg.addColorStop(0,`rgba(255,60,80,${.95*ph*f})`);rg.addColorStop(1,'rgba(255,40,60,0)');g.fillStyle=rg;g.beginPath();g.arc(p[0],p[1],rad,0,6.283);g.fill();g.globalCompositeOperation='source-over'}
+  }
+  /* far-end bulkhead door with a glow */
+  {const z=N*DZ,f=.9;const a=P(-HW*.7,-HH*.8,z),b=P(HW*.7,HH,z);
+   g.globalCompositeOperation='lighter';const gl=g.createRadialGradient(CX,CY+20,0,CX,CY+20,420);gl.addColorStop(0,'rgba(150,90,255,.42)');gl.addColorStop(1,'rgba(150,90,255,0)');g.fillStyle=gl;g.fillRect(CX-440,CY-400,880,840);g.globalCompositeOperation='source-over';
+   g.fillStyle='rgba(12,7,24,.9)';g.fillRect(a[0],a[1],b[0]-a[0],b[1]-a[1]);g.strokeStyle='rgba(166,92,255,.5)';g.lineWidth=1.5;g.strokeRect(a[0],a[1],b[0]-a[0],b[1]-a[1]);g.beginPath();g.moveTo(CX,a[1]);g.lineTo(CX,b[1]);g.stroke()}
+  /* dust motes in the air */
+  g.globalCompositeOperation='lighter';
+  for(const d of dust){const p=P(d.x,d.y,d.z),f=fog(d.z);g.fillStyle=`rgba(200,170,255,${d.a*f*.8})`;g.beginPath();g.arc(p[0],p[1],Math.max(.6,.012*F/d.z),0,6.283);g.fill()}
+  g.globalCompositeOperation='source-over';
+}
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;T+=dt;off=(off+dt*.16*SPEED)%1;
+  for(const d of dust){d.z-=dt*SPEED*.18;d.x+=Math.sin(T*.3+d.y*5)*dt*.01;if(d.z<NEAR){d.z=N*DZ;d.x=R(-HW,HW);d.y=R(-HH,HH)}}
+  draw();if(!STILL)requestAnimationFrame(frame)}
+if(STILL){off=0;draw()}else requestAnimationFrame(frame);
+</script></body></html>
