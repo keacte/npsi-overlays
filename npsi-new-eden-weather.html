@@ -132,58 +132,58 @@ if(QS.get('bg')==='1')document.body.classList.add('bg');
 const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const R=(a,b)=>a+Math.random()*(b-a);
 /* ================= EDIT ME – every location is a real EVE Online place ================= */
-/* img = type ID from CCP's image server (images.evetech.net). fx = bubbles|rain|sun|rust|storm|hole|calm|cats */
+/* img = type ID from CCP's image server (images.evetech.net). fx = calm|rain|sun|rust|storm|hole|cats (drifting rock) */
 const LOCS=[
- {id:'jita',name:'JITA',reg:'THE FORGE',sec:'0.9',ac:'#a65cff',fx:'rain',img:638,
-  big:'HEAVY',unit:'TRAFFIC',temp:'HEAVY',cond:'Congested, high market activity',
-  txt:'Jita remains the cluster’s busiest trade hub. Expect heavy traffic around the Jita 4-4 station and longer undock times at peak hours. Pilots hauling valuable cargo should take extra care on the approach gates.',
-  met:[['TRAFFIC','HEAVY',1],['MARKET','VERY ACTIVE'],['UNDOCK','PEAK-HOUR DELAYS'],['GATE RISK','MODERATE']],
-  q:'Allow extra time at the station during peak hours and check local before you jump.'},
- {id:'perimeter',name:'PERIMETER',reg:'THE FORGE',sec:'0.9',ac:'#ff5a8a',fx:'cats',img:16240,
-  big:'BUSY',unit:'TRADE ROUTE',temp:'BUSY',cond:'Busy trade hub, gate watch advised',
-  txt:'Perimeter, home of the Tranquility Trade Tower, is a major market hub beside Jita. Traffic on the Jita gate is consistently heavy and hostile pilots are known to watch the approach. Check local and your route before jumping.',
-  met:[['MARKET','ACTIVE'],['GATE TRAFFIC','HEAVY',1],['THREAT WATCH','ELEVATED'],['ADVICE','CHECK LOCAL']],
-  q:'Scout the gate first and avoid flying anything you cannot afford to lose.'},
- {id:'amarr',name:'AMARR',reg:'DOMAIN',sec:'1.0',ac:'#ffc83d',fx:'sun',img:642,
-  big:'CLEAR',unit:'SKIES',temp:'CLEAR',cond:'Clear, high-security conditions',
-  txt:'Amarr Prime and the Domain region report settled conditions. As the Empire’s capital and a major trade hub, expect steady traffic and a heavy NPC security presence. The threat to travelling pilots is low.',
-  met:[['SECURITY','1.0'],['THREAT','LOW'],['TRAFFIC','STEADY'],['VISIBILITY','CLEAR']],
-  q:'Standard precautions apply. Keep your ship insured and your route planned.'},
- {id:'rens',name:'RENS',reg:'HEIMATAR',sec:'0.9',ac:'#ff8a3d',fx:'rust',img:587,
-  big:'STABLE',unit:'CONDITIONS',temp:'STABLE',cond:'Stable, moderate traffic',
-  txt:'Rens, the Minmatar trade hub in Heimatar, reports stable conditions and moderate market traffic. The surrounding high-security systems are generally quiet, with the usual traffic along the trade routes.',
-  met:[['TRAFFIC','MODERATE'],['MARKET','STEADY'],['THREAT','LOW'],['VISIBILITY','GOOD']],
-  q:'A good place to restock before heading out on fleet.'},
- {id:'tama',name:'TAMA',reg:'THE CITADEL',sec:'0.3',ac:'#b98bff',fx:'bubbles',img:29990,
-  big:'ACTIVE',unit:'COMBAT CONDITIONS',temp:'ACTIVE',cond:'High hostile activity, low-security',
-  txt:'Tama, in the Citadel region, is one of the busiest low-security systems for combat. Expect gate camps, bubbles and smartbombs, and be ready for sudden engagements. Keep your fit suited to the conditions and follow your FC.',
-  met:[['THREAT','HIGH',1],['GATE CAMPS','LIKELY'],['BUBBLES','EXPECTED'],['RISK','SIGNIFICANT',1]],
-  q:'Not purple, shoot it. Follow your FC’s instructions and stay with the fleet.'},
- {id:'pochven',name:'POCHVEN',reg:'TRIGLAVIAN SPACE',sec:'NULL',ac:'#ff2b3d',fx:'storm',img:2017,
-  big:'SEVERE',unit:'SYSTEM EFFECTS',temp:'SEVERE',cond:'Persistent Triglavian system effects',
-  txt:'Pochven is Triglavian-controlled space with persistent environmental effects in every system. Access is by filament or wormhole, and stargates connect only within the region. Expect hostile NPCs and pilots alike.',
-  met:[['EFFECTS','ACTIVE',1],['ACCESS','FILAMENT / WH'],['GATES','INTERNAL ONLY'],['THREAT','HIGH',1]],
-  q:'Check the system effects before you enter and plan your way out.'},
- {id:'thera',name:'THERA',reg:'WORMHOLE SPACE',sec:'W-SPACE',ac:'#4fd6ff',fx:'hole',img:30889,
-  big:'VARIABLE',unit:'CONNECTIONS',temp:'VARIABLE',cond:'Wormhole connections changing',
-  txt:'Thera is a large shattered wormhole system with four NPC stations and many connections to known space. Wormholes have limited mass and lifetime, so confirm the current connection before you travel and always keep a way home.',
-  met:[['CONNECTIONS','CHANGING'],['STATIONS','FOUR NPC'],['WORMHOLE MASS','LIMITED',1],['TRAVEL','CONFIRM ROUTE']],
-  q:'Use a current public scouting list and confirm your route home first.'},
- {id:'delve',name:'DELVE',reg:'DELVE',sec:'NULL',ac:'#5a8aff',fx:'calm',img:28352,
-  big:'NULLSEC',unit:'SPACE',temp:'NULLSEC',cond:'Large nullsec region, check intel',
-  txt:'Delve is a large nullsecurity region. Conditions vary with local sovereignty and ongoing operations, so check intel channels and local before you travel and be aware that docking restrictions may apply.',
-  met:[['SECURITY','NULL'],['INTEL','CHECK FIRST'],['LOCAL','CHECK FIRST'],['DOCKING','MAY BE RESTRICTED']],
-  q:'Check intel channels before you go and confirm where you can dock.'}
+ {id:'jita',name:'JITA',reg:'THE FORGE',ac:'#a65cff',fx:'calm',img:638,
+  big:'CLEAR',unit:'SKIES',temp:'CLEAR',cond:'Clear skies, thin high cloud',
+  txt:'High pressure holds over the Forge. Skies above Jita are clear, with a thin layer of high cloud around the inner planets. Visibility is excellent and solar winds are light.',
+  met:[['VISIBILITY','EXCELLENT'],['SOLAR WIND','LIGHT'],['CLOUD COVER','10%'],['TEMPERATURE','MILD']],
+  q:'A calm, settled outlook through the evening.'},
+ {id:'perimeter',name:'PERIMETER',reg:'THE FORGE',ac:'#ff5a8a',fx:'calm',img:16240,
+  big:'LIGHT',unit:'SOLAR WIND',temp:'BREEZY',cond:'Light solar wind, scattered cloud',
+  txt:'A gentle solar breeze drifts through Perimeter with scattered cloud over the outer planets. Visibility is good and conditions are expected to stay settled.',
+  met:[['VISIBILITY','GOOD'],['SOLAR WIND','LIGHT'],['CLOUD COVER','30%'],['DUST','LOW']],
+  q:'Light winds ahead, with a quiet night to follow.'},
+ {id:'amarr',name:'AMARR',reg:'DOMAIN',ac:'#ffc83d',fx:'sun',img:642,
+  big:'SUNNY',unit:'AND WARM',temp:'SUNNY',cond:'Warm and sunny, cloudless',
+  txt:'A bright, warm day across the Domain. Amarr Prime enjoys cloudless skies under a strong sun, with excellent visibility and very little wind.',
+  met:[['TEMPERATURE','WARM'],['UV INDEX','HIGH',1],['CLOUD COVER','0%'],['VISIBILITY','EXCELLENT']],
+  q:'Sun protection is recommended in the Domain today.'},
+ {id:'rens',name:'RENS',reg:'HEIMATAR',ac:'#ff8a3d',fx:'rust',img:587,
+  big:'OVERCAST',unit:'LIGHT DUST',temp:'OVERCAST',cond:'Overcast with light dust',
+  txt:'Heavy cloud and a fine layer of dust settle over Rens in Heimatar. Temperatures are cool and visibility is moderate, improving slightly by morning.',
+  met:[['CLOUD COVER','80%'],['DUST','LIGHT'],['TEMPERATURE','COOL'],['VISIBILITY','MODERATE']],
+  q:'Expect a grey, dusty afternoon, brightening by morning.'},
+ {id:'tama',name:'TAMA',reg:'THE CITADEL',ac:'#b98bff',fx:'rain',img:29990,
+  big:'GUSTY',unit:'SOLAR WINDS',temp:'GUSTY',cond:'Unsettled, gusty solar winds',
+  txt:'Unsettled conditions over the Citadel. Strong, gusty solar winds are forecast with static discharge possible at higher altitudes, and visibility will be reduced at times.',
+  met:[['SOLAR WIND','STRONG',1],['STATIC DISCHARGE','POSSIBLE'],['VISIBILITY','REDUCED'],['CLOUD COVER','60%']],
+  q:'Winds are expected to ease overnight.'},
+ {id:'pochven',name:'POCHVEN',reg:'TRIGLAVIAN SPACE',ac:'#ff2b3d',fx:'storm',img:2017,
+  big:'STORM',unit:'RED SKIES',temp:'STORM',cond:'Severe storm, red skies',
+  txt:'Persistent storm systems cover Pochven. Skies are red, winds are severe and visibility is poor, with intense electrical activity across every system in the region.',
+  met:[['WINDS','SEVERE',1],['VISIBILITY','POOR',1],['ELECTRICAL ACTIVITY','HIGH',1],['TEMPERATURE','EXTREME']],
+  q:'Conditions are not expected to improve. Reduce speed and keep sensors active.'},
+ {id:'thera',name:'THERA',reg:'WORMHOLE SPACE',ac:'#4fd6ff',fx:'hole',img:30889,
+  big:'DEBRIS',unit:'SHATTERED SKY',temp:'DEBRIS',cond:'Shattered planets, drifting debris',
+  txt:'The shattered inner planets of Thera scatter rock and dust across the system. Expect a dense debris field, variable visibility and spatial turbulence near the wormholes.',
+  met:[['DEBRIS FIELD','DENSE',1],['VISIBILITY','VARIABLE'],['TURBULENCE','MODERATE'],['SOLAR WIND','LIGHT']],
+  q:'Watch for drifting debris, especially near the wormholes.'},
+ {id:'delve',name:'DELVE',reg:'DELVE',ac:'#5a8aff',fx:'cats',img:28352,
+  big:'ROCKY',unit:'ASTEROID FIELDS',temp:'ROCKY',cond:'Dense asteroid fields, clear intervals',
+  txt:'Dense asteroid belts and drifting rock fields are forecast across Delve. Visibility is good between the belts, though dust clouds may reduce it close to the larger fields.',
+  met:[['ASTEROID DENSITY','HIGH'],['DUST','MODERATE'],['VISIBILITY','GOOD'],['SOLAR WIND','LIGHT']],
+  q:'Keep an eye out for drifting rock near the larger fields.'}
 ];
 LOCS.forEach(l=>{l.cap=l.name+' · '+l.reg});
 const DAYS=[
- ['TODAY','Heavy trade-hub traffic','Busy markets and longer undocks at Jita and Perimeter.','~'],
- ['DOWNTIME','11:00 UTC daily','Server downtime. Dock up and secure your ships beforehand.','!'],
- ['FLEETS','Check the fleet list','Public fleets form throughout the week. See NPSI.ROCKS.','%'],
- ['WEEKEND','Higher pilot activity','Expect more traffic and more fleets across New Eden.','Ω'],
- ['ALL WEEK','Gate activity continues','Gate camps remain active on major routes. Check local.','☼']
+ ['TODAY','Clear, light solar wind','High pressure over the Forge. Mild and bright.','~'],
+ ['TONIGHT','Dust and drifting debris','Visibility drops around Thera after dark.','!'],
+ ['TOMORROW','Gusty solar winds','Winds strengthen across the Citadel, easing by evening.','%'],
+ ['WEEKEND','Storms over Pochven','Red storm bands intensify while skies stay clear elsewhere.','Ω'],
+ ['NEXT WEEK','Asteroid showers','Drifting rock over Delve, settling across the rest of New Eden.','☼']
 ];
-const ALERTS=['TRAFFIC ADVISORY: HEAVY TRAFFIC REPORTED AT MAJOR TRADE HUBS DURING PEAK HOURS','ROUTE ADVISORY: CHECK LOCAL BEFORE JUMPING THROUGH BUSY TRADE-ROUTE GATES','DAILY SERVER DOWNTIME AT 11:00 UTC. SECURE YOUR SHIPS BEFOREHAND','WORMHOLE ADVISORY: THERA CONNECTIONS CHANGE FREQUENTLY. CONFIRM A ROUTE HOME BEFORE TRAVELLING','TRIGLAVIAN SPACE: PERSISTENT SYSTEM EFFECTS APPLY IN EVERY POCHVEN SYSTEM','LOW-SECURITY ADVISORY: EXPECT BUBBLES AND SMARTBOMBS AT POPULAR GATES','NPSI REMINDER: NOT PURPLE, SHOOT IT. FOLLOW YOUR FC’S INSTRUCTIONS','FLY SAFE: DO NOT FLY WHAT YOU CANNOT AFFORD TO LOSE','FLEET FORMING? CHECK NPSI.ROCKS FOR THE LATEST FLEET LIST'];
+const ALERTS=['SOLAR WIND ADVISORY: GUSTY CONDITIONS ACROSS THE CITADEL','STORM WARNING: SEVERE STORM ACTIVITY OVER POCHVEN, VISIBILITY POOR','DEBRIS ADVISORY: DRIFTING ROCK FRAGMENTS AROUND THE SHATTERED PLANETS OF THERA','ASTEROID FIELD ADVISORY: DENSE FIELDS AND DUST CLOUDS OVER DELVE','UV WARNING: HIGH UV INDEX ACROSS THE DOMAIN','DUST ADVISORY: LIGHT DUST AND OVERCAST SKIES OVER HEIMATAR','CLEAR SKIES CONTINUE ACROSS THE FORGE','STELLAR ACTIVITY: SOLAR FLARE ACTIVITY REMAINS LOW ACROSS NEW EDEN'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
 const SHOTS={jita:'https://images.ctfassets.net/7lhcm73ukv5p/1RduTH15RyJtq9Vd4dsU2m/9bb49e45a251fc145c9adc6c2c111562/Screenshot_3840x2160.jpg?w=900&fm=jpg&fl=progressive'};
@@ -204,7 +204,7 @@ function show(k){
   document.querySelectorAll('.row').forEach(r=>r.classList.toggle('on',+r.dataset.k===k));
   const c=$('cin');
   c.innerHTML=`<div class="lab"><i></i>CURRENT CONDITIONS</div><div class="title" id="lname" data-t="${esc(l.name)}">${esc(l.name)}</div>
-   <div class="reg">${esc(l.reg)} · SEC <b>${esc(l.sec)}</b></div><div class="sub">${esc(l.cond)}<i>_</i></div><div class="bar"><u id="pg"></u></div>
+   <div class="reg">${esc(l.reg)}</div><div class="sub">${esc(l.cond)}<i>_</i></div><div class="bar"><u id="pg"></u></div>
    <div id="big"><b>${esc(l.big)}</b><span>${esc(l.unit)}</span></div>
    <div class="status">${l.met.map(m=>`<span>${esc(m[0])} <b class="${m[2]?'bad':''}">${esc(m[1])}</b></span>`).join('')}</div>
    <div id="txt">${esc(l.txt)}</div>${MIN?'<div id="count">00:00</div>':''}`;
