@@ -173,7 +173,12 @@ const LOCS=[
   big:'ROCKY',unit:'ASTEROID FIELDS',temp:'ROCKY',cond:'Dense asteroid fields, clear intervals',
   txt:'Dense asteroid belts and drifting rock fields are forecast across Delve. Visibility is good between the belts, though dust clouds may reduce it close to the larger fields.',
   met:[['ASTEROID DENSITY','HIGH'],['DUST','MODERATE'],['VISIBILITY','GOOD'],['SOLAR WIND','LIGHT']],
-  q:'Keep an eye out for drifting rock near the larger fields.'}
+  q:'Keep an eye out for drifting rock near the larger fields.'},
+ {id:'klyc0',name:'KLY-C0',reg:'PURE BLIND',ac:'#3ddc97',fx:'cats',img:13,
+  big:'STORMY',unit:'GAS GIANTS',temp:'STORMY',cond:'Gas giant storms, drifting rock',
+  txt:'Eight planets share the skies of KLY-C0, from a hot lava world close to the star to three gas giants further out. Expect storm bands around the gas giants and drifting rock across ten asteroid belts, with good visibility in the inner system.',
+  met:[['GAS GIANT STORMS','ACTIVE',1],['ASTEROID BELTS','10'],['INNER PLANET','EXTREME HEAT'],['VISIBILITY','GOOD']],
+  q:'Settled in the inner system, with unsettled weather around the outer gas giants.'}
 ];
 LOCS.forEach(l=>{l.cap=l.name+' · '+l.reg});
 const DAYS=[
@@ -183,7 +188,7 @@ const DAYS=[
  ['WEEKEND','Storms over Pochven','Red storm bands intensify while skies stay clear elsewhere.','Ω'],
  ['NEXT WEEK','Asteroid showers','Drifting rock over Delve, settling across the rest of New Eden.','☼']
 ];
-const ALERTS=['SOLAR WIND ADVISORY: GUSTY CONDITIONS ACROSS THE CITADEL','STORM WARNING: SEVERE STORM ACTIVITY OVER POCHVEN, VISIBILITY POOR','DEBRIS ADVISORY: DRIFTING ROCK FRAGMENTS AROUND THE SHATTERED PLANETS OF THERA','ASTEROID FIELD ADVISORY: DENSE FIELDS AND DUST CLOUDS OVER DELVE','UV WARNING: HIGH UV INDEX ACROSS THE DOMAIN','DUST ADVISORY: LIGHT DUST AND OVERCAST SKIES OVER HEIMATAR','CLEAR SKIES CONTINUE ACROSS THE FORGE','STELLAR ACTIVITY: SOLAR FLARE ACTIVITY REMAINS LOW ACROSS NEW EDEN'];
+const ALERTS=['SOLAR WIND ADVISORY: GUSTY CONDITIONS ACROSS THE CITADEL','STORM WARNING: SEVERE STORM ACTIVITY OVER POCHVEN, VISIBILITY POOR','STORM AND ROCK ADVISORY: GAS GIANT STORM BANDS AND DRIFTING ASTEROIDS IN KLY-C0','DEBRIS ADVISORY: DRIFTING ROCK FRAGMENTS AROUND THE SHATTERED PLANETS OF THERA','ASTEROID FIELD ADVISORY: DENSE FIELDS AND DUST CLOUDS OVER DELVE','UV WARNING: HIGH UV INDEX ACROSS THE DOMAIN','DUST ADVISORY: LIGHT DUST AND OVERCAST SKIES OVER HEIMATAR','CLEAR SKIES CONTINUE ACROSS THE FORGE','STELLAR ACTIVITY: SOLAR FLARE ACTIVITY REMAINS LOW ACROSS NEW EDEN'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
 const SHOTS={jita:'https://images.ctfassets.net/7lhcm73ukv5p/1RduTH15RyJtq9Vd4dsU2m/9bb49e45a251fc145c9adc6c2c111562/Screenshot_3840x2160.jpg?w=900&fm=jpg&fl=progressive'};
