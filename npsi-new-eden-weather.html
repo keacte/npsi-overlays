@@ -64,6 +64,9 @@ body.bg #bgl{display:block}
 #pic video.vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 50%}
 #pic .hasvid img,#pic .hasvid .planet{display:none}
 #pic .frm.nosig{background:#000}#pic .frm.nosig img,#pic .frm.nosig .planet{display:none}
+#pic canvas.grain{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;opacity:.11;mix-blend-mode:overlay;pointer-events:none;z-index:2}
+#pic .gband{position:absolute;left:0;right:0;height:0;backdrop-filter:hue-rotate(35deg) saturate(1.5) brightness(1.12);z-index:2;pointer-events:none;display:none}
+#pic .frm.gl .vid,#pic .frm.gl #pimg{filter:drop-shadow(3px 0 0 rgba(255,40,80,.55)) drop-shadow(-3px 0 0 rgba(40,220,255,.55))}
 #pic canvas.stat{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
 #pic .nsg{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:700 22px Orbitron,sans-serif;letter-spacing:.3em;color:#fff;text-shadow:0 0 12px #000,0 0 4px #000;animation:nsb 1.2s steps(2) infinite}@keyframes nsb{50%{opacity:.35}}
 #pic img.shot{object-fit:cover;animation:kb 18s ease-in-out infinite alternate;filter:none}
@@ -230,6 +233,21 @@ function show(k){
   const nm=$('lname');let f=88;nm.style.fontSize=f+'px';while(nm.scrollWidth>820&&f>36){f-=4;nm.style.fontSize=f+'px'}
   $('pic').innerHTML=`<div class="frm"><div class="planet"></div><img alt="" id="pimg"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><div id="cap">${esc(l.cap)}</div></div>
    <div id="qt"><em>FORECASTER’S NOTE</em>${esc(l.q)}</div><div id="credit">EVE ONLINE © CCP GAMES</div>`;
+  /* subtle camera character: faint grain + rare chromatic-aberration / slice glitches */
+  if(!l.nosig){const fr=document.querySelector('#pic .frm');
+   const gc=document.createElement('canvas');gc.className='grain';gc.width=160;gc.height=125;fr.appendChild(gc);
+   const gx=gc.getContext('2d'),gi=gx.createImageData(160,125),gd=gi.data;
+   (function gt(){if(!gc.isConnected)return;for(let p=0;p<gd.length;p+=4){const v=Math.random()*255|0;gd[p]=gd[p+1]=gd[p+2]=v;gd[p+3]=255}gx.putImageData(gi,0,0);setTimeout(gt,80)})();
+   const band=document.createElement('div');band.className='gband';fr.appendChild(band);
+   const tg=()=>{if(!fr.isConnected)return;
+    const med=document.querySelector('#pic .vid')||$('pimg'),n=1+(Math.random()<.35?1:0);let k=0;
+    const burst=()=>{if(!fr.isConnected)return;
+     fr.classList.add('gl');
+     if(med){med.style.translate=((Math.random()*8-4)|0)+'px 0'}
+     band.style.display='block';band.style.top=(Math.random()*85|0)+'%';band.style.height=(4+Math.random()*14|0)+'px';band.style.transform='translateX('+((Math.random()*10-5)|0)+'px)';
+     setTimeout(()=>{fr.classList.remove('gl');band.style.display='none';if(med)med.style.translate='';if(++k<n)setTimeout(burst,60+Math.random()*80);else setTimeout(tg,2500+Math.random()*5500)},70+Math.random()*90)};
+    burst()};
+   setTimeout(tg,1500+Math.random()*3000)}
   if(l.nosig){const fr=document.querySelector('#pic .frm');fr.classList.add('nosig');
    const cv=document.createElement('canvas');cv.className='stat';cv.width=140;cv.height=110;fr.insertBefore(cv,fr.firstChild);
    const nsg=document.createElement('div');nsg.className='nsg';nsg.textContent='NO SIGNAL';fr.insertBefore(nsg,cv.nextSibling);
