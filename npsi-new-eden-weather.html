@@ -61,6 +61,8 @@ body.bg #bgl{display:block}
 #pic .planet{position:absolute;left:50%;top:50%;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--ac),rgba(30,10,60,.9) 70%);opacity:.5}
 #pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;animation:flt 7s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(0,0,0,.8))}
 @keyframes flt{50%{transform:translateY(-8px) scale(1.03)}}
+#pic img.shot{object-fit:cover;animation:kb 18s ease-in-out infinite alternate;filter:none}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.08) translateX(-1.5%)}}
 #pic .frm:after{content:'';position:absolute;left:0;right:0;height:60px;top:-60px;background:linear-gradient(180deg,transparent,rgba(166,92,255,.22),transparent);animation:scan 4.5s linear infinite}
 @keyframes scan{to{top:100%}}
 #pic i{position:absolute;width:20px;height:20px;border:2px solid var(--ac);z-index:2}
@@ -90,8 +92,7 @@ body.bg #bgl{display:block}
 @keyframes tick{to{transform:translateX(-50%)}}
 .clock{flex:none;padding:0 28px;font:700 22px 'Orbitron';letter-spacing:3px;color:var(--violet);background:#000;font-variant-numeric:tabular-nums}
 /* logo */
-#logo{position:absolute;left:50%;top:22px;height:104px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 0 14px rgba(163,92,255,.75));animation:bob 4s ease-in-out infinite}
-@keyframes bob{50%{transform:translateX(-50%) translateY(-6px)}}
+#logo{position:absolute;left:50%;top:22px;height:104px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 0 14px rgba(163,92,255,.75))}
 /* outlook bar (replaces the command bar) */
 #cmdbar{position:absolute;left:30px;right:30px;bottom:72px;display:flex;gap:14px;z-index:3}
 #cmdbar .c{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:10px 16px;min-width:0;background:rgba(5,3,8,.55);border-left:3px solid var(--steel-dim);animation:cin .6s both;transition:all .35s}
@@ -133,7 +134,7 @@ const R=(a,b)=>a+Math.random()*(b-a);
 /* ================= EDIT ME – every location is a real EVE Online place ================= */
 /* img = type ID from CCP's image server (images.evetech.net). fx = bubbles|rain|sun|rust|storm|hole|calm|cats */
 const LOCS=[
- {id:'jita',name:'JITA',reg:'THE FORGE',sec:'0.9',ac:'#a65cff',fx:'rain',img:638,cap:'PICTURED: A RAVEN, BEING UNDERCUT BY A BIGGER RAVEN',
+ {id:'jita',name:'JITA',reg:'THE FORGE',sec:'0.9',ac:'#a65cff',fx:'rain',img:638,cap:'PICTURED: A RAVEN, BEING UNDERCUT BY A BIGGER RAVEN',scap:'JITA 4-4 · WHERE EVERYTHING IS CHEAPER FOR FOUR MINUTES',
   big:'−0.01',unit:'ISK PER UNDERCUT',temp:'−0.01 ISK',cond:'Scams scattered, lag overcast',
   txt:'A dense front of 6,000 pilots has stalled over Jita 4-4. Visibility: ships. Everything is cheaper than it was four minutes ago and will be again in four minutes. Local is warm, with a 90% chance of “WTB 1 PLEX”.',
   met:[['LAG INDEX','11 / 10',1],['SCAM RISK','SCATTERED'],['UNDOCK ODDS','3%',1],['TRADE HUB','OVERCROWDED']],
@@ -183,6 +184,9 @@ const DAYS=[
 ];
 const ALERTS=['WARNING: A 14-CATALYST GANG IS APPROACHING THE JITA GATE. THEY ARE NOT HERE FOR THE VIEW','FLASH FLOOD OF UNDERCUTS IN THE FORGE: SELLERS ARE URGED TO REMAIN CALM AND UNDERCUT BY 0.01 ISK','FOG ADVISORY IN THE DOMAIN: IT IS NOT FOG, IT IS A HOLY AEROSOL','NPSI REMINDER: NOT PURPLE, SHOOT IT. PURPLE, DO NOT SHOOT IT. THE FORECAST IS SIMPLE','ROCKS FALLING OVER RENS: EXPECT FALLING ROCKS, EVEN IN STATIONS','POCHVEN SKY REMAINS RED. WE HAVE STOPPED ASKING WHY','THUNDERSTORM WARNING IN FEDERATION SPACE: THE THUNDER IS A DREADNOUGHT','CAPSULEER SAFETY NOTICE: UMBRELLAS ARE NOT ACCEPTED AS INSURANCE','INSURANCE DOES NOT PAY OUT FOR ACTS OF GOD, ACTS OF MOM, OR ACTS OF ‘IT WAS A SAFE SPOT’','TSUNAMI OF FRIGATES ADVANCING ON AMAMAKE. EVACUATE YOUR CRUISERS','THERA WORMHOLE FORECAST: IT WAS THERE JUST NOW','WIND SPEED: 3.0 AU/S. WIND DIRECTION: TOWARDS A BUBBLE','TEMPERATURE: 98% HEAT, 2% HOPE','COLD FRONT MOVING IN OVER THE ASTEROID BELT. THE MINERS ARE FINE. THE MINERS ARE ALWAYS FINE','THIS FORECAST MAY CONTAIN PILOTS. SOME PILOTS MAY CONTAIN LAG','CYNO LIGHTNING EXPECTED. IT WILL NOT STRIKE TWICE; IT WILL STRIKE FORTY-FIVE TIMES','WEATHER ACCURACY: 4%. A NEW RECORD'];
 
+/* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
+   Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
+const SHOTS={jita:'https://images.ctfassets.net/7lhcm73ukv5p/1RduTH15RyJtq9Vd4dsU2m/9bb49e45a251fc145c9adc6c2c111562/Screenshot_3840x2160.jpg?w=900&fm=jpg&fl=progressive'};
 /* scene presets: same family as the Starting Soon / BRB / Thanks For Watching screens */
 const SCENES={starting:['STREAM STARTING','FORECAST: STREAM ARRIVING SHORTLY'],brb:['BE RIGHT BACK','FORECAST: ONE SHORT BREAK, 100% CHANCE OF SNACKS'],ending:['STREAM ENDING','FORECAST: CLEAR SKIES — GO OUTSIDE'],weather:['LIVE FORECAST',"THE ONLY FORECAST THAT'S WRONG FASTER THAN YOUR FC"]};
 const SC=SCENES[QS.get('scene')]||SCENES.weather;$('bt').textContent=SC[0];$('ts').textContent=SC[1];
@@ -206,9 +210,10 @@ function show(k){
    <div id="txt">${esc(l.txt)}</div>${MIN?'<div id="count">00:00</div>':''}`;
   c.classList.remove('sw');void c.offsetWidth;c.classList.add('sw');
   const nm=$('lname');let f=88;nm.style.fontSize=f+'px';while(nm.scrollWidth>820&&f>36){f-=4;nm.style.fontSize=f+'px'}
-  $('pic').innerHTML=`<div class="frm"><div class="planet"></div><img alt="" id="pimg" src="https://images.evetech.net/types/${l.img}/render?size=512"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><div id="cap">${esc(l.cap)}</div></div>
-   <div id="qt"><em>CHIEF METEOROLOGIST</em>${esc(l.q.replace(/^[^:]*:\s*/,''))}</div><div id="credit">IMAGE: CCP GAMES / EVE ONLINE</div>`;
-  const im=$('pimg');im.onerror=()=>{im.onerror=()=>{im.style.display='none'};im.src=`https://images.evetech.net/types/${l.img}/icon?size=512`};
+  $('pic').innerHTML=`<div class="frm"><div class="planet"></div><img alt="" id="pimg"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><div id="cap">${esc(l.cap)}</div></div>
+   <div id="qt"><em>CHIEF METEOROLOGIST</em>${esc(l.q.replace(/^[^:]*:\s*/,''))}</div><div id="credit">EVE ONLINE © CCP GAMES</div>`;
+  const im=$('pimg');const chain=[`img/${l.id}.jpg`,SHOTS[l.id],`https://images.evetech.net/types/${l.img}/render?size=512`,`https://images.evetech.net/types/${l.img}/icon?size=512`].filter(Boolean);
+  let ci2=0;const tryNext=()=>{if(ci2>=chain.length){im.style.display='none';return}const u=chain[ci2++];const sh=u.startsWith('img/')||u===SHOTS[l.id];im.classList.toggle('shot',sh);$('cap').textContent=sh?(l.scap||`${l.name} · ${l.reg}`):l.cap;im.src=u};im.onerror=tryNext;tryNext();
   fxMode=l.fx;parts.length=0;
   const u=$('pg');u.style.transition='none';u.style.width='0';void u.offsetWidth;u.style.transition=`width ${SECONDS}s linear`;u.style.width='100%';
 }
