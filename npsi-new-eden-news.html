@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>NPSI.ROCKS – New Eden News</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* OBS Browser Source 1920x1080, transparent (same family as the Starting Soon / BRB / Thanks For Watching screens).
+   Options: ?scene=starting|brb|ending  ?seconds=10  ?minutes=5 (countdown)  ?loc=delve (lock one story)  ?bg=1 (built-in space background) */
+:root{--bg:#050308;--steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif;--purple:#8a3ffc;--violet:#b98bff;--glow:#a35cff;--dim:#2a1747;--white:#f4efff;--red:#ff2a2a;--ac:#a65cff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:transparent;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:transparent;font-family:'Rajdhani','Segoe UI',sans-serif;color:var(--white);overflow:hidden}
+@keyframes blink{50%{opacity:.15}}
+#bgl{position:absolute;inset:0;display:none;background:radial-gradient(ellipse at 50% 55%,#150a2b 0%,#0a0516 55%,#050308 100%)}
+body.bg #bgl{display:block}
+#stars{position:absolute;inset:0;display:none}body.bg #stars{display:block}
+#bokeh{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none;filter:blur(5px)}
+#fx{position:absolute;inset:0;pointer-events:none;opacity:.85}
+/* badge */
+.feed{position:absolute;right:40px;top:36px;border:1px solid var(--purple);padding:12px 20px;background:rgba(5,3,8,.55);font:600 18px 'Orbitron';letter-spacing:4px;display:flex;gap:18px;justify-content:space-between;align-items:center;z-index:3}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red);animation:blink 1s infinite}
+/* page title (top left) */
+#ttl{position:absolute;left:40px;top:34px;z-index:3;font:900 30px/1 'Orbitron';letter-spacing:6px;color:#fff;text-shadow:0 0 18px var(--glow)}
+#ttl span{color:var(--violet)}#ttl small{display:block;margin-top:8px;font:600 13px 'Orbitron';letter-spacing:3px;color:#a898c4;text-shadow:none}
+/* centre */
+.center{position:absolute;left:0;right:0;top:230px;bottom:190px;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:2}
+.rings{position:absolute;width:760px;height:760px;opacity:.9}
+.rings svg{width:100%;height:100%;overflow:visible}
+.r1{transform-origin:380px 380px;animation:spin 40s linear infinite}
+.r2{transform-origin:380px 380px;animation:spin 25s linear infinite reverse}
+.r3{transform-origin:380px 380px;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulsering{transform-origin:380px 380px;animation:ping 3.5s ease-out infinite;stroke:var(--ac)}
+.acr{stroke:var(--ac);transition:stroke .6s}
+@keyframes ping{from{transform:scale(.6);opacity:.8}to{transform:scale(1.25);opacity:0}}
+.lab{position:relative;font:700 17px 'Orbitron';letter-spacing:8px;color:var(--ac);display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.lab i{width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:blink 1.4s steps(2) infinite}
+.title{position:relative;font:900 88px/1 'Orbitron';letter-spacing:6px;text-align:center;white-space:nowrap;text-shadow:0 0 30px var(--ac),0 0 70px rgba(138,63,252,.7);animation:flick 7s infinite}
+.title:before,.title:after{content:attr(data-t);position:absolute;left:0;right:0;top:0;opacity:0}
+.title:before{color:#ff4fd8;animation:gl1 5s infinite}.title:after{color:#4fd8ff;animation:gl2 5s infinite}
+@keyframes gl1{0%,92%,100%{opacity:0}93%{opacity:.8;transform:translate(-6px,2px);clip-path:inset(10% 0 60% 0)}96%{opacity:.8;transform:translate(5px,-2px);clip-path:inset(55% 0 15% 0)}}
+@keyframes gl2{0%,92%,100%{opacity:0}94%{opacity:.8;transform:translate(6px,-2px);clip-path:inset(60% 0 10% 0)}97%{opacity:.8;transform:translate(-5px,2px);clip-path:inset(15% 0 55% 0)}}
+@keyframes flick{0%,95%,100%{opacity:1}96%{opacity:.7}97%{opacity:1}98%{opacity:.8}}
+.reg{position:relative;margin-top:14px;font:600 20px 'Orbitron';letter-spacing:6px;color:#a898c4}.reg b{color:var(--ac)}
+.sub{margin-top:14px;font:700 28px/1.15 'Rajdhani';letter-spacing:6px;color:var(--violet);position:relative;text-transform:uppercase;text-align:center;max-width:820px}
+.sub i{font-style:normal;animation:blink 1.2s steps(2) infinite}
+.bar{position:relative;margin-top:26px;width:560px;height:10px;border:1px solid var(--purple);overflow:hidden}
+.bar:after{content:"";position:absolute;top:0;bottom:0;width:140px;background:linear-gradient(90deg,transparent,var(--ac),transparent);animation:sweep 2.2s ease-in-out infinite}
+@keyframes sweep{from{left:-140px}to{left:560px}}
+.bar u{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(166,92,255,.35);z-index:1}
+#big{position:relative;margin-top:20px;display:flex;align-items:baseline;gap:18px}
+#big b{font:900 72px/1 'Orbitron';letter-spacing:4px;color:var(--ac);text-shadow:0 0 22px var(--ac)}
+#big span{font:700 18px/1.15 'Orbitron';letter-spacing:4px;color:#cdb4ff;max-width:260px}
+.status{position:relative;margin-top:16px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 26px;max-width:820px;font:600 14px 'Orbitron';letter-spacing:2px;color:#9a86c4}
+.status b{color:var(--white);font-weight:600}.status b.bad{color:#ff4a5a}
+#txt{position:relative;margin-top:14px;max-width:700px;text-align:center;font:500 22px/1.3 'Rajdhani';color:#d9cdf2;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#count{position:relative;display:block;margin-top:14px;font:900 54px 'Orbitron';letter-spacing:8px;color:var(--ac);text-shadow:0 0 18px var(--ac)}
+#cin.sw>*{animation:swap .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes swap{from{opacity:0;transform:translateY(16px)}}
+/* picture (left) */
+#pic{position:absolute;left:90px;top:300px;width:420px;z-index:3}
+#pic .frm{position:relative;height:330px;border:1px solid var(--ac);background:rgba(6,3,13,.7);overflow:hidden}
+#pic .planet{position:absolute;left:50%;top:50%;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--ac),rgba(30,10,60,.9) 70%);opacity:.5}
+#pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;animation:flt 7s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(0,0,0,.8))}
+@keyframes flt{50%{transform:translateY(-8px) scale(1.03)}}
+#pic video.vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 50%}
+#pic .hasvid img,#pic .hasvid .planet{display:none}
+#pic .frm.nosig{background:#000}#pic .frm.nosig img,#pic .frm.nosig .planet{display:none}
+#pic canvas.grain{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;opacity:.11;mix-blend-mode:overlay;pointer-events:none;z-index:2}
+#pic .gband{position:absolute;left:0;right:0;height:0;backdrop-filter:hue-rotate(35deg) saturate(1.5) brightness(1.12);z-index:2;pointer-events:none;display:none}
+#pic .frm.gl .vid,#pic .frm.gl #pimg{filter:drop-shadow(3px 0 0 rgba(255,40,80,.55)) drop-shadow(-3px 0 0 rgba(40,220,255,.55))}
+#pic canvas.stat{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#pic .nsg{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:700 22px Orbitron,sans-serif;letter-spacing:.3em;color:#fff;text-shadow:0 0 12px #000,0 0 4px #000;animation:nsb 1.2s steps(2) infinite}@keyframes nsb{50%{opacity:.35}}
+#pic img.shot{object-fit:cover;animation:kb 18s ease-in-out infinite alternate;filter:none}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.08) translateX(-1.5%)}}
+#pic .frm:after{content:'';position:absolute;left:0;right:0;height:60px;top:-60px;background:linear-gradient(180deg,transparent,rgba(166,92,255,.22),transparent);animation:scan 4.5s linear infinite}
+@keyframes scan{to{top:100%}}
+#pic i{position:absolute;width:20px;height:20px;border:2px solid var(--ac);z-index:2}
+#pic i.a{left:6px;top:6px;border-right:0;border-bottom:0}#pic i.b{right:6px;top:6px;border-left:0;border-bottom:0}
+#pic i.c{left:6px;bottom:6px;border-right:0;border-top:0}#pic i.d{right:6px;bottom:6px;border-left:0;border-top:0}
+#cap{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:linear-gradient(0deg,rgba(5,3,8,.95),transparent);font:600 12px/1.25 'Orbitron';letter-spacing:2px;color:#cdb4ff;z-index:2}
+#qt{margin-top:12px;padding:10px 14px;border-left:3px solid var(--ac);background:rgba(5,3,8,.55);font:500 16px/1.25 'Rajdhani';letter-spacing:.04em;color:#bfb0dd}
+#qt em{display:block;margin-bottom:3px;font:600 11px 'Orbitron';letter-spacing:3px;color:var(--ac);font-style:normal}
+#credit{margin-top:6px;font:500 10px 'Orbitron';letter-spacing:3px;color:#6f5f93;text-align:right}
+/* list (right) */
+#list{position:absolute;right:90px;top:300px;width:400px;z-index:3;display:flex;flex-direction:column;gap:6px}
+#list h3{font:700 13px 'Orbitron';letter-spacing:5px;color:var(--violet);margin-bottom:2px;display:flex;justify-content:space-between}
+#list h3 span{color:#6f5f93}
+.row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;height:50px;padding:0 14px;border:1px solid var(--dim);border-left:3px solid var(--rc);background:rgba(5,3,8,.6);transition:all .35s}
+.row{position:relative;overflow:hidden}.row b,.row em{position:relative;z-index:2}
+.row .rv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 38%;opacity:.65;z-index:0;transition:opacity .4s}
+.row .rs{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,3,8,.85),rgba(5,3,8,.15) 70%,rgba(5,3,8,.55))}
+.row.on .rv{opacity:1}
+.row.on{background:rgba(166,92,255,.26);border-color:var(--rc);box-shadow:0 0 18px rgba(163,92,255,.4);transform:translateX(-6px)}
+.row b{font:800 20px/1 'Oxanium';letter-spacing:2px;color:#fff;text-transform:uppercase}
+.row em{font:800 15px 'Orbitron';font-style:normal;color:var(--rc);text-shadow:0 0 10px var(--rc);white-space:nowrap}
+/* corner brackets */
+.br{position:absolute;width:60px;height:60px;border:2px solid var(--purple);animation:blink 3s infinite;z-index:3}
+.br.tl{left:30px;top:30px;border-right:0;border-bottom:0}.br.bl{left:30px;bottom:150px;border-right:0;border-top:0}
+.br.tr{right:30px;top:30px;border-left:0;border-bottom:0}.br.brr{right:30px;bottom:150px;border-left:0;border-top:0}
+/* ticker */
+.ticker{position:absolute;left:0;right:0;bottom:0;height:52px;background:#000;border-top:1px solid var(--purple);display:flex;align-items:center;z-index:4}
+.ticker .tag{flex:none;height:100%;padding:0 24px;display:flex;align-items:center;background:var(--red);color:#fff;font:900 16px 'Orbitron';letter-spacing:4px}
+.tickwrap{flex:1;height:100%;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+.tickwrap div{display:inline-block;font:600 24px 'Rajdhani';letter-spacing:2px;animation:tick 160s linear infinite}
+@keyframes tick{to{transform:translateX(-50%)}}
+.clock{flex:none;padding:0 28px;font:700 22px 'Orbitron';letter-spacing:3px;color:var(--violet);background:#000;font-variant-numeric:tabular-nums}
+/* logo */
+#logo{position:absolute;left:50%;top:22px;height:104px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 0 14px rgba(163,92,255,.75))}
+/* outlook bar (replaces the command bar) */
+#cmdbar{position:absolute;left:30px;right:30px;bottom:72px;display:flex;gap:14px;z-index:3}
+#cmdbar .c{flex:1;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:10px 16px;min-width:0;background:rgba(5,3,8,.55);border-left:3px solid var(--steel-dim);animation:cin .6s both;transition:all .35s}
+#cmdbar .c small{font:700 12px 'Orbitron';letter-spacing:4px;color:var(--violet)}
+#cmdbar .c b{font:700 24px/1.1 var(--head);letter-spacing:.03em;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmdbar .c p{font:600 15px/1.2 'Rajdhani';letter-spacing:.06em;color:#a898c4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmdbar .c.on{border-left-color:#fff;background:rgba(166,92,255,.28);box-shadow:0 0 18px rgba(163,92,255,.45);transform:translateY(-4px)}
+#cmdbar .c.on b{color:#fff}
+@keyframes cin{from{opacity:0;transform:translateY(24px)}}
+</style></head><body>
+<div id="stage">
+  <div id="bgl"></div><canvas id="bokeh" width="960" height="540"></canvas><canvas id="stars" width="1920" height="1080"></canvas><canvas id="fx" width="1920" height="1080"></canvas>
+  <div id="ttl">NEW <span>EDEN</span> NEWS<small id="ts">YOUR NEWS FROM NEW EDEN</small></div>
+  <div class="center">
+    <div class="rings"><svg viewBox="0 0 760 760"><g fill="none" stroke="#8a3ffc">
+      <circle class="pulsering" cx="380" cy="380" r="200" stroke-width="2"/>
+      <g class="r1"><circle cx="380" cy="380" r="370" stroke-width="1.5" stroke-dasharray="4 14" opacity=".7"/><circle class="acr" cx="380" cy="380" r="355" stroke-width="5" stroke-dasharray="120 300"/></g>
+      <g class="r2"><circle cx="380" cy="380" r="310" stroke-width="2" stroke-dasharray="40 20 4 20" opacity=".8"/><circle class="acr" cx="380" cy="380" r="295" stroke-width="8" stroke-dasharray="80 500"/></g>
+      <g class="r3"><circle cx="380" cy="380" r="250" stroke-width="1" stroke-dasharray="2 8"/><path d="M380 120 L400 150 L360 150 Z M380 640 L400 610 L360 610 Z" fill="#b98bff" stroke="none"/></g></g></svg></div>
+    <div id="cin" style="position:relative;display:flex;flex-direction:column;align-items:center"></div>
+  </div>
+  <div id="pic"></div>
+  <div id="list"></div>
+  <div class="feed"><span id="bt">LIVE NEWS</span><span class="dot"></span></div>
+  <div class="br tl"></div><div class="br bl"></div><div class="br tr"></div><div class="br brr"></div>
+  <img id="logo" alt="NPSI logo" src="data:image/png;base64,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">
+  <div id="cmdbar"></div>
+  <div class="ticker"><div class="tag">&#9888; HEADLINES</div><div class="tickwrap"><div id="rail"></div></div><div class="clock" id="clk">00:00:00 UTC</div></div>
+</div>
+<script>
+const stage=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1920*s)/2}px,${(innerHeight-1080*s)/2}px) scale(${s})`}
+addEventListener('resize',fit);fit();
+const QS=new URLSearchParams(location.search),$=id=>document.getElementById(id);
+const SECONDS=Math.max(4,+QS.get('seconds')||10);
+if(QS.get('bg')==='1')document.body.classList.add('bg');
+const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const R=(a,b)=>a+Math.random()*(b-a);
+/* ================= EDIT ME – every story is about a real EVE Online place; edit the text freely ================= */
+/* img = type ID from CCP's image server (images.evetech.net). fx = calm|rain|sun|rust|storm|hole|cats (drifting rock) */
+const LOCS=[
+ {id:'delve',name:'DELVE CLASH',reg:'DELVE · NULLSEC',ac:'#ff5a8a',fx:'calm',img:11567,
+  big:'TITANS',unit:'IN THE FIELD',temp:'BREAKING',cond:'Titan-class hulls reported on grid in Delve',
+  txt:'Capsuleer coalitions are reported to have committed capital and titan-class ships to a large engagement in Delve. Reports are still arriving and the outcome is not yet known.',
+  met:[['STATUS','ONGOING',1],['REGION','DELVE'],['SHIP CLASS','TITAN'],['REPORTS','UNCONFIRMED']],
+  q:'Details are still developing. We will update as confirmed reports arrive.'},
+ {id:'jita',name:'JITA TRAFFIC',reg:'THE FORGE · HIGHSEC',ac:'#a65cff',fx:'calm',img:638,
+  big:'BUSY',unit:'GATES AND DOCKS',temp:'BUSY',cond:'Heavy capsuleer traffic around Jita IV',
+  txt:'Jump gate and dock traffic around Jita remains heavy, with long queues reported at the Perimeter gate. Pilots are advised to allow extra time for undocking and to watch for smartbombing activity.',
+  met:[['GATE QUEUES','LONG',1],['REGION','THE FORGE'],['SECURITY','HIGHSEC'],['ADVICE','ALLOW EXTRA TIME']],
+  q:'Pilots are advised to travel with caution through the Forge.'},
+ {id:'pochven',name:'POCHVEN WATCH',reg:'TRIGLAVIAN SPACE',ac:'#ff2b3d',fx:'storm',img:2017,
+  nosig:1,big:'OFFLINE',unit:'INTEL CHANNELS',temp:'OFFLINE',cond:'Reporting from Pochven is currently unavailable',
+  txt:'Our reporting from Pochven is currently unavailable. Check back later for updates.',
+  met:[['REPORTING','UNAVAILABLE',1],['REGION','POCHVEN']],
+  q:'Our reporting from Pochven is currently unavailable, check back later.'},
+ {id:'amarr',name:'AMARR PARADE',reg:'DOMAIN · EMPIRE',ac:'#ffc83d',fx:'sun',img:642,
+  big:'IMPERIAL',unit:'NAVY REVIEW',temp:'CEREMONY',cond:'Navy fleet review held over Amarr Prime',
+  txt:'The Amarr Empire has staged a ceremonial fleet review above Amarr Prime, with Imperial Navy battleships passing in formation. Capsuleers were invited to watch from the station docks.',
+  met:[['EVENT','FLEET REVIEW'],['LOCATION','AMARR PRIME'],['ATTENDANCE','CAPSULEERS INVITED'],['SECURITY','HIGHSEC']],
+  q:'The Empire says further reviews will be announced in due course.'},
+ {id:'tama',name:'TAMA CAMPS',reg:'THE CITADEL · LOWSEC',ac:'#b98bff',fx:'rain',img:29990,
+  big:'GATE CAMPS',unit:'REPORTED',temp:'DANGER',cond:'Roaming gangs reported on the Tama gates',
+  txt:'Roaming pilots are reported on the gates and stations around Tama in the Citadel. Travellers through low security space should scout ahead and avoid undocking into unknown fleets.',
+  met:[['THREAT','ELEVATED',1],['REGION','THE CITADEL'],['SECURITY','LOWSEC'],['ADVICE','SCOUT AHEAD']],
+  q:'Haulers are advised to use alternative routes where possible.'},
+ {id:'thera',name:'THERA ROUTES',reg:'WORMHOLE SPACE',ac:'#4fd6ff',fx:'hole',img:29984,
+  big:'ROUTES',unit:'OPEN AND CLOSING',temp:'ACTIVE',cond:'Wormhole connections shifting around Thera',
+  txt:'Wormhole connections into Thera continue to open and collapse, giving scouts new routes into the known-space regions. Explorers are reminded that mass limits can change without notice.',
+  met:[['CONNECTIONS','SHIFTING'],['REGION','WORMHOLE SPACE'],['RISK','VARIABLE',1],['ADVICE','CHECK MASS']],
+  q:'Scouts are asked to report new connections to local channels.'},
+ {id:'rens',name:'RENS HARBOUR',reg:'HEIMATAR · EMPIRE',ac:'#ff8a3d',fx:'rust',img:587,
+  big:'ARRIVALS',unit:'NEW PILOTS',temp:'WELCOME',cond:'New capsuleers continue to arrive in Heimatar',
+  txt:'A steady flow of new capsuleers is arriving in Heimatar, and local corporations are running welcome programmes at Rens. Veterans are encouraged to offer help to those taking their first steps in New Eden.',
+  met:[['EVENT','WELCOME PROGRAMME'],['LOCATION','RENS'],['REGION','HEIMATAR'],['SECURITY','HIGHSEC']],
+  q:'Corporations are recruiting and training new pilots.'},
+ {id:'klyc0',name:'KLY-C0 MINING',reg:'PURE BLIND · NULLSEC',ac:'#3ddc97',fx:'cats',img:17478,
+  big:'MINERS',unit:'AT WORK',temp:'INDUSTRY',cond:'Mining operations active in KLY-C0',
+  txt:'Mining fleets are working the belts of KLY-C0, which has ten asteroid belts across its eight planets. Escorts are advised, as fleets in null security space are frequent targets.',
+  met:[['ACTIVITY','MINING'],['ASTEROID BELTS','10'],['REGION','PURE BLIND'],['ADVICE','ESCORT FLEETS']],
+  q:'Industrial fleets are advised to keep a scout on the gates.'}
+];
+LOCS.forEach(l=>{l.cap=l.reg});
+const DAYS=[
+ ['TOP STORY','Titans on grid in Delve','Capital-class engagement reported across the region.','!'],
+ ['TRAVEL','Heavy traffic at Jita','Allow extra time at the Perimeter gate.','~'],
+ ['EMPIRE','Imperial fleet review','Navy battleships pass over Amarr Prime.','Ω'],
+ ['DANGER','Gate camps in the Citadel','Scout ahead through Tama.','%'],
+ ['INDUSTRY','Mining fleets in KLY-C0','Escorts advised in Pure Blind.','☼']
+];
+const ALERTS=['BREAKING: TITAN-CLASS SHIPS REPORTED ON GRID IN DELVE','TRAVEL: HEAVY GATE TRAFFIC AROUND JITA, ALLOW EXTRA TIME','EMPIRE: AMARR NAVY HOLDS CEREMONIAL FLEET REVIEW OVER AMARR PRIME','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','EXPLORATION: WORMHOLE CONNECTIONS SHIFTING AROUND THERA','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
+/* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
+   Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
+/* clips embedded in this file so they play even when the img folder is missing (same clip as img/jita.webm) */
+const VDATA={};
+const vsrc=id=>(VDATA[id]?`<source src="${VDATA[id]}" type="video/webm">`:'')+`<source src="img/${id}.mp4" type="video/mp4"><source src="img/${id}.webm" type="video/webm">`;
+const VIDEOS=[];   /* locations whose looping clip (img/<id>.mp4) also plays behind their row in the regional list */
+const SHOTS={jita:'https://images.ctfassets.net/7lhcm73ukv5p/1RduTH15RyJtq9Vd4dsU2m/9bb49e45a251fc145c9adc6c2c111562/Screenshot_3840x2160.jpg?w=900&fm=jpg&fl=progressive'};
+/* scene presets: same family as the Starting Soon / BRB / Thanks For Watching screens */
+const SCENES={starting:['STREAM STARTING','THE STREAM BEGINS SHORTLY'],brb:['BE RIGHT BACK','WE WILL BE BACK IN A MOMENT'],ending:['STREAM ENDING','THANK YOU FOR WATCHING'],news:['LIVE NEWS','YOUR NEWS FROM NEW EDEN']};
+const SC=SCENES[QS.get('scene')]||SCENES.news;$('bt').textContent=SC[0];$('ts').textContent=SC[1];
+let i=0;const locked=QS.get('loc'),L0=LOCS.findIndex(l=>l.id===locked);
+$('list').innerHTML=`<h3>TOP STORIES <span>NEW EDEN</span></h3>`+LOCS.map((l,k)=>`<div class="row" data-k="${k}" style="--rc:${l.ac}">${VIDEOS.includes(l.id)?`<video class="rv" muted loop autoplay playsinline preload="auto">${vsrc(l.id)}</video><span class="rs"></span>`:''}<b>${esc(l.name)}</b><em>${esc(l.temp)}</em></div>`).join('');
+$('cmdbar').innerHTML=DAYS.map((d,k)=>`<div class="c" style="animation-delay:${k*.12}s"><small>${esc(d[0])}</small><b>${esc(d[1])}</b><p>${esc(d[2])}</p></div>`).join('');
+const cs=[...$('cmdbar').children];let ci=0;(function cyc(){cs.forEach((e,k)=>e.classList.toggle('on',k===ci));ci=(ci+1)%cs.length;setTimeout(cyc,2600)})();
+const ar=ALERTS.map(a=>`<span>${esc(a)}</span><span style="color:#8a3ffc;margin:0 26px">◆</span>`).join('');$('rail').innerHTML=ar+ar;
+setInterval(()=>{$('clk').textContent=new Date().toISOString().substr(11,8)+' UTC'},1000);
+/* optional countdown */
+const MIN=+QS.get('minutes')||0,T0=Date.now();
+function cdTick(){const left=Math.max(0,MIN*60-Math.round((Date.now()-T0)/1000)),m=String(Math.floor(left/60)).padStart(2,'0'),s=String(left%60).padStart(2,'0'),c=$('count');if(c)c.textContent=`${m}:${s}`}
+function show(k){
+  const l=LOCS[k];i=k;document.documentElement.style.setProperty('--ac',l.ac);
+  document.querySelectorAll('.row').forEach(r=>r.classList.toggle('on',+r.dataset.k===k));
+  const c=$('cin');
+  c.innerHTML=`<div class="lab"><i></i>TOP STORY</div><div class="title" id="lname" data-t="${esc(l.name)}">${esc(l.name)}</div>
+   <div class="reg">${esc(l.reg)}</div><div class="sub">${esc(l.cond)}<i>_</i></div><div class="bar"><u id="pg"></u></div>
+   <div id="big"><b>${esc(l.big)}</b><span>${esc(l.unit)}</span></div>
+   <div class="status">${l.met.map(m=>`<span>${esc(m[0])} <b class="${m[2]?'bad':''}">${esc(m[1])}</b></span>`).join('')}</div>
+   <div id="txt">${esc(l.txt)}</div>${MIN?'<div id="count">00:00</div>':''}`;
+  c.classList.remove('sw');void c.offsetWidth;c.classList.add('sw');
+  const nm=$('lname');let f=88;nm.style.fontSize=f+'px';while(nm.scrollWidth>820&&f>36){f-=4;nm.style.fontSize=f+'px'}
+  $('pic').innerHTML=`<div class="frm"><div class="planet"></div><img alt="" id="pimg"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><div id="cap">${esc(l.cap)}</div></div>
+   <div id="qt"><em>EDITOR’S NOTE</em>${esc(l.q)}</div><div id="credit">EVE ONLINE © CCP GAMES</div>`;
+  /* subtle camera character: faint grain + rare chromatic-aberration / slice glitches */
+  if(!l.nosig){const fr=document.querySelector('#pic .frm');
+   const gc=document.createElement('canvas');gc.className='grain';gc.width=160;gc.height=125;fr.appendChild(gc);
+   const gx=gc.getContext('2d'),gi=gx.createImageData(160,125),gd=gi.data;
+   (function gt(){if(!gc.isConnected)return;for(let p=0;p<gd.length;p+=4){const v=Math.random()*255|0;gd[p]=gd[p+1]=gd[p+2]=v;gd[p+3]=255}gx.putImageData(gi,0,0);setTimeout(gt,80)})();
+   const band=document.createElement('div');band.className='gband';fr.appendChild(band);
+   const tg=()=>{if(!fr.isConnected)return;
+    const med=document.querySelector('#pic .vid')||$('pimg'),n=1+(Math.random()<.35?1:0);let k=0;
+    const burst=()=>{if(!fr.isConnected)return;
+     fr.classList.add('gl');
+     if(med){med.style.translate=((Math.random()*8-4)|0)+'px 0'}
+     band.style.display='block';band.style.top=(Math.random()*85|0)+'%';band.style.height=(4+Math.random()*14|0)+'px';band.style.transform='translateX('+((Math.random()*10-5)|0)+'px)';
+     setTimeout(()=>{fr.classList.remove('gl');band.style.display='none';if(med)med.style.translate='';if(++k<n)setTimeout(burst,60+Math.random()*80);else setTimeout(tg,2500+Math.random()*5500)},70+Math.random()*90)};
+    burst()};
+   setTimeout(tg,1500+Math.random()*3000)}
+  if(l.nosig){const fr=document.querySelector('#pic .frm');fr.classList.add('nosig');
+   const cv=document.createElement('canvas');cv.className='stat';cv.width=140;cv.height=110;fr.insertBefore(cv,fr.firstChild);
+   const nsg=document.createElement('div');nsg.className='nsg';nsg.textContent='NO SIGNAL';fr.insertBefore(nsg,cv.nextSibling);
+   const cx=cv.getContext('2d'),im2=cx.createImageData(140,110),d=im2.data;
+   (function tick(){if(!cv.isConnected)return;for(let p=0;p<d.length;p+=4){const v=Math.random()*255*(Math.random()<.5?.55:1)|0;d[p]=d[p+1]=d[p+2]=v;d[p+3]=255}cx.putImageData(im2,0,0);setTimeout(()=>requestAnimationFrame(tick),45)})();
+   fxMode=l.fx;parts.length=0;const u0=$('pg');u0.style.transition='none';u0.style.width='0';void u0.offsetWidth;u0.style.transition=`width ${SECONDS}s linear`;u0.style.width='100%';return}
+  /* looping video (img/<id>.mp4 or .webm) takes priority over still images */
+  {const fr=document.querySelector('#pic .frm'),v=document.createElement('video');
+   v.className='vid';v.muted=true;v.defaultMuted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.preload='auto';
+   v.innerHTML=vsrc(l.id);if(l.id==='amarr')v.style.objectPosition='38% 50%';if(l.id==='rens'||l.id==='tama'||l.id==='thera'||l.id==='delve'||l.id==='klyc0')v.style.objectPosition='50% 50%';
+   const bad=()=>{v.remove()};v.querySelectorAll('source').forEach(x=>x.addEventListener('error',()=>{if(![...v.querySelectorAll('source')].some(y=>y.dataset.ok))bad()}));
+   v.addEventListener('error',bad);
+   v.addEventListener('loadeddata',()=>{v.querySelectorAll('source').forEach(x=>x.dataset.ok=1);fr.classList.add('hasvid');v.play().catch(()=>{})});
+   fr.insertBefore(v,fr.firstChild);}
+  const im=$('pimg');const chain=[`img/${l.id}.jpg`,SHOTS[l.id],`https://images.evetech.net/types/${l.img}/render?size=512`,`https://images.evetech.net/types/${l.img}/icon?size=512`].filter(Boolean);
+  let ci2=0;const tryNext=()=>{if(ci2>=chain.length){im.style.display='none';return}const u=chain[ci2++];const sh=u.startsWith('img/')||u===SHOTS[l.id];im.classList.toggle('shot',sh);$('cap').textContent=sh?l.cap:l.cap;im.src=u};im.onerror=tryNext;tryNext();
+  fxMode=l.fx;parts.length=0;
+  const u=$('pg');u.style.transition='none';u.style.width='0';void u.offsetWidth;u.style.transition=`width ${SECONDS}s linear`;u.style.width='100%';
+}
+/* background FX (whole stage, subtle) */
+const fx=$('fx'),g=fx.getContext('2d'),W=1920,H=1080;let fxMode='rain';const parts=[];
+function spawn(){const m=fxMode;
+  if(m==='rain'||m==='storm')parts.push({x:R(0,W+200),y:-10,vx:m==='storm'?-90:-20,vy:R(520,820),l:R(14,30)});
+  else if(m==='cats')parts.push({x:R(0,W),y:-20,vx:R(-20,20),vy:R(80,170),r:R(5,11),a:R(0,6.28),w:R(-2,2)});
+  else if(m==='bubbles')parts.push({x:R(0,W),y:H+20,vx:R(-12,12),vy:R(-60,-25),r:R(8,34),a:R(.15,.4)});
+  else if(m==='sun')parts.push({x:R(0,W),y:R(0,H),vx:R(-6,6),vy:R(-24,-8),r:R(1,3),a:R(.3,.8),life:R(2,5),t:0});
+  else if(m==='rust')parts.push({x:R(0,W),y:H+10,vx:R(-30,10),vy:R(-90,-30),r:R(1.2,3),a:R(.4,.9),life:R(2,5),t:0});
+  else if(m==='hole'){const a=R(0,6.28),d=R(500,1000);parts.push({a,d,r:R(1,2.6)})}
+  else parts.push({x:R(0,W),y:R(0,H),vx:R(8,26),vy:R(-6,6),r:R(1,3),a:R(.2,.6),life:R(5,9),t:0});}
+let flash=0,last=performance.now(),acc=0;
+function hexA(h,a){const n=parseInt(h.slice(1),16);return`rgba(${n>>16},${n>>8&255},${n&255},${a})`}
+function loop(now){const dt=Math.min(.1,(now-last)/1000);last=now;g.clearRect(0,0,W,H);const col=LOCS[i].ac;
+  if(MIN)cdTick();
+  if(fxMode==='sun'){const gr=g.createRadialGradient(W*.5,-80,10,W*.5,-80,1100);gr.addColorStop(0,'rgba(255,214,90,.22)');gr.addColorStop(1,'rgba(255,200,61,0)');g.fillStyle=gr;g.fillRect(0,0,W,H)}
+  if(fxMode==='storm'){if(Math.random()<dt*.3)flash=1;if(flash>0){g.fillStyle=`rgba(255,43,61,${flash*.16})`;g.fillRect(0,0,W,H);flash-=dt*3}}
+  const rate={rain:110,storm:170,cats:9,bubbles:5,sun:14,rust:16,hole:40,calm:6}[fxMode]||8;acc+=rate*dt;while(acc>=1){spawn();acc--}
+  for(let k=parts.length-1;k>=0;k--){const p=parts[k];
+    if(fxMode==='hole'){p.d-=90*dt;p.a+=.45*dt;const x=W/2+Math.cos(p.a)*p.d,y=H/2+Math.sin(p.a)*p.d*.5;if(p.d<20){parts.splice(k,1);continue}g.fillStyle=hexA(col,Math.min(.8,1-p.d/1100+.2));g.beginPath();g.arc(x,y,p.r,0,6.28);g.fill();continue}
+    p.x+=(p.vx||0)*dt;p.y+=(p.vy||0)*dt;
+    if(p.life!==undefined){p.t+=dt;if(p.t>p.life){parts.splice(k,1);continue}}
+    if(p.y>H+40||p.y<-60||p.x<-60||p.x>W+260){parts.splice(k,1);continue}
+    if(fxMode==='rain'||fxMode==='storm'){g.strokeStyle=fxMode==='storm'?'rgba(255,80,90,.45)':hexA(col,.4);g.lineWidth=1.5;g.beginPath();g.moveTo(p.x,p.y);g.lineTo(p.x-p.vx*p.l/p.vy,p.y-p.l);g.stroke()}
+    else if(fxMode==='cats'){p.a+=p.w*dt;g.save();g.translate(p.x,p.y);g.rotate(p.a);g.fillStyle=hexA(col,.5);g.beginPath();g.moveTo(0,-p.r*1.6);g.lineTo(p.r,p.r);g.lineTo(-p.r,p.r);g.closePath();g.fill();g.restore()}
+    else if(fxMode==='bubbles'){g.strokeStyle=hexA(col,p.a+.2);g.lineWidth=1.5;g.fillStyle=hexA(col,p.a*.2);g.beginPath();g.arc(p.x,p.y,p.r,0,6.28);g.fill();g.stroke()}
+    else{const a=p.a*(1-p.t/p.life);g.fillStyle=fxMode==='rust'?`rgba(255,138,61,${a})`:fxMode==='sun'?`rgba(255,214,90,${a})`:hexA(col,a);g.beginPath();g.arc(p.x,p.y,p.r,0,6.28);g.fill()}}
+  requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+show(L0>=0?L0:0);if(L0<0)setInterval(()=>show((i+1)%LOCS.length),SECONDS*1000);
+/* bokeh: soft out-of-focus light discs drifting slowly behind the whole scene */
+{const bc=$('bokeh'),bx=bc.getContext('2d'),BW=960,BH=540,cols=['166,92,255','255,90,160','90,170,255','255,200,90','120,255,230'];
+ const B=[];for(let n=0;n<26;n++)B.push({x:Math.random()*BW,y:Math.random()*BH,r:14+Math.random()*46,vx:(Math.random()-.5)*7,vy:-2-Math.random()*7,c:cols[Math.random()*cols.length|0],a:.02+Math.random()*.045,p:Math.random()*6.28,s:.15+Math.random()*.35});
+ let bl=performance.now();
+ (function bt(now){const dt=Math.min(.1,(now-bl)/1000);bl=now;bx.clearRect(0,0,BW,BH);
+  for(const o of B){o.x+=o.vx*dt;o.y+=o.vy*dt;o.p+=o.s*dt;if(o.y<-o.r*1.5){o.y=BH+o.r*1.5;o.x=Math.random()*BW}if(o.x<-o.r*1.5)o.x=BW+o.r;if(o.x>BW+o.r*1.5)o.x=-o.r;
+   const a=o.a*(.65+.35*Math.sin(o.p)),g=bx.createRadialGradient(o.x,o.y,o.r*.55,o.x,o.y,o.r);
+   g.addColorStop(0,`rgba(${o.c},${a*.55})`);g.addColorStop(.85,`rgba(${o.c},${a})`);g.addColorStop(1,`rgba(${o.c},0)`);
+   bx.fillStyle=g;bx.beginPath();bx.arc(o.x,o.y,o.r,0,6.283);bx.fill()}
+  requestAnimationFrame(bt)})(bl)}
+/* optional built-in star background (?bg=1) */
+const sg=$('stars').getContext('2d');const stars=Array.from({length:320},()=>({x:R(0,1920),y:R(0,1080),r:R(.4,1.8),t:R(0,6.28),s:R(.5,2),v:R(2,10)}));
+(function st(now){if(document.body.classList.contains('bg')){sg.clearRect(0,0,1920,1080);for(const s of stars){s.x-=s.v*.016;if(s.x<-3)s.x=1923;sg.globalAlpha=.25+.55*(.5+.5*Math.sin(s.t+now/1000*s.s));sg.fillStyle='#e2d0ff';sg.beginPath();sg.arc(s.x,s.y,s.r,0,6.28);sg.fill()}}requestAnimationFrame(st)})(0);
+</script></body></html>
