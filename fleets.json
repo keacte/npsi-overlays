@@ -1,54 +1,6 @@
 {
- "updated": "2026-11-26T02:58:51.903Z",
+ "updated": "2026-11-27T03:56:42.267Z",
  "fleets": [
-  {
-   "id": 5757,
-   "name": "Slop Fleet, Caldari Faction Warfare",
-   "host": "EVE LinkNet",
-   "fc": "Edmine Codie",
-   "staging": "Oisio",
-   "time": "2026-11-25T02:30:00+00:00",
-   "end": "2026-11-25T04:30:00+00:00",
-   "ended": true,
-   "hostImage": "/providers/2026/10/28/eve-linknet-eff0a25d.webp",
-   "logo": "logos/eve-linknet-eff0a25d.webp"
-  },
-  {
-   "id": 5814,
-   "name": "Rocket Party!",
-   "host": "Spectre Fleet",
-   "fc": "Virion Stoneshard",
-   "staging": "Jita",
-   "time": "2026-11-25T17:00:00+00:00",
-   "end": "2026-11-25T19:00:00+00:00",
-   "ended": true,
-   "hostImage": "/providers/2026/10/28/spectre-fleet-49100b7f.webp",
-   "logo": "logos/spectre-fleet-49100b7f.webp"
-  },
-  {
-   "id": 5817,
-   "name": "Casual Camp then Null Roam? ESS? Who knows!",
-   "host": "Shadow Cartel NPSI",
-   "fc": "Dietcoke650",
-   "staging": "Amamake",
-   "time": "2026-11-25T23:00:00+00:00",
-   "end": "2026-11-26T01:00:00+00:00",
-   "ended": true,
-   "hostImage": "/providers/2026/11/01/shadow-cartel-npsi-aa76ff28.webp",
-   "logo": "logos/shadow-cartel-npsi-aa76ff28.webp"
-  },
-  {
-   "id": 5790,
-   "name": "Wednesday Whaling",
-   "host": "Bombers Bar",
-   "fc": "Lord InsidiousTroll",
-   "staging": "Thera",
-   "time": "2026-11-25T23:50:00+00:00",
-   "end": "2026-11-26T01:50:00+00:00",
-   "ended": true,
-   "hostImage": "/providers/2026/10/28/bombers-bar-fa2ee367.webp",
-   "logo": "logos/bombers-bar-fa2ee367.webp"
-  },
   {
    "id": 5797,
    "name": "K-FLEET: ShrinkWrapped pew pew!",
@@ -57,7 +9,7 @@
    "staging": "Jita",
    "time": "2026-11-26T19:30:00+00:00",
    "end": "2026-11-26T23:30:00+00:00",
-   "ended": false,
+   "ended": true,
    "hostImage": "/providers/2026/10/28/fun-inc-0c6a80c2.webp",
    "logo": "logos/fun-inc-0c6a80c2.webp"
   },
@@ -216,6 +168,30 @@
    "ended": false,
    "hostImage": "/providers/2026/10/28/fun-inc-0c6a80c2.webp",
    "logo": "logos/fun-inc-0c6a80c2.webp"
+  },
+  {
+   "id": 5751,
+   "name": "Broken Daggers Funtime Faction Warfare - T1/Navy Cruisers and below",
+   "host": "EVE LinkNet",
+   "fc": "Broken Daggers",
+   "staging": "Oisio - LinkNet Central Station",
+   "time": "2026-12-04T02:30:00+00:00",
+   "end": "2026-12-04T04:30:00+00:00",
+   "ended": false,
+   "hostImage": "/providers/2026/10/28/eve-linknet-eff0a25d.webp",
+   "logo": "logos/eve-linknet-eff0a25d.webp"
+  },
+  {
+   "id": 5779,
+   "name": "super armada !!! w/haz an odins ",
+   "host": "Bombers Bar",
+   "fc": "hazzzzard haz",
+   "staging": "",
+   "time": "2026-12-04T18:00:00+00:00",
+   "end": "2026-12-04T20:00:00+00:00",
+   "ended": false,
+   "hostImage": "/providers/2026/10/28/bombers-bar-fa2ee367.webp",
+   "logo": "logos/bombers-bar-fa2ee367.webp"
   }
  ]
 }
