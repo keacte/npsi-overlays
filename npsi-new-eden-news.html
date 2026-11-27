@@ -4,7 +4,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 /* OBS Browser Source 1920x1080, transparent (same family as the Starting Soon / BRB / Thanks For Watching screens).
-   Options: ?scene=starting|brb|ending  ?seconds=10  ?minutes=5 (countdown)  ?loc=delve (lock one story)  ?bg=1 (built-in space background) */
+   Options: ?scene=starting|brb|ending  ?seconds=15  ?minutes=5 (countdown)  ?loc=delve (lock one story)  ?bg=1 (built-in space background) */
 :root{--bg:#050308;--steel:#a65cff;--steel-dim:#4b2a80;--text:#f4eeff;--head:'Oxanium','Eurostile','Segoe UI',sans-serif;--purple:#8a3ffc;--violet:#b98bff;--glow:#a35cff;--dim:#2a1747;--white:#f4efff;--red:#ff2a2a;--ac:#a65cff}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;background:transparent;overflow:hidden}
@@ -147,7 +147,7 @@ const stage=document.getElementById('stage');
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1920*s)/2}px,${(innerHeight-1080*s)/2}px) scale(${s})`}
 addEventListener('resize',fit);fit();
 const QS=new URLSearchParams(location.search),$=id=>document.getElementById(id);
-const SECONDS=Math.max(4,+QS.get('seconds')||10);
+const SECONDS=Math.max(4,+QS.get('seconds')||15);
 if(QS.get('bg')==='1')document.body.classList.add('bg');
 const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const R=(a,b)=>a+Math.random()*(b-a);
