@@ -172,11 +172,11 @@ const LOCS=[
   txt:'Roaming pilots are reported on the gates and stations around Tama in the Citadel. Travellers through low security space should scout ahead and avoid undocking into unknown fleets.',
   met:[['THREAT','ELEVATED',1],['REGION','THE CITADEL'],['SECURITY','LOWSEC'],['ADVICE','SCOUT AHEAD']],
   q:'Haulers are advised to use alternative routes where possible.'},
- {id:'thera',name:'THERA ROUTES',reg:'WORMHOLE SPACE',ac:'#4fd6ff',fx:'hole',img:29984,
-  big:'ROUTES',unit:'OPEN AND CLOSING',temp:'ACTIVE',cond:'Wormhole connections shifting around Thera',
-  txt:'Wormhole connections into Thera continue to open and collapse, giving scouts new routes into the known-space regions. Explorers are reminded that mass limits can change without notice.',
-  met:[['CONNECTIONS','SHIFTING'],['REGION','WORMHOLE SPACE'],['RISK','VARIABLE',1],['ADVICE','CHECK MASS']],
-  q:'Scouts are asked to report new connections to local channels.'},
+ {id:'thera',name:'THERA INTEL',reg:'WORMHOLE SPACE',ac:'#4fd6ff',fx:'hole',img:29984,
+  big:'SCANNING',unit:'NEW SIGNATURES',temp:'CAUTION',cond:'New signatures being scanned down daily',
+  txt:'New signatures are being scanned down daily. Check back for more intel soon. There is a risk of small roaming gangs and fleet activity in the system. Act with caution.',
+  met:[['SIGNATURES','SCANNED DAILY'],['SMALL GANGS','RISK',1],['FLEET ACTIVITY','REPORTED',1],['ADVICE','ACT WITH CAUTION']],
+  q:'New signatures are being scanned down daily, check back for more intel soon. Act with caution.'},
  {id:'rens',name:'RENS HARBOUR',reg:'HEIMATAR · EMPIRE',ac:'#ff8a3d',fx:'rust',img:587,
   big:'ARRIVALS',unit:'NEW PILOTS',temp:'WELCOME',cond:'New capsuleers continue to arrive in Heimatar',
   txt:'A steady flow of new capsuleers is arriving in Heimatar, and local corporations are running welcome programmes at Rens. Veterans are encouraged to offer help to those taking their first steps in New Eden.',
@@ -196,7 +196,7 @@ const DAYS=[
  ['DANGER','Gate camps in the Citadel','Scout ahead through Tama.','%'],
  ['INDUSTRY','Mining fleets in KLY-C0','Escorts advised in Pure Blind.','☼']
 ];
-const ALERTS=['BREAKING: TITAN-CLASS SHIPS REPORTED ON GRID IN DELVE','TRAVEL: HEAVY GATE TRAFFIC AROUND JITA, ALLOW EXTRA TIME','EMPIRE: AMARR NAVY HOLDS CEREMONIAL FLEET REVIEW OVER AMARR PRIME','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','EXPLORATION: WORMHOLE CONNECTIONS SHIFTING AROUND THERA','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
+const ALERTS=['BREAKING: TITAN-CLASS SHIPS REPORTED ON GRID IN DELVE','TRAVEL: HEAVY GATE TRAFFIC AROUND JITA, ALLOW EXTRA TIME','EMPIRE: AMARR NAVY HOLDS CEREMONIAL FLEET REVIEW OVER AMARR PRIME','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
 /* clips embedded in this file so they play even when the img folder is missing (same clip as img/jita.webm) */
