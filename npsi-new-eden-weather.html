@@ -13,7 +13,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #bgl{position:absolute;inset:0;display:none;background:radial-gradient(ellipse at 50% 55%,#150a2b 0%,#0a0516 55%,#050308 100%)}
 body.bg #bgl{display:block}
 #stars{position:absolute;inset:0;display:none}body.bg #stars{display:block}
-#bokeh{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none;filter:blur(3px)}
+#bokeh{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none;filter:blur(5px)}
 #fx{position:absolute;inset:0;pointer-events:none;opacity:.85}
 /* badge */
 .feed{position:absolute;right:40px;top:36px;border:1px solid var(--purple);padding:12px 20px;background:rgba(5,3,8,.55);font:600 18px 'Orbitron';letter-spacing:4px;display:flex;gap:18px;justify-content:space-between;align-items:center;z-index:3}
@@ -299,7 +299,7 @@ requestAnimationFrame(loop);
 show(L0>=0?L0:0);if(L0<0)setInterval(()=>show((i+1)%LOCS.length),SECONDS*1000);
 /* bokeh: soft out-of-focus light discs drifting slowly behind the whole scene */
 {const bc=$('bokeh'),bx=bc.getContext('2d'),BW=960,BH=540,cols=['166,92,255','255,90,160','90,170,255','255,200,90','120,255,230'];
- const B=[];for(let n=0;n<34;n++)B.push({x:Math.random()*BW,y:Math.random()*BH,r:14+Math.random()*46,vx:(Math.random()-.5)*7,vy:-2-Math.random()*7,c:cols[Math.random()*cols.length|0],a:.05+Math.random()*.1,p:Math.random()*6.28,s:.15+Math.random()*.35});
+ const B=[];for(let n=0;n<26;n++)B.push({x:Math.random()*BW,y:Math.random()*BH,r:14+Math.random()*46,vx:(Math.random()-.5)*7,vy:-2-Math.random()*7,c:cols[Math.random()*cols.length|0],a:.02+Math.random()*.045,p:Math.random()*6.28,s:.15+Math.random()*.35});
  let bl=performance.now();
  (function bt(now){const dt=Math.min(.1,(now-bl)/1000);bl=now;bx.clearRect(0,0,BW,BH);
   for(const o of B){o.x+=o.vx*dt;o.y+=o.vy*dt;o.p+=o.s*dt;if(o.y<-o.r*1.5){o.y=BH+o.r*1.5;o.x=Math.random()*BW}if(o.x<-o.r*1.5)o.x=BW+o.r;if(o.x>BW+o.r*1.5)o.x=-o.r;
