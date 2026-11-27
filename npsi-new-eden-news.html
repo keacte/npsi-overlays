@@ -162,11 +162,11 @@ const LOCS=[
   txt:'Our reporting from Pochven is currently unavailable. Check back later for updates.',
   met:[['REPORTING','UNAVAILABLE',1],['REGION','POCHVEN']],
   q:'Our reporting from Pochven is currently unavailable, check back later.'},
- {id:'amarr',name:'AMARR PARADE',reg:'DOMAIN · EMPIRE',ac:'#ffc83d',fx:'sun',img:642,
-  big:'IMPERIAL',unit:'NAVY REVIEW',temp:'CEREMONY',cond:'Navy fleet review held over Amarr Prime',
-  txt:'The Amarr Empire has staged a ceremonial fleet review above Amarr Prime, with Imperial Navy battleships passing in formation. Capsuleers were invited to watch from the station docks.',
-  met:[['EVENT','FLEET REVIEW'],['LOCATION','AMARR PRIME'],['ATTENDANCE','CAPSULEERS INVITED'],['SECURITY','HIGHSEC']],
-  q:'The Empire says further reviews will be announced in due course.'},
+ {id:'amarr',name:'AMARR NEW YEAR',reg:'DOMAIN · EMPIRE',ac:'#ffc83d',fx:'sun',img:642,
+  big:'CEREMONY',unit:'AND PARADE',temp:'CEREMONY',cond:'New Year ceremony and parade at Amarr Prime',
+  txt:'Amarr Prime is preparing its New Year ceremony and parade. The estimated arrival time of the Space Pope and his entourage has been updated, so check back for the latest.',
+  met:[['EVENT','NEW YEAR PARADE'],['LOCATION','AMARR PRIME'],['SPACE POPE ETA','UPDATED',1],['ENTOURAGE','ACCOMPANYING']],
+  q:'The Space Pope’s estimated arrival time has been updated, check back for the latest.'},
  {id:'tama',name:'TAMA CAMPS',reg:'THE CITADEL · LOWSEC',ac:'#b98bff',fx:'rain',img:29990,
   big:'GATE CAMPS',unit:'REPORTED',temp:'DANGER',cond:'Roaming gangs reported on the Tama gates',
   txt:'Roaming pilots are reported on the gates and stations around Tama in the Citadel. Travellers through low security space should scout ahead and avoid undocking into unknown fleets.',
@@ -192,11 +192,11 @@ LOCS.forEach(l=>{l.cap=l.reg});
 const DAYS=[
  ['TOP STORY','Titans on grid in Delve','Capital-class engagement reported across the region.','!'],
  ['WARNING','Scammers active in Jita','New double-your-ISK entity operating.','~'],
- ['EMPIRE','Imperial fleet review','Navy battleships pass over Amarr Prime.','Ω'],
+ ['EMPIRE','Amarr New Year parade','Space Pope arrival time updated.','Ω'],
  ['DANGER','Gate camps in the Citadel','Scout ahead through Tama.','%'],
  ['INDUSTRY','Mining fleets in KLY-C0','Escorts advised in Pure Blind.','☼']
 ];
-const ALERTS=['BREAKING: TITAN-CLASS SHIPS REPORTED ON GRID IN DELVE','WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','EMPIRE: AMARR NAVY HOLDS CEREMONIAL FLEET REVIEW OVER AMARR PRIME','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
+const ALERTS=['BREAKING: TITAN-CLASS SHIPS REPORTED ON GRID IN DELVE','WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','AMARR: NEW YEAR CEREMONY AND PARADE, SPACE POPE AND ENTOURAGE ETA UPDATED','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
 /* clips embedded in this file so they play even when the img folder is missing (same clip as img/jita.webm) */
