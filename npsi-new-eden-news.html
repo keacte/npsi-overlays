@@ -15,9 +15,13 @@ body.bg #bgl{display:block}
 #stars{position:absolute;inset:0;display:none}body.bg #stars{display:block}
 /* view from inside the Sisters of EVE station: space + station hull seen through a viewport, interior frame in front */
 #space,#frame,#stn,#dim{position:absolute;left:0;top:0;width:1920px;height:1080px;display:none;pointer-events:none}
-body.win #space,body.win #stn,body.win #dim{display:block}
+body.win #stn,body.win #dim{display:block}
+body.win.space #space{display:block}   /* stars, nebula, planet and sun glare: hidden by default, ?space=1 restores them */
+body.win:not(.space) #bokeh{display:none}
+body:not(.fx) #fx{display:none}   /* drifting particle effects: hidden by default, ?fx=1 restores them */
+body.win:not(.space) #bgl{display:block;background:#050308}
 body.win.frame #frame{display:block}   /* window frame is hidden by default, ?frame=1 brings it back */
-body.win #bgl,body.win #stars{display:none}
+body.win #stars{display:none}
 #stn{filter:brightness(.62) saturate(.8) blur(1.1px);animation:stndrift 70s ease-in-out infinite alternate;transform-origin:30% 75%}
 #stn img{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:fill}
 @keyframes stndrift{from{transform:translate(-14px,6px) scale(1)}to{transform:translate(18px,-8px) scale(1.035)}}
@@ -158,7 +162,7 @@ function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.tr
 addEventListener('resize',fit);fit();
 const QS=new URLSearchParams(location.search),$=id=>document.getElementById(id);
 const SECONDS=Math.max(4,+QS.get('seconds')||15);
-if(QS.get('bg')!=='0')document.body.classList.add('bg','win');if(QS.get('frame')==='1')document.body.classList.add('frame');   /* default: station-window background; ?bg=0 = transparent for OBS compositing */
+if(QS.get('bg')!=='0')document.body.classList.add('bg','win');if(QS.get('frame')==='1')document.body.classList.add('frame');if(QS.get('space')==='1')document.body.classList.add('space');if(QS.get('fx')==='1')document.body.classList.add('fx');   /* default: station-window background; ?bg=0 = transparent for OBS compositing */
 const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const R=(a,b)=>a+Math.random()*(b-a);
 /* ================= EDIT ME – every story is about a real EVE Online place; edit the text freely ================= */
