@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-27T13:36:41.440Z",
+ "updated": "2026-11-27T22:30:09.560Z",
  "fleets": [
   {
    "id": 5797,
@@ -43,9 +43,9 @@
    "host": "Bombers Bar",
    "fc": "moyraine",
    "staging": "",
-   "time": "2026-11-27T18:00:00+00:00",
-   "end": "2026-11-27T20:00:00+00:00",
-   "ended": false,
+   "time": "2026-11-27T19:00:00+00:00",
+   "end": "2026-11-27T21:00:00+00:00",
+   "ended": true,
    "hostImage": "/providers/2026/10/28/bombers-bar-fa2ee367.webp",
    "logo": "logos/bombers-bar-fa2ee367.webp"
   },
