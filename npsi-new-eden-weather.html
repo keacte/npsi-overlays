@@ -61,6 +61,8 @@ body.bg #bgl{display:block}
 #pic .planet{position:absolute;left:50%;top:50%;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--ac),rgba(30,10,60,.9) 70%);opacity:.5}
 #pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;animation:flt 7s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(0,0,0,.8))}
 @keyframes flt{50%{transform:translateY(-8px) scale(1.03)}}
+#pic video.vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 50%}
+#pic .hasvid img,#pic .hasvid .planet{display:none}
 #pic img.shot{object-fit:cover;animation:kb 18s ease-in-out infinite alternate;filter:none}
 @keyframes kb{from{transform:scale(1)}to{transform:scale(1.08) translateX(-1.5%)}}
 #pic .frm:after{content:'';position:absolute;left:0;right:0;height:60px;top:-60px;background:linear-gradient(180deg,transparent,rgba(166,92,255,.22),transparent);animation:scan 4.5s linear infinite}
@@ -217,6 +219,14 @@ function show(k){
   const nm=$('lname');let f=88;nm.style.fontSize=f+'px';while(nm.scrollWidth>820&&f>36){f-=4;nm.style.fontSize=f+'px'}
   $('pic').innerHTML=`<div class="frm"><div class="planet"></div><img alt="" id="pimg"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><div id="cap">${esc(l.cap)}</div></div>
    <div id="qt"><em>FORECASTER’S NOTE</em>${esc(l.q)}</div><div id="credit">EVE ONLINE © CCP GAMES</div>`;
+  /* looping video (img/<id>.mp4 or .webm) takes priority over still images */
+  {const fr=document.querySelector('#pic .frm'),v=document.createElement('video');
+   v.className='vid';v.muted=true;v.defaultMuted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.preload='auto';
+   v.innerHTML=`<source src="img/${l.id}.mp4" type="video/mp4"><source src="img/${l.id}.webm" type="video/webm">`;
+   const bad=()=>{v.remove()};v.querySelectorAll('source').forEach(x=>x.addEventListener('error',()=>{if(![...v.querySelectorAll('source')].some(y=>y.dataset.ok))bad()}));
+   v.addEventListener('error',bad);
+   v.addEventListener('loadeddata',()=>{v.querySelectorAll('source').forEach(x=>x.dataset.ok=1);fr.classList.add('hasvid');v.play().catch(()=>{})});
+   fr.insertBefore(v,fr.firstChild);}
   const im=$('pimg');const chain=[`img/${l.id}.jpg`,SHOTS[l.id],`https://images.evetech.net/types/${l.img}/render?size=512`,`https://images.evetech.net/types/${l.img}/icon?size=512`].filter(Boolean);
   let ci2=0;const tryNext=()=>{if(ci2>=chain.length){im.style.display='none';return}const u=chain[ci2++];const sh=u.startsWith('img/')||u===SHOTS[l.id];im.classList.toggle('shot',sh);$('cap').textContent=sh?`${l.name} · ${l.reg}`:l.cap;im.src=u};im.onerror=tryNext;tryNext();
   fxMode=l.fx;parts.length=0;
