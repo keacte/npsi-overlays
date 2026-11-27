@@ -4617,8 +4617,8 @@ show(L0>=0?L0:0);if(L0<0)setInterval(()=>show((i+1)%LOCS.length),SECONDS*1000);
   for(const [cx,cy,rad,col] of neb){const g=x.createRadialGradient(cx,cy,0,cx,cy,rad);g.addColorStop(0,`rgba(${col})`);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(cx-rad,cy-rad,rad*2,rad*2)}
   for(const s of st){x.globalAlpha=s.a*(.55+.45*Math.sin(s.t+now/1000*s.s));x.fillStyle='#e6dcff';x.beginPath();x.arc(s.x,s.y,s.r,0,6.283);x.fill()}x.globalAlpha=1})(0)}
 /* live 3D station (Sisters of EVE Logistics Station model, optimised and embedded): the two ring sets turn slowly about their axis.
-   ?spin=2 degrees per second (default 2, 0 = stopped).  If WebGL is unavailable the still image stays. */
-{const SPIN=QS.has('spin')?+QS.get('spin'):2;
+   ?spin=1 degrees per second (default 1, 0 = stopped).  If WebGL is unavailable the still image stays. */
+{const SPIN=QS.has('spin')?+QS.get('spin'):1;
  try{const bin=atob(window.__STN_GLB),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);window.__STN_GLB=null;
   const url=URL.createObjectURL(new Blob([u],{type:'model/gltf-binary'}));
   StationLive($('stnLive'),url,{spin:SPIN,onready:()=>{$('stnLive').style.opacity=1;setTimeout(()=>{$('stnA').style.display='none'},1300)},onerror:e=>console.warn('station model failed',e)})}catch(e){console.warn('station live failed',e)}}
