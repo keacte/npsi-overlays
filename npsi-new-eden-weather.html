@@ -13,6 +13,7 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 #bgl{position:absolute;inset:0;display:none;background:radial-gradient(ellipse at 50% 55%,#150a2b 0%,#0a0516 55%,#050308 100%)}
 body.bg #bgl{display:block}
 #stars{position:absolute;inset:0;display:none}body.bg #stars{display:block}
+#bokeh{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none;filter:blur(3px)}
 #fx{position:absolute;inset:0;pointer-events:none;opacity:.85}
 /* badge */
 .feed{position:absolute;right:40px;top:36px;border:1px solid var(--purple);padding:12px 20px;background:rgba(5,3,8,.55);font:600 18px 'Orbitron';letter-spacing:4px;display:flex;gap:18px;justify-content:space-between;align-items:center;z-index:3}
@@ -116,7 +117,7 @@ body.bg #bgl{display:block}
 @keyframes cin{from{opacity:0;transform:translateY(24px)}}
 </style></head><body>
 <div id="stage">
-  <div id="bgl"></div><canvas id="stars" width="1920" height="1080"></canvas><canvas id="fx" width="1920" height="1080"></canvas>
+  <div id="bgl"></div><canvas id="bokeh" width="960" height="540"></canvas><canvas id="stars" width="1920" height="1080"></canvas><canvas id="fx" width="1920" height="1080"></canvas>
   <div id="ttl">NEW <span>EDEN</span> WEATHER<small id="ts">YOUR FORECAST FOR NEW EDEN</small></div>
   <div class="center">
     <div class="rings"><svg viewBox="0 0 760 760"><g fill="none" stroke="#8a3ffc">
@@ -296,6 +297,16 @@ function loop(now){const dt=Math.min(.1,(now-last)/1000);last=now;g.clearRect(0,
   requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 show(L0>=0?L0:0);if(L0<0)setInterval(()=>show((i+1)%LOCS.length),SECONDS*1000);
+/* bokeh: soft out-of-focus light discs drifting slowly behind the whole scene */
+{const bc=$('bokeh'),bx=bc.getContext('2d'),BW=960,BH=540,cols=['166,92,255','255,90,160','90,170,255','255,200,90','120,255,230'];
+ const B=[];for(let n=0;n<34;n++)B.push({x:Math.random()*BW,y:Math.random()*BH,r:14+Math.random()*46,vx:(Math.random()-.5)*7,vy:-2-Math.random()*7,c:cols[Math.random()*cols.length|0],a:.05+Math.random()*.1,p:Math.random()*6.28,s:.15+Math.random()*.35});
+ let bl=performance.now();
+ (function bt(now){const dt=Math.min(.1,(now-bl)/1000);bl=now;bx.clearRect(0,0,BW,BH);
+  for(const o of B){o.x+=o.vx*dt;o.y+=o.vy*dt;o.p+=o.s*dt;if(o.y<-o.r*1.5){o.y=BH+o.r*1.5;o.x=Math.random()*BW}if(o.x<-o.r*1.5)o.x=BW+o.r;if(o.x>BW+o.r*1.5)o.x=-o.r;
+   const a=o.a*(.65+.35*Math.sin(o.p)),g=bx.createRadialGradient(o.x,o.y,o.r*.55,o.x,o.y,o.r);
+   g.addColorStop(0,`rgba(${o.c},${a*.55})`);g.addColorStop(.85,`rgba(${o.c},${a})`);g.addColorStop(1,`rgba(${o.c},0)`);
+   bx.fillStyle=g;bx.beginPath();bx.arc(o.x,o.y,o.r,0,6.283);bx.fill()}
+  requestAnimationFrame(bt)})(bl)}
 /* optional built-in star background (?bg=1) */
 const sg=$('stars').getContext('2d');const stars=Array.from({length:320},()=>({x:R(0,1920),y:R(0,1080),r:R(.4,1.8),t:R(0,6.28),s:R(.5,2),v:R(2,10)}));
 (function st(now){if(document.body.classList.contains('bg')){sg.clearRect(0,0,1920,1080);for(const s of stars){s.x-=s.v*.016;if(s.x<-3)s.x=1923;sg.globalAlpha=.25+.55*(.5+.5*Math.sin(s.t+now/1000*s.s));sg.fillStyle='#e2d0ff';sg.beginPath();sg.arc(s.x,s.y,s.r,0,6.28);sg.fill()}}requestAnimationFrame(st)})(0);
