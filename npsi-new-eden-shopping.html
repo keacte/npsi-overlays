@@ -88,10 +88,10 @@ body.bg #nebbg,body.bg #lite,body.bg #vg{display:block}
 .swap{animation:sw .5s ease-out}@keyframes sw{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 #stn,#dim{position:absolute;left:0;top:0;width:1920px;height:1080px;display:none;pointer-events:none}
 body.bg #stn,body.bg #dim{display:block}
-#stn{filter:brightness(.62) saturate(.8);animation:stndrift 70s ease-in-out infinite alternate;transform-origin:30% 75%}
+#stn{filter:brightness(.8) saturate(.85);animation:stndrift 70s ease-in-out infinite alternate;transform-origin:70% 75%}
 #stn img,#stn canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;object-fit:fill}
 #stn canvas{transition:opacity 1.2s}
-@keyframes stndrift{from{transform:translate(-14px,6px) scale(1)}to{transform:translate(18px,-8px) scale(1.035)}}
+@keyframes stndrift{from{transform:scaleX(-1) translate(-14px,6px) scale(1)}to{transform:scaleX(-1) translate(18px,-8px) scale(1.035)}}
 #dim{background:radial-gradient(ellipse 46% 40% at 50% 52%,rgba(6,3,14,.5),rgba(6,3,14,0) 100%)}
 </style></head><body>
 <div id="stage">
