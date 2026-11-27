@@ -14,6 +14,13 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 body.bg #bgl{display:block}
 #stars{position:absolute;inset:0;display:none}body.bg #stars{display:block}
 #bokeh{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none;filter:blur(5px)}
+#stage:after{content:'';position:absolute;inset:0;border:0 solid #ff1f2f;box-shadow:inset 0 0 0 rgba(255,31,47,0);pointer-events:none;z-index:9;opacity:0}
+body.crit #stage:after{opacity:1;border-width:14px;animation:critflash .9s steps(1) infinite}
+@keyframes critflash{0%{border-color:#ff1f2f;box-shadow:inset 0 0 90px rgba(255,31,47,.55)}50%{border-color:rgba(255,31,47,.08);box-shadow:inset 0 0 20px rgba(255,31,47,.1)}}
+body.crit #pic .frm,body.crit #qt{animation:critbox .9s steps(1) infinite}
+@keyframes critbox{0%{border-color:#ff1f2f;box-shadow:0 0 22px #ff1f2f}50%{border-color:rgba(255,31,47,.15);box-shadow:none}}
+body.crit .center #cin .title{animation:crittxt .9s steps(1) infinite}
+@keyframes crittxt{0%{text-shadow:0 0 30px #ff1f2f,0 0 8px #ff1f2f}50%{text-shadow:0 0 6px rgba(255,31,47,.3)}}
 #fx{position:absolute;inset:0;pointer-events:none;opacity:.85}
 /* badge */
 .feed{position:absolute;right:40px;top:36px;border:1px solid var(--purple);padding:12px 20px;background:rgba(5,3,8,.55);font:600 18px 'Orbitron';letter-spacing:4px;display:flex;gap:18px;justify-content:space-between;align-items:center;z-index:3}
@@ -147,6 +154,11 @@ const R=(a,b)=>a+Math.random()*(b-a);
 /* ================= EDIT ME – every story is about a real EVE Online place; edit the text freely ================= */
 /* img = type ID from CCP's image server (images.evetech.net). fx = calm|rain|sun|rust|storm|hole|cats (drifting rock) */
 const LOCS=[
+ {id:'ahbazon',name:'AHBAZON',reg:'CRITICAL WARNING',ac:'#ff1f2f',fx:'storm',img:587,crit:1,
+  big:'AVOID',unit:'AT ALL COSTS',temp:'CRITICAL',cond:'Critical warning: do not advance through Ahbazon',
+  txt:'Gate camps and pirates are reported in Ahbazon. There is a risk of imminent loss of life for any pilot advancing through the system. Avoid at all costs and find another route.',
+  met:[['GATE CAMPS','POSSIBLE',1],['PIRATES','REPORTED',1],['RISK','LOSS OF LIFE',1],['ADVICE','AVOID AT ALL COSTS']],
+  q:'CRITICAL: Do not advance through Ahbazon. Imminent loss of life.'},
  {id:'jita',name:'JITA SCAMS',reg:'THE FORGE · HIGHSEC',ac:'#a65cff',fx:'calm',img:638,
   big:'SCAMMERS',unit:'ACTIVE IN JITA',temp:'WARNING',cond:'Trade and contract scammers active in Jita',
   txt:'Trade and contract scammers are active in and around Jita. A new double-your-ISK entity is also operating in the area, promising to double any ISK sent. Never send ISK for a promised return. Check contracts carefully.',
@@ -175,11 +187,12 @@ const LOCS=[
 ];
 LOCS.forEach(l=>{l.cap=l.reg});
 const DAYS=[
+ ['CRITICAL','Avoid Ahbazon at all costs','Gate camps and pirates, imminent loss of life.','!'],
  ['WARNING','Scammers active in Jita','New double-your-ISK entity operating.','~'],
  ['EMPIRE','Amarr New Year parade','Space Pope arrival time updated.','Ω'],
  ['DANGER','Gate camps in the Citadel','Scout ahead through Tama.','%']
 ];
-const ALERTS=['WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','AMARR: NEW YEAR CEREMONY AND PARADE, SPACE POPE AND ENTOURAGE ETA UPDATED','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
+const ALERTS=['CRITICAL WARNING: AVOID AHBAZON AT ALL COSTS, POSSIBLE GATE CAMPS AND PIRATES, IMMINENT LOSS OF LIFE IF ADVANCING','WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','AMARR: NEW YEAR CEREMONY AND PARADE, SPACE POPE AND ENTOURAGE ETA UPDATED','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
 /* clips embedded in this file so they play even when the img folder is missing (same clip as img/jita.webm) */
@@ -200,7 +213,7 @@ setInterval(()=>{$('clk').textContent=new Date().toISOString().substr(11,8)+' UT
 const MIN=+QS.get('minutes')||0,T0=Date.now();
 function cdTick(){const left=Math.max(0,MIN*60-Math.round((Date.now()-T0)/1000)),m=String(Math.floor(left/60)).padStart(2,'0'),s=String(left%60).padStart(2,'0'),c=$('count');if(c)c.textContent=`${m}:${s}`}
 function show(k){
-  const l=LOCS[k];i=k;document.documentElement.style.setProperty('--ac',l.ac);
+  const l=LOCS[k];i=k;document.body.classList.toggle('crit',!!l.crit);document.documentElement.style.setProperty('--ac',l.ac);
   document.querySelectorAll('.row').forEach(r=>r.classList.toggle('on',+r.dataset.k===k));
   const c=$('cin');
   c.innerHTML=`<div class="lab"><i></i>TOP STORY</div><div class="title" id="lname" data-t="${esc(l.name)}">${esc(l.name)}</div>
