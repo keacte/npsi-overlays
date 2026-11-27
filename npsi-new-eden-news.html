@@ -239,7 +239,7 @@ function show(k){
   c.classList.remove('sw');void c.offsetWidth;c.classList.add('sw');
   const nm=$('lname');let f=88;nm.style.fontSize=f+'px';while(nm.scrollWidth>820&&f>36){f-=4;nm.style.fontSize=f+'px'}
   $('pic').innerHTML=`<div class="frm"><div class="planet"></div><img alt="" id="pimg"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><div id="cap">${esc(l.cap)}</div></div>
-   <div id="qt"><em>EDITOR’S NOTE</em>${esc(l.q)}</div><div id="credit">EVE ONLINE © CCP GAMES</div>`;
+   <div id="qt"><em>EDITOR’S NOTE</em>${esc(l.q)}</div>`;
   /* subtle camera character: faint grain + rare chromatic-aberration / slice glitches */
   if(!l.nosig){const fr=document.querySelector('#pic .frm');
    const gc=document.createElement('canvas');gc.className='grain';gc.width=160;gc.height=125;fr.appendChild(gc);
