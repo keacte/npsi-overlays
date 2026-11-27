@@ -147,11 +147,6 @@ const R=(a,b)=>a+Math.random()*(b-a);
 /* ================= EDIT ME – every story is about a real EVE Online place; edit the text freely ================= */
 /* img = type ID from CCP's image server (images.evetech.net). fx = calm|rain|sun|rust|storm|hole|cats (drifting rock) */
 const LOCS=[
- {id:'delve',name:'DELVE CLASH',reg:'DELVE · NULLSEC',ac:'#ff5a8a',fx:'calm',img:11567,
-  big:'TITANS',unit:'IN THE FIELD',temp:'BREAKING',cond:'Titan-class hulls reported on grid in Delve',
-  txt:'Capsuleer coalitions are reported to have committed capital and titan-class ships to a large engagement in Delve. Reports are still arriving and the outcome is not yet known.',
-  met:[['STATUS','ONGOING',1],['REGION','DELVE'],['SHIP CLASS','TITAN'],['REPORTS','UNCONFIRMED']],
-  q:'Details are still developing. We will update as confirmed reports arrive.'},
  {id:'jita',name:'JITA SCAMS',reg:'THE FORGE · HIGHSEC',ac:'#a65cff',fx:'calm',img:638,
   big:'SCAMMERS',unit:'ACTIVE IN JITA',temp:'WARNING',cond:'Trade and contract scammers active in Jita',
   txt:'Trade and contract scammers are active in and around Jita. A new double-your-ISK entity is also operating in the area, promising to double any ISK sent. Never send ISK for a promised return. Check contracts carefully.',
@@ -190,13 +185,12 @@ const LOCS=[
 ];
 LOCS.forEach(l=>{l.cap=l.reg});
 const DAYS=[
- ['TOP STORY','Titans on grid in Delve','Capital-class engagement reported across the region.','!'],
  ['WARNING','Scammers active in Jita','New double-your-ISK entity operating.','~'],
  ['EMPIRE','Amarr New Year parade','Space Pope arrival time updated.','Ω'],
  ['DANGER','Gate camps in the Citadel','Scout ahead through Tama.','%'],
  ['INDUSTRY','Mining fleets in KLY-C0','Escorts advised in Pure Blind.','☼']
 ];
-const ALERTS=['BREAKING: TITAN-CLASS SHIPS REPORTED ON GRID IN DELVE','WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','AMARR: NEW YEAR CEREMONY AND PARADE, SPACE POPE AND ENTOURAGE ETA UPDATED','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
+const ALERTS=['WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','AMARR: NEW YEAR CEREMONY AND PARADE, SPACE POPE AND ENTOURAGE ETA UPDATED','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
 /* clips embedded in this file so they play even when the img folder is missing (same clip as img/jita.webm) */
