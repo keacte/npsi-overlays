@@ -63,6 +63,9 @@ body.bg #bgl{display:block}
 @keyframes flt{50%{transform:translateY(-8px) scale(1.03)}}
 #pic video.vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 50%}
 #pic .hasvid img,#pic .hasvid .planet{display:none}
+#pic .frm.nosig{background:#000}#pic .frm.nosig img,#pic .frm.nosig .planet{display:none}
+#pic canvas.stat{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#pic .nsg{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:700 22px Orbitron,sans-serif;letter-spacing:.3em;color:#fff;text-shadow:0 0 12px #000,0 0 4px #000;animation:nsb 1.2s steps(2) infinite}@keyframes nsb{50%{opacity:.35}}
 #pic img.shot{object-fit:cover;animation:kb 18s ease-in-out infinite alternate;filter:none}
 @keyframes kb{from{transform:scale(1)}to{transform:scale(1.08) translateX(-1.5%)}}
 #pic .frm:after{content:'';position:absolute;left:0;right:0;height:60px;top:-60px;background:linear-gradient(180deg,transparent,rgba(166,92,255,.22),transparent);animation:scan 4.5s linear infinite}
@@ -166,10 +169,10 @@ const LOCS=[
   met:[['SOLAR WIND','STRONG',1],['STATIC DISCHARGE','POSSIBLE'],['VISIBILITY','REDUCED'],['CLOUD COVER','60%']],
   q:'Winds are expected to ease overnight.'},
  {id:'pochven',name:'POCHVEN',reg:'TRIGLAVIAN SPACE',ac:'#ff2b3d',fx:'storm',img:2017,
-  big:'STORM',unit:'RED SKIES',temp:'STORM',cond:'Severe storm, red skies',
-  txt:'Persistent storm systems cover Pochven. Skies are red, winds are severe and visibility is poor, with intense electrical activity across every system in the region.',
-  met:[['WINDS','SEVERE',1],['VISIBILITY','POOR',1],['ELECTRICAL ACTIVITY','HIGH',1],['TEMPERATURE','EXTREME']],
-  q:'Conditions are not expected to improve. Reduce speed and keep sensors active.'},
+  nosig:1,big:'STORM',unit:'INTEL OFFLINE',temp:'STORM',cond:'Thermal storms active',
+  txt:'Thermal storms impacting intel channels, check back later.',
+  met:[['THERMAL STORMS','ACTIVE',1],['INTEL CHANNELS','IMPACTED',1]],
+  q:'Thermal storms impacting intel channels, check back later.'},
  {id:'thera',name:'THERA',reg:'WORMHOLE SPACE',ac:'#4fd6ff',fx:'hole',img:30889,
   big:'DEBRIS',unit:'SHATTERED SKY',temp:'DEBRIS',cond:'Shattered planets, drifting debris',
   txt:'The shattered inner planets of Thera scatter rock and dust across the system. Expect a dense debris field, variable visibility and spatial turbulence near the wormholes.',
@@ -227,6 +230,12 @@ function show(k){
   const nm=$('lname');let f=88;nm.style.fontSize=f+'px';while(nm.scrollWidth>820&&f>36){f-=4;nm.style.fontSize=f+'px'}
   $('pic').innerHTML=`<div class="frm"><div class="planet"></div><img alt="" id="pimg"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><div id="cap">${esc(l.cap)}</div></div>
    <div id="qt"><em>FORECASTER’S NOTE</em>${esc(l.q)}</div><div id="credit">EVE ONLINE © CCP GAMES</div>`;
+  if(l.nosig){const fr=document.querySelector('#pic .frm');fr.classList.add('nosig');
+   const cv=document.createElement('canvas');cv.className='stat';cv.width=140;cv.height=110;fr.insertBefore(cv,fr.firstChild);
+   const nsg=document.createElement('div');nsg.className='nsg';nsg.textContent='NO SIGNAL';fr.insertBefore(nsg,cv.nextSibling);
+   const cx=cv.getContext('2d'),im2=cx.createImageData(140,110),d=im2.data;
+   (function tick(){if(!cv.isConnected)return;for(let p=0;p<d.length;p+=4){const v=Math.random()*255*(Math.random()<.5?.55:1)|0;d[p]=d[p+1]=d[p+2]=v;d[p+3]=255}cx.putImageData(im2,0,0);setTimeout(()=>requestAnimationFrame(tick),45)})();
+   fxMode=l.fx;parts.length=0;const u0=$('pg');u0.style.transition='none';u0.style.width='0';void u0.offsetWidth;u0.style.transition=`width ${SECONDS}s linear`;u0.style.width='100%';return}
   /* looping video (img/<id>.mp4 or .webm) takes priority over still images */
   {const fr=document.querySelector('#pic .frm'),v=document.createElement('video');
    v.className='vid';v.muted=true;v.defaultMuted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.preload='auto';
