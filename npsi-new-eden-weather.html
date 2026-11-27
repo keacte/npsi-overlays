@@ -79,6 +79,10 @@ body.bg #bgl{display:block}
 #list h3{font:700 13px 'Orbitron';letter-spacing:5px;color:var(--violet);margin-bottom:2px;display:flex;justify-content:space-between}
 #list h3 span{color:#6f5f93}
 .row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;height:50px;padding:0 14px;border:1px solid var(--dim);border-left:3px solid var(--rc);background:rgba(5,3,8,.6);transition:all .35s}
+.row{position:relative;overflow:hidden}.row b,.row em{position:relative;z-index:2}
+.row .rv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 38%;opacity:.65;z-index:0;transition:opacity .4s}
+.row .rs{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,3,8,.85),rgba(5,3,8,.15) 70%,rgba(5,3,8,.55))}
+.row.on .rv{opacity:1}
 .row.on{background:rgba(166,92,255,.26);border-color:var(--rc);box-shadow:0 0 18px rgba(163,92,255,.4);transform:translateX(-6px)}
 .row b{font:800 20px/1 'Oxanium';letter-spacing:2px;color:#fff;text-transform:uppercase}
 .row em{font:800 15px 'Orbitron';font-style:normal;color:var(--rc);text-shadow:0 0 10px var(--rc);white-space:nowrap}
@@ -193,12 +197,13 @@ const DAYS=[
 const ALERTS=['SOLAR WIND ADVISORY: GUSTY CONDITIONS ACROSS THE CITADEL','STORM WARNING: SEVERE STORM ACTIVITY OVER POCHVEN, VISIBILITY POOR','STORM AND ROCK ADVISORY: GAS GIANT STORM BANDS AND DRIFTING ASTEROIDS IN KLY-C0','DEBRIS ADVISORY: DRIFTING ROCK FRAGMENTS AROUND THE SHATTERED PLANETS OF THERA','ASTEROID FIELD ADVISORY: DENSE FIELDS AND DUST CLOUDS OVER DELVE','UV WARNING: HIGH UV INDEX ACROSS THE DOMAIN','DUST ADVISORY: LIGHT DUST AND OVERCAST SKIES OVER HEIMATAR','CLEAR SKIES CONTINUE ACROSS THE FORGE','STELLAR ACTIVITY: SOLAR FLARE ACTIVITY REMAINS LOW ACROSS NEW EDEN'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
+const VIDEOS=['jita'];   /* locations whose looping clip (img/<id>.mp4) also plays behind their row in the regional list */
 const SHOTS={jita:'https://images.ctfassets.net/7lhcm73ukv5p/1RduTH15RyJtq9Vd4dsU2m/9bb49e45a251fc145c9adc6c2c111562/Screenshot_3840x2160.jpg?w=900&fm=jpg&fl=progressive'};
 /* scene presets: same family as the Starting Soon / BRB / Thanks For Watching screens */
 const SCENES={starting:['STREAM STARTING','THE STREAM BEGINS SHORTLY'],brb:['BE RIGHT BACK','WE WILL BE BACK IN A MOMENT'],ending:['STREAM ENDING','THANK YOU FOR WATCHING'],weather:['LIVE FORECAST','YOUR FORECAST FOR NEW EDEN']};
 const SC=SCENES[QS.get('scene')]||SCENES.weather;$('bt').textContent=SC[0];$('ts').textContent=SC[1];
 let i=0;const locked=QS.get('loc'),L0=LOCS.findIndex(l=>l.id===locked);
-$('list').innerHTML=`<h3>NEW EDEN NOW <span>REGIONAL</span></h3>`+LOCS.map((l,k)=>`<div class="row" data-k="${k}" style="--rc:${l.ac}"><b>${esc(l.name)}</b><em>${esc(l.temp)}</em></div>`).join('');
+$('list').innerHTML=`<h3>NEW EDEN NOW <span>REGIONAL</span></h3>`+LOCS.map((l,k)=>`<div class="row" data-k="${k}" style="--rc:${l.ac}">${VIDEOS.includes(l.id)?`<video class="rv" muted loop autoplay playsinline preload="auto"><source src="img/${l.id}.mp4" type="video/mp4"><source src="img/${l.id}.webm" type="video/webm"></video><span class="rs"></span>`:''}<b>${esc(l.name)}</b><em>${esc(l.temp)}</em></div>`).join('');
 $('cmdbar').innerHTML=DAYS.map((d,k)=>`<div class="c" style="animation-delay:${k*.12}s"><small>${esc(d[0])}</small><b>${esc(d[1])}</b><p>${esc(d[2])}</p></div>`).join('');
 const cs=[...$('cmdbar').children];let ci=0;(function cyc(){cs.forEach((e,k)=>e.classList.toggle('on',k===ci));ci=(ci+1)%cs.length;setTimeout(cyc,2600)})();
 const ar=ALERTS.map(a=>`<span>${esc(a)}</span><span style="color:#8a3ffc;margin:0 26px">◆</span>`).join('');$('rail').innerHTML=ar+ar;
