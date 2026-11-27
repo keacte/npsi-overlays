@@ -171,26 +171,15 @@ const LOCS=[
   big:'SCANNING',unit:'NEW SIGNATURES',temp:'CAUTION',cond:'New signatures being scanned down daily',
   txt:'New signatures are being scanned down daily. Check back for more intel soon. There is a risk of small roaming gangs and fleet activity in the system. Act with caution.',
   met:[['SIGNATURES','SCANNED DAILY'],['SMALL GANGS','RISK',1],['FLEET ACTIVITY','REPORTED',1],['ADVICE','ACT WITH CAUTION']],
-  q:'New signatures are being scanned down daily, check back for more intel soon. Act with caution.'},
- {id:'rens',name:'RENS HARBOUR',reg:'HEIMATAR · EMPIRE',ac:'#ff8a3d',fx:'rust',img:587,
-  big:'ARRIVALS',unit:'NEW PILOTS',temp:'WELCOME',cond:'New capsuleers continue to arrive in Heimatar',
-  txt:'A steady flow of new capsuleers is arriving in Heimatar, and local corporations are running welcome programmes at Rens. Veterans are encouraged to offer help to those taking their first steps in New Eden.',
-  met:[['EVENT','WELCOME PROGRAMME'],['LOCATION','RENS'],['REGION','HEIMATAR'],['SECURITY','HIGHSEC']],
-  q:'Corporations are recruiting and training new pilots.'},
- {id:'klyc0',name:'KLY-C0 MINING',reg:'PURE BLIND · NULLSEC',ac:'#3ddc97',fx:'cats',img:17478,
-  big:'MINERS',unit:'AT WORK',temp:'INDUSTRY',cond:'Mining operations active in KLY-C0',
-  txt:'Mining fleets are working the belts of KLY-C0, which has ten asteroid belts across its eight planets. Escorts are advised, as fleets in null security space are frequent targets.',
-  met:[['ACTIVITY','MINING'],['ASTEROID BELTS','10'],['REGION','PURE BLIND'],['ADVICE','ESCORT FLEETS']],
-  q:'Industrial fleets are advised to keep a scout on the gates.'}
+  q:'New signatures are being scanned down daily, check back for more intel soon. Act with caution.'}
 ];
 LOCS.forEach(l=>{l.cap=l.reg});
 const DAYS=[
  ['WARNING','Scammers active in Jita','New double-your-ISK entity operating.','~'],
  ['EMPIRE','Amarr New Year parade','Space Pope arrival time updated.','Ω'],
- ['DANGER','Gate camps in the Citadel','Scout ahead through Tama.','%'],
- ['INDUSTRY','Mining fleets in KLY-C0','Escorts advised in Pure Blind.','☼']
+ ['DANGER','Gate camps in the Citadel','Scout ahead through Tama.','%']
 ];
-const ALERTS=['WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','AMARR: NEW YEAR CEREMONY AND PARADE, SPACE POPE AND ENTOURAGE ETA UPDATED','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
+const ALERTS=['WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','AMARR: NEW YEAR CEREMONY AND PARADE, SPACE POPE AND ENTOURAGE ETA UPDATED','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
 /* clips embedded in this file so they play even when the img folder is missing (same clip as img/jita.webm) */
