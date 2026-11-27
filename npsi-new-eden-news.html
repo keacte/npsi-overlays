@@ -152,11 +152,11 @@ const LOCS=[
   txt:'Capsuleer coalitions are reported to have committed capital and titan-class ships to a large engagement in Delve. Reports are still arriving and the outcome is not yet known.',
   met:[['STATUS','ONGOING',1],['REGION','DELVE'],['SHIP CLASS','TITAN'],['REPORTS','UNCONFIRMED']],
   q:'Details are still developing. We will update as confirmed reports arrive.'},
- {id:'jita',name:'JITA TRAFFIC',reg:'THE FORGE · HIGHSEC',ac:'#a65cff',fx:'calm',img:638,
-  big:'BUSY',unit:'GATES AND DOCKS',temp:'BUSY',cond:'Heavy capsuleer traffic around Jita IV',
-  txt:'Jump gate and dock traffic around Jita remains heavy, with long queues reported at the Perimeter gate. Pilots are advised to allow extra time for undocking and to watch for smartbombing activity.',
-  met:[['GATE QUEUES','LONG',1],['REGION','THE FORGE'],['SECURITY','HIGHSEC'],['ADVICE','ALLOW EXTRA TIME']],
-  q:'Pilots are advised to travel with caution through the Forge.'},
+ {id:'jita',name:'JITA SCAMS',reg:'THE FORGE · HIGHSEC',ac:'#a65cff',fx:'calm',img:638,
+  big:'SCAMMERS',unit:'ACTIVE IN JITA',temp:'WARNING',cond:'Trade and contract scammers active in Jita',
+  txt:'Trade and contract scammers are active in and around Jita. A new double-your-ISK entity is also operating in the area, promising to double any ISK sent. Never send ISK for a promised return. Check contracts carefully.',
+  met:[['TRADE SCAMS','REPORTED',1],['CONTRACT SCAMS','REPORTED',1],['DOUBLE YOUR ISK','NEW ENTITY',1],['ADVICE','CHECK CONTRACTS']],
+  q:'If an offer sounds too good to be true, it is. Never send ISK to double it.'},
  {id:'pochven',name:'POCHVEN WATCH',reg:'TRIGLAVIAN SPACE',ac:'#ff2b3d',fx:'storm',img:2017,
   nosig:1,big:'OFFLINE',unit:'INTEL CHANNELS',temp:'OFFLINE',cond:'Reporting from Pochven is currently unavailable',
   txt:'Our reporting from Pochven is currently unavailable. Check back later for updates.',
@@ -191,12 +191,12 @@ const LOCS=[
 LOCS.forEach(l=>{l.cap=l.reg});
 const DAYS=[
  ['TOP STORY','Titans on grid in Delve','Capital-class engagement reported across the region.','!'],
- ['TRAVEL','Heavy traffic at Jita','Allow extra time at the Perimeter gate.','~'],
+ ['WARNING','Scammers active in Jita','New double-your-ISK entity operating.','~'],
  ['EMPIRE','Imperial fleet review','Navy battleships pass over Amarr Prime.','Ω'],
  ['DANGER','Gate camps in the Citadel','Scout ahead through Tama.','%'],
  ['INDUSTRY','Mining fleets in KLY-C0','Escorts advised in Pure Blind.','☼']
 ];
-const ALERTS=['BREAKING: TITAN-CLASS SHIPS REPORTED ON GRID IN DELVE','TRAVEL: HEAVY GATE TRAFFIC AROUND JITA, ALLOW EXTRA TIME','EMPIRE: AMARR NAVY HOLDS CEREMONIAL FLEET REVIEW OVER AMARR PRIME','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
+const ALERTS=['BREAKING: TITAN-CLASS SHIPS REPORTED ON GRID IN DELVE','WARNING: TRADE AND CONTRACT SCAMMERS ACTIVE IN JITA, NEW DOUBLE-YOUR-ISK ENTITY OPERATING IN THE AREA','EMPIRE: AMARR NAVY HOLDS CEREMONIAL FLEET REVIEW OVER AMARR PRIME','DANGER: ROAMING GANGS REPORTED ON THE TAMA GATES','THERA: NEW SIGNATURES BEING SCANNED DAILY, SMALL GANGS AND FLEET ACTIVITY REPORTED, ACT WITH CAUTION','NEW PILOTS: WELCOME PROGRAMMES UNDER WAY IN RENS','INDUSTRY: MINING FLEETS ACTIVE IN KLY-C0, ESCORTS ADVISED','POCHVEN: REPORTING CURRENTLY UNAVAILABLE, CHECK BACK LATER'];
 /* IN-GAME PHOTOS. Order tried: img/<id>.jpg (your own screenshot, put it next to this file) -> SHOTS[id] (official CCP image) -> CCP ship/planet render.
    Add your own with F12 in game, save as img/jita.jpg, img/tama.jpg ... (16:9 or 4:3 both fine). */
 /* clips embedded in this file so they play even when the img folder is missing (same clip as img/jita.webm) */
